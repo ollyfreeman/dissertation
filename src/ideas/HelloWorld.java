@@ -1,4 +1,4 @@
-package main;
+package ideas;
 
 public class HelloWorld {
 	public static void main(String[] args) {
