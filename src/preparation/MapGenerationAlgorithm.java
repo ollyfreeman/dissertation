@@ -1,10 +1,10 @@
-package ideas;
+package preparation;
 
 public class MapGenerationAlgorithm {
 	
-	private static final int size = 20;
-	private static final int coverage = 100;
-	private static final int clusterWeight = 100;
+	private static final int size = 30;
+	private static final int coverage = 200;
+	private static final int clusterWeight = 00;
 	private static int potentialCount = size*size;
 	private static int[] map = new int[size*size];
 	
