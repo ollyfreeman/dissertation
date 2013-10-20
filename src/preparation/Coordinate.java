@@ -1,10 +1,11 @@
 package preparation;
 
-public class Location {
+public class Coordinate {		//should this be refactored to Coordinate?
+	
 	private int x;
 	private int y;
 	
-	public Location(int x, int y) {
+	public Coordinate(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}

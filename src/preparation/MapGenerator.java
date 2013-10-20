@@ -1,17 +1,19 @@
 package preparation;
 
-//this class is in some dire need of some design patterns
+//this class is in some dire need of some design patterns (or is it?)
+
+//should I be using Location objects (or subclasses thereof to deal with potential fields)? Should I export the map as Location[][]? Probably
 
 public class MapGenerator {
 
-	private static char[][] map;					
+	private static int[][] map;					//is this suitably efficient?			
 	private static int totalPotential = 0; 		//this is a sum of the potential scores on the entire map (initialised with 1 each)
 	
 	/* 
 	 * Core method, calls all the others (which are private)
 	 * Makes a blank map, then keeps adding new blocks until you have reached the coveragePercentage
 	 */
-	public static void generateMap (int width, int height, int coveragePercentage, int clusteringScore) {
+	public static Map generateMap (int width, int height, int coveragePercentage, int clusteringScore) {
 		int totalSize = width*height;
 		map = makeBlankMap(width, height);
 		
@@ -21,21 +23,20 @@ public class MapGenerator {
 		//loop until we have as many blocks as the coverage indicated
 		while(coverageCounter < coverage) {
 			int locationInPotential = newLocationInPotentialSpace();			//this is the location within the potential space of the new block
-			Location location = findLocation(locationInPotential, width, height);//this is the location in the spatial space of the  of the new block
+			Coordinate coordinate = calculateCoordinate(locationInPotential, width, height);//this is the location (coordinate) in the spatial space of the  of the new block
 
-			updatePotentialField(location, width, height, clusteringScore);		//updates the potential field of the map
+			updatePotentialField(coordinate, width, height, clusteringScore);		//updates the potential field of the map
 			
 			coverageCounter++;
 		}
 		
 		removeStartAndEnd(width, height);		// makes sure that the start and the end are unblocked
 		
-		printMap(width, height);
-
+		return new Map(map);
 	}
 
-	private static char[][] makeBlankMap(int width, int height) {
-		char[][] map = new char[width][height];
+	private static int[][] makeBlankMap(int width, int height) {
+		int[][] map = new int[width][height];
 		for(int i=0; i < width; i++) {
 			for(int j=0; j < height; j++) {
 				map[i][j] = 1;
@@ -50,7 +51,7 @@ public class MapGenerator {
 		return (int) Math.floor(Math.random()*totalPotential);
 	}
 
-	private static Location findLocation(int locationInPotential, int width, int height) {
+	private static Coordinate calculateCoordinate(int locationInPotential, int width, int height) {
 		
 		int potentialCounter = map[0][0];
 
@@ -65,12 +66,12 @@ public class MapGenerator {
 			}
 			potentialCounter += map[xCounter][yCounter];
 		}
-		return new Location(xCounter,yCounter);
+		return new Coordinate(xCounter,yCounter);
 	}
 
-	private static void updatePotentialField(Location location, int width, int height, int clusteringScore) {
-		int x = location.getX();
-		int y = location.getY();
+	private static void updatePotentialField(Coordinate coordinate, int width, int height, int clusteringScore) {
+		int x = coordinate.getX();
+		int y = coordinate.getY();
 		if(map[x][y] != 0){					//if the cell is not already blocked
 			totalPotential -= map[x][y];		//set the potential of the blocked cell to zero and reduce the total accordingly
 			map[x][y] = 0;
@@ -85,13 +86,13 @@ public class MapGenerator {
 			 * require a new data structure or something and it's October so CBA
 			 */
 			
-			Location[] adjacentRelativeLocations = {new Location(0,-1), new Location(-1,0), new Location(1,0), new Location(0,1)}; // i.e. {above,left,right,below}
-			for(int i=0; i<adjacentRelativeLocations.length; i++) {
+			Coordinate[] adjacentRelativeCoordinates = {new Coordinate(0,-1), new Coordinate(-1,0), new Coordinate(1,0), new Coordinate(0,1)}; // i.e. {above,left,right,below}
+			for(int i=0; i<adjacentRelativeCoordinates.length; i++) {
 				try {
-					int relativeXLocation = adjacentRelativeLocations[i].getX();
-					int relativeYLocation = adjacentRelativeLocations[i].getY();
-					if(map[x + relativeXLocation][y + relativeYLocation] !=0) { //if the adjacent location doesn't contain a blocked cell
-						map[x + relativeXLocation][y + relativeYLocation] += (2*clusteringScore);
+					int relativeXCoordinate = adjacentRelativeCoordinates[i].getX();
+					int relativeYCoordinate = adjacentRelativeCoordinates[i].getY();
+					if(map[x + relativeXCoordinate][y + relativeYCoordinate] !=0) { //if the adjacent location doesn't contain a blocked cell
+						map[x + relativeXCoordinate][y + relativeYCoordinate] += (2*clusteringScore);
 						totalPotential += (2*clusteringScore);
 					}
 				} catch (ArrayIndexOutOfBoundsException e) {
@@ -99,13 +100,13 @@ public class MapGenerator {
 				}
 			}
 			
-			Location[] diagonalRelativeLocations = {new Location(-1,-1), new Location(-1,1), new Location(1,-1), new Location(1,1)}; // i.e. {above-left,above-right,below-left,below-right}
-			for(int i=0; i<diagonalRelativeLocations.length; i++) {
+			Coordinate[] diagonalRelativeCoordinates = {new Coordinate(-1,-1), new Coordinate(-1,1), new Coordinate(1,-1), new Coordinate(1,1)}; // i.e. {above-left,above-right,below-left,below-right}
+			for(int i=0; i<diagonalRelativeCoordinates.length; i++) {
 				try {
-					int relativeXLocation = diagonalRelativeLocations[i].getX();
-					int relativeYLocation = diagonalRelativeLocations[i].getY();
-					if(map[x + relativeXLocation][y + relativeYLocation] !=0) { //if the adjacent location doesn't contain a blocked cell
-						map[x + relativeXLocation][y + relativeYLocation] += clusteringScore;
+					int relativeXCoordinate = diagonalRelativeCoordinates[i].getX();
+					int relativeYCoordinate = diagonalRelativeCoordinates[i].getY();
+					if(map[x + relativeXCoordinate][y + relativeYCoordinate] !=0) { //if the adjacent location doesn't contain a blocked cell
+						map[x + relativeXCoordinate][y + relativeYCoordinate] += clusteringScore;
 						totalPotential += clusteringScore;
 					}
 				} catch (ArrayIndexOutOfBoundsException e) {
@@ -123,22 +124,9 @@ public class MapGenerator {
 		map[0][0] = 1;
 		map[width-1][height-1] = 1;
 	}
-
-	private static void printMap(int width, int height) {
-		for(int y=0;y<height; y++) {
-			for(int x=0; x<width; x++) {
-				if(map[x][y] == 0) {
-					System.out.print("X ");
-				} else {
-					System.out.print("- ");
-				}
-			}
-			System.out.print("\n");
-		}
-	}
 	
 	public static void main(String[] args) {
-		generateMap (40, 40, 30, 50);
+		generateMap (60, 40, 28, 35);
 	}
 	
 }

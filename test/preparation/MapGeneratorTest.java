@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class MapGenerationTest {
+public class MapGeneratorTest {
 	
 	@BeforeClass
 	  public static void testSetup() {
