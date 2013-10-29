@@ -6,12 +6,12 @@ public class Test {
 		Map map = MapGenerator.generateMap(40, 40, 20, 100);
 		
 		Graph graph = GraphGenerator.generateGraph(map);
-		Node n = AStarAlgorithm.getPath(graph);
+		Node n = AStarAlgorithm_v2.getPath(graph);
 		
 		while(n != null) {
 			Cell cell = map.getCell(n.getX(), n.getY());
 			cell.setPath();
-			n = n.getPrevious();
+			n = n.getParent();
 		}
 		map.printMap();
 	}

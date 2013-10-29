@@ -43,7 +43,7 @@ public class AStarAlgorithm {
 					 * with uninitialised g values (i.e. always 0) and this seemed to work at equvialent
 					 * speed or maybe quicker than what I have now! How? Were the results sub-optimal?!
 					 */ 
-					neighbour.setPrevious(current);
+					neighbour.setParent(current);
 					neighbour.setG(gScore);
 					neighbour.setF(fScore);
 					if(!openSet.contains(neighbour)) {

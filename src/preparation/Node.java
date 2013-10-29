@@ -9,12 +9,15 @@ public class Node implements Comparable {
 	private final Coordinate coordinate;
 	
 	private double f;
-	private double g = Double.POSITIVE_INFINITY;
+	private double g;
 	private Node parent;
 	
 	public Node(Coordinate coordinate) {
 		successors = new LinkedList<Node>();		//is this the best implementation?
 		this.coordinate = coordinate;
+		parent = null;
+		g = Double.POSITIVE_INFINITY;
+		//f = Double.POSITIVE_INFINITY;	dont't NEED to initialize this because it gets set before it ever gets tested (in A* at least)
 	}
 
 	public void addSuccessor(Node node) {
@@ -53,11 +56,11 @@ public class Node implements Comparable {
 		this.g = g;
 	}
 
-	public Node getPrevious() {
+	public Node getParent() {
 		return parent;
 	}
 
-	public void setPrevious(Node previous) {
+	public void setParent(Node previous) {
 		this.parent = previous;
 	}
 	
