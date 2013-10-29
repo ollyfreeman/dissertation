@@ -42,13 +42,16 @@ public class Map {
 		for(int y=0;y < map[0].length; y++) {
 			for(int x=0; x < map.length; x++) {
 				if(map[x][y].isBlocked()) {
-					System.out.print("X ");
-				} else {
 					System.out.print("- ");
+				} else if(map[x][y].isPath()){
+					System.out.print("o ");
+				} else {
+					System.out.print("  ");
 				}
 			}
 			System.out.print("\n");
 		}
+		System.out.println();
 	}
 
 }

@@ -1,5 +1,11 @@
 package preparation;
 
+/*
+ * can make this much more efficient by only ever setting neighbours to left, bottom left and below
+ * as long as you also set them to point back to you at the same time (kinda taking inspiration from
+ * dynamic programming), as long as you sweep left to right, then down a column, then left to right etc
+ */
+
 //this class is in some dire need of some design patterns (or is it?)
 
 //should I be using Location objects (or subclasses thereof to deal with potential fields)? Should I export the map as Location[][]? Probably
