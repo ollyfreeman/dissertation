@@ -75,11 +75,11 @@ public class Node implements Comparable {
 				}
 			}
 		//}
-		System.out.print("Successors of ("+x+","+y+"): ");
+		/*System.out.print("Successors of ("+x+","+y+"): ");
 		for(Node n : successors) {
 			System.out.print("(" + n.getX() + "," + n.getY() + ")");
 		}
-		System.out.print("... :( ...");
+		System.out.print("... :( ...");*/
 		return null;
 	}
 	
