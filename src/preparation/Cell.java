@@ -32,8 +32,8 @@ public class Cell {
 		return isPath;
 	}
 
-	public void setPath() {
-		this.isPath = true;
+	public void setPath(boolean b) {
+		this.isPath = b;
 	}
 	
 	

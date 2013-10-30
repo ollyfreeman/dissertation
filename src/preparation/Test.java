@@ -6,12 +6,29 @@ public class Test {
 		Map map = MapGenerator.generateMap(40, 40, 20, 100);
 		
 		Graph graph = GraphGenerator.generateGraph(map);
-		Node n = AStarAlgorithm_v2.getPath(graph);
-		
+		Node n,goal,n2,n3;
+		n=goal=n2=n3= AStarAlgorithm_v2.getPath(graph);
+
 		while(n != null) {
 			Cell cell = map.getCell(n.getX(), n.getY());
-			cell.setPath();
+			cell.setPath(true);
 			n = n.getParent();
+		}
+		map.printMap();
+		
+		System.out.println("---------");
+		
+		AStarSmoothing.smoothe(graph.getHead(), goal);
+		for(int y=0;y < 40; y++) {
+			for(int x=0; x < 40; x++) {
+				Cell cell = map.getCell(x, y);
+				cell.setPath(false);
+			}
+		}
+		while(n3 != null) {
+			Cell cell = map.getCell(n3.getX(), n3.getY());
+			cell.setPath(true);
+			n3 = n3.getParent();
 		}
 		map.printMap();
 	}

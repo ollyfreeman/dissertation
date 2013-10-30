@@ -64,6 +64,25 @@ public class Node implements Comparable {
 		this.parent = previous;
 	}
 	
+	//for VisibilityTest stuff with Bresenham
+	public Node getReachable(int x, int y) { //should this be Coordinate object?
+		/*if((!(parent == null)) && (parent.getX() == x) && (parent.getY() == y)) {
+			return parent;
+		} else {*/
+			for(Node n : successors) {
+				if((n.getCoordinate().getX() == x) && (n.getCoordinate().getY() == y)) {
+					return n;
+				}
+			}
+		//}
+		System.out.print("Successors of ("+x+","+y+"): ");
+		for(Node n : successors) {
+			System.out.print("(" + n.getX() + "," + n.getY() + ")");
+		}
+		System.out.print("... :( ...");
+		return null;
+	}
+	
 	@Override
 	//comparable by f score
 	public int compareTo(Object other) {

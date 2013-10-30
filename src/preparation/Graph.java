@@ -26,5 +26,15 @@ public class Graph {
 	public Node getGoal() {
 		return goal;
 	}
+	
+	//FOR TESTING BRESENHAM PURPOSES ONLY
+	public Node get2010() {
+		for(Node n: graph) {
+			if((n.getCoordinate().getX() == 20) && (n.getCoordinate().getY() == 10)) {
+				return n;
+			}
+		}
+		return null;
+	}
 
 }

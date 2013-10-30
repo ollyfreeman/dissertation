@@ -2,7 +2,7 @@ package preparation;
 
 public class Map {
 	
-	private Cell[][] map;
+	public Cell[][] map; //will be made private! for testing only!!
 	
 	/*
 	 * not convinced I should have this code in the constructor. I'd rather do like what I did for
