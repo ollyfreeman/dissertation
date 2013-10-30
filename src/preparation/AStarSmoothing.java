@@ -5,7 +5,7 @@ public class AStarSmoothing {
 	public static void smoothe(Node start, Node goal) { //i.e. start of path and goal of path, but we go in reverse so we start at the goal!
 		Node current = goal;
 		Node target = current.getParent().getParent();
-		while(target != start) {
+		while(target != null) {
 			System.out.print("Current at: " + current.getX() + "," + current.getY());
 			System.out.print(". Target at: " + target.getX() + "," + target.getY());
 			System.out.print("\n");
