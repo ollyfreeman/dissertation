@@ -1,6 +1,6 @@
 package preparation;
 
-public class Coordinate {		//should this be refactored to Coordinate?
+public class Coordinate {		//THERE IS A JAVA CLASS POINT FOR THIS!
 	
 	private int x;
 	private int y;
@@ -24,8 +24,5 @@ public class Coordinate {		//should this be refactored to Coordinate?
 
 	public void setY(int y) {
 		this.y = y;
-	}
-	
-	
-
+	}	
 }

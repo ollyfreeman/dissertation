@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Node implements Comparable {
 
-	private List<Node> successors;
+	private List<Node> neighbours;
 	private final Coordinate coordinate;
 	
 	private double f;
@@ -13,19 +13,19 @@ public class Node implements Comparable {
 	private Node parent;
 	
 	public Node(Coordinate coordinate) {
-		successors = new LinkedList<Node>();		//is this the best implementation?
+		neighbours = new LinkedList<Node>();		//is this the best implementation?
 		this.coordinate = coordinate;
 		parent = null;
 		g = Double.POSITIVE_INFINITY;
-		//f = Double.POSITIVE_INFINITY;	dont't NEED to initialize this because it gets set before it ever gets tested (in A* at least)
+		f = Double.POSITIVE_INFINITY;	//does NEED to be initialised because it's used to sort the priority queue
 	}
 
-	public void addSuccessor(Node node) {
-		successors.add(node);
+	public void addNeighbour(Node node) {
+		neighbours.add(node);
 	}
 	
-	public List<Node> getSuccessors() {
-		return successors;
+	public List<Node> getNeighbours() {
+		return neighbours;
 	}
 	
 	public Coordinate getCoordinate() {
@@ -69,7 +69,7 @@ public class Node implements Comparable {
 		/*if((!(parent == null)) && (parent.getX() == x) && (parent.getY() == y)) {
 			return parent;
 		} else {*/
-			for(Node n : successors) {
+			for(Node n : neighbours) {
 				if((n.getCoordinate().getX() == x) && (n.getCoordinate().getY() == y)) {
 					return n;
 				}
@@ -102,8 +102,8 @@ public class Node implements Comparable {
 	
 	public String toString() {
 		String s ="Coordinate: (" + coordinate.getX() +"," + coordinate.getY() + ")";
-		s+= ", Successors: ";
-		for(Node n : successors) {
+		s+= ", Neighbours: ";
+		for(Node n : neighbours) {
 			s+= n.coordinateAsString() + " ";
 		}
 		return s;

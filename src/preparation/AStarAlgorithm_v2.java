@@ -24,7 +24,7 @@ public class AStarAlgorithm_v2 {
 				return goal;
 			}
 			closedSet.add(current);
-			for(Node neighbour : current.getSuccessors()) {
+			for(Node neighbour : current.getNeighbours()) {
 				//double gScore = current.getG() + getDistance(current, neighbour);
 				//double fScore = gScore + getDistance(neighbour,goal);
 				if(!closedSet.contains(neighbour)) {// && fScore >= neighbour.getF()) { 

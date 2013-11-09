@@ -90,6 +90,9 @@ public class MapGenerator {
 			 * 
 			 * Also I've been really lazy and just copy and pasted code for readability and ease. May clean this up later but it would
 			 * require a new data structure or something and it's October so CBA
+			 * 
+			 * In dissertation, I could compare this to Power Laws in graphs (see PoC) as opposed to
+			 * potential fields?
 			 */
 			
 			Coordinate[] adjacentRelativeCoordinates = {new Coordinate(0,-1), new Coordinate(-1,0), new Coordinate(1,0), new Coordinate(0,1)}; // i.e. {above,left,right,below}

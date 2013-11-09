@@ -4,7 +4,7 @@ public class Cell {
 	
 	private final Coordinate coordinate;
 	private final boolean isBlocked;
-	private boolean isPath = false; //
+	private boolean isPath = false; //NOT GOING TO DO THIS IN THE FINAL VERSION
 
 	public Cell(Coordinate coordinate, boolean blocked) {
 		super();
@@ -35,7 +35,4 @@ public class Cell {
 	public void setPath(boolean b) {
 		this.isPath = b;
 	}
-	
-	
-
 }

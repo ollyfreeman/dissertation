@@ -39,7 +39,7 @@ public class GraphGenerator {
 						try {
 							Node neighbour = graphArray2D[i + adjacentRelativeCoordinates[k].getX()][j + adjacentRelativeCoordinates[k].getY()];
 							if(neighbour != null) {
-								graphArray2D[i][j].addSuccessor(neighbour);
+								graphArray2D[i][j].addNeighbour(neighbour);
 								//System.out.println(neighbour.coordinateAsString() + " added to " + graphArray2D[i][j].coordinateAsString());
 							}
 						} catch (ArrayIndexOutOfBoundsException e) {
@@ -100,7 +100,7 @@ public class GraphGenerator {
 						try {
 							Node neighbour = graphArray2D[i + adjacentRelativeCoordinates[k].getX()][j + adjacentRelativeCoordinates[k].getY()];
 							if(neighbour != null) {
-								graphArray2D[i][j].addSuccessor(neighbour);
+								graphArray2D[i][j].addNeighbour(neighbour);
 								//System.out.println(neighbour.coordinateAsString() + " added to " + graphArray2D[i][j].coordinateAsString());
 							} else {
 								diagonalRelativeCoordinates[k] = null;
@@ -115,7 +115,7 @@ public class GraphGenerator {
 							if(diagonalRelativeCoordinates[k] != null) {
 								Node neighbour = graphArray2D[i + diagonalRelativeCoordinates[k].getX()][j + diagonalRelativeCoordinates[k].getY()];
 								if(neighbour != null) {
-									graphArray2D[i][j].addSuccessor(neighbour);
+									graphArray2D[i][j].addNeighbour(neighbour);
 									//System.out.println(neighbour.coordinateAsString() + " added to " + graphArray2D[i][j].coordinateAsString());
 								}
 							}
@@ -124,7 +124,6 @@ public class GraphGenerator {
 						}
 					}
 				}
-				
 			}
 		}
 

@@ -26,7 +26,7 @@ public class ThetaStarAlgorithm {
 				return goal;
 			}
 			closedSet.add(current);
-			for(Node neighbour : current.getSuccessors()) {
+			for(Node neighbour : current.getNeighbours()) {
 				if(!closedSet.contains(neighbour)) {
 					if (updateCost(current, neighbour, goal)) {
 						if(!openSet.contains(neighbour)) {
