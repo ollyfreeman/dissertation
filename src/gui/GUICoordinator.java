@@ -24,7 +24,7 @@ public class GUICoordinator {
 		drawingPanel = new DrawingPanel(800,800);
 		mapCreationPanel = new MapCreationPanel(engine,this);
 		algorithmPanel = new AlgorithmPanel(engine);
-		window = new Window(engine, this, drawingPanel, mapCreationPanel, algorithmPanel);
+		window = new Window(engine, drawingPanel, mapCreationPanel, algorithmPanel);
 		drawingPanel.setWindow(window);
 		window.setVisible(true);
 	}

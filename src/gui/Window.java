@@ -11,15 +11,13 @@ import javax.swing.JFrame;
 
 public class Window extends JFrame {
 	
-	private static final long serialVersionUID = 1L;
-	
-	private GUICoordinator coordinator;
+	private static final long serialVersionUID = 1L; 
 	
 	private final int width = 1500;
 	private final int height = 900;
 	
-	public Window(Engine engine, GUICoordinator coordinator, DrawingPanel drawingPanel, MapCreationPanel mapCreationPanel, AlgorithmPanel algorithmPanel) {
-		super("Algorithm Visualiser");
+	public Window(Engine engine, DrawingPanel drawingPanel, MapCreationPanel mapCreationPanel, AlgorithmPanel algorithmPanel) {
+		super("Algorithm Visualiser");	
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(width, height);
 		this.setLayout(new GridBagLayout());

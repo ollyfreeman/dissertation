@@ -2,58 +2,83 @@ package engine;
 
 import engine.graph.*;
 import data.AlgorithmType;
+import javax.vecmath.Vector2d;
 
+/*
+ * Objects of this class contain all of the data relevant to a single running of
+ * an algorithm over a map. The graph is a copy made purely for this algorithm on 
+ * its associated map.
+ */
 public class AlgorithmData {
 	
 	private final AlgorithmType algorithmType;
 	private final Graph graph;
 	private final Node goalNode;
 	
-	private double distance;	//these 3 are all redundant, in that they could be derived from the graph, but would be silly to not keep them here
-	private double angle;
+	/*
+	 * these 3 are all redundant (i.e. can be calculated from the Graph and Node),
+	 * but certainly worth being cached
+	 */
+	private final double distance;
+	private final double angle;
 	private final double time;
 	
 	public AlgorithmData(AlgorithmType algorithmType, Graph graph) {
-		super();
 		this.algorithmType = algorithmType;
 		this.graph = graph;
+		
+		//I have all of this in the constructor as a lot of the instance variables are final
+		/*
+		 * Do the algorithm to get the goal node and the time
+		 */
 		double startTime, endTime;
-		if(algorithmType.equals(AlgorithmType.AStar)) {
+		switch (algorithmType) {
+		case AStar:
 			startTime = System.nanoTime();
 			goalNode = AStarAlgorithm.getPath(graph);
-			endTime = System.nanoTime();
-			
-		} else if(algorithmType.equals(AlgorithmType.AStarSmoothed)) {
+			endTime = System.nanoTime();	
+			break;
+		case AStarSmoothed:
 			startTime = System.nanoTime();
 			goalNode = AStarAlgorithm.getPath(graph);
 			AStarSmoothed.smoothe(graph.getHead(), goalNode);
 			endTime = System.nanoTime();
-		} else if(algorithmType.equals(AlgorithmType.ThetaStar)) {
+			break;
+		case ThetaStar:
 			startTime = System.nanoTime();
 			goalNode = ThetaStarAlgorithm.getPath(graph);
 			endTime = System.nanoTime();
-		} else { //need to fill the else clauses properly
+			break;
+		default:
+			//TODO for the further algorithms
 			startTime =  0.0;
 			endTime = 0.0;
 			goalNode = null;
 			System.out.println("Oops");
 		}
 		time = (endTime - startTime)/1000000;
+		
+		/*
+		 * calculate the distance and angle by tracing back through path from goal to source
+		 */
 		Node n = goalNode;
+		double distanceAccumulator = 0.0;
+		double angleAccumulator = 0.0;
 		while(n != null) {
 			try {
-				distance+=getDistance(n,n.getParent());
+				distanceAccumulator+=getDistance(n,n.getParent());
 			} catch (NullPointerException e) {
 				//when we get to the final (source) node
 			}
 			try {
-				angle += getAngle(n);
+				angleAccumulator += getAngle(n);
 			}catch (NullPointerException e) {
 				//when we get to the penultimate node
 			}
 			n = n.getParent();
 		}
-		
+		this.distance = distanceAccumulator;
+		this.angle = angleAccumulator;
 	}
 	
 	public AlgorithmType getAlgorithmType() {
@@ -80,23 +105,25 @@ public class AlgorithmData {
 		return time;
 	}
 	
+	/*
+	 * helper method - gets Euclidean distance between 2 nodes
+	 */
 	private double getDistance(Node n1, Node n2) {
 		double xDiff = n1.getX() - n2.getX();
 		double yDiff = n1.getY() - n2.getY();
 		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
 	}
 	
+	/*
+	 * helper method - implemented dot product myself in 'preparation.TestAlgorithms'
+	 * but have used a library here
+	 */
 	private double getAngle(Node n) {
 		Node p = n.getParent();
 		Node pp = p.getParent();
-		double dotProduct = (p.getX()-n.getX())*(pp.getX()-p.getX()) + (p.getY()-n.getY())*(pp.getY()-p.getY());
-		double denominator = getDistance(n, p)*getDistance(p, pp);
-		double cosAngle = (dotProduct/denominator);
-		if(cosAngle > 1) {
-			System.out.println("Nodes: " + n.toString() + ", " + p.toString() + " and " + pp.toString() + " gave an cos of angle of " + cosAngle);
-		}
-		double angle = (Math.acos(cosAngle))*(180/Math.PI);
-		return angle; //abs returns a value between
+		Vector2d v0 = new Vector2d(p.getX()-n.getX(), p.getY()-n.getY());
+		Vector2d v1 = new Vector2d(pp.getX()-p.getX(), pp.getY()-p.getY());
+		return v0.angle(v1)*(180.00/Math.PI);
 	}
 
 }
