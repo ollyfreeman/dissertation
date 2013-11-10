@@ -1,17 +1,19 @@
-package preparation;
+package engine.graph;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import utility.Coordinate;
 
 public class Node implements Comparable<Node> {
 
 	private List<Node> neighbours;
 	private final Coordinate coordinate;
-	
+
 	private double f;
 	private double g;
 	private Node parent;
-	
+
 	public Node(Coordinate coordinate) {
 		neighbours = new LinkedList<Node>();		//is this the best implementation?
 		this.coordinate = coordinate;
@@ -23,23 +25,23 @@ public class Node implements Comparable<Node> {
 	public void addNeighbour(Node node) {
 		neighbours.add(node);
 	}
-	
+
 	public List<Node> getNeighbours() {
 		return neighbours;
 	}
-	
+
 	public Coordinate getCoordinate() {
 		return coordinate;
 	}
-	
+
 	public int getX() {
 		return coordinate.getX();
 	}
-	
+
 	public int getY() {
 		return coordinate.getY();
 	}
-	
+
 	public double getF() {
 		return f;
 	}
@@ -63,26 +65,16 @@ public class Node implements Comparable<Node> {
 	public void setParent(Node previous) {
 		this.parent = previous;
 	}
-	
-	//for VisibilityTest stuff with Bresenham
-	public Node getReachable(int x, int y) { //should this be Coordinate object?
-		/*if((!(parent == null)) && (parent.getX() == x) && (parent.getY() == y)) {
-			return parent;
-		} else {*/
-			for(Node n : neighbours) {
-				if((n.getCoordinate().getX() == x) && (n.getCoordinate().getY() == y)) {
-					return n;
-				}
+
+	public Node getReachable(int x, int y) {
+		for(Node n : neighbours) {
+			if((n.getCoordinate().getX() == x) && (n.getCoordinate().getY() == y)) {
+				return n;
 			}
-		//}
-		/*System.out.print("Successors of ("+x+","+y+"): ");
-		for(Node n : successors) {
-			System.out.print("(" + n.getX() + "," + n.getY() + ")");
 		}
-		System.out.print("... :( ...");*/
 		return null;
 	}
-	
+
 	@Override
 	//comparable by f score
 	public int compareTo(Node other) {
@@ -96,10 +88,11 @@ public class Node implements Comparable<Node> {
 		}
 	}
 
+	/*
 	public String coordinateAsString() {
 		return "(" + coordinate.getX() +"," + coordinate.getY() + ")";
 	}
-	
+
 	public String toString() {
 		String s ="Coordinate: (" + coordinate.getX() +"," + coordinate.getY() + ")";
 		s+= ", Neighbours: ";
@@ -107,6 +100,6 @@ public class Node implements Comparable<Node> {
 			s+= n.coordinateAsString() + " ";
 		}
 		return s;
-	}
-	
+	}*/
+
 }

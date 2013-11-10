@@ -3,7 +3,6 @@ package preparation;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -11,6 +10,7 @@ import javax.swing.JPanel;
 
 public class DrawingPanel extends JPanel{
 
+	private static final long serialVersionUID = 1L;
 	Map map;
 	int width;
 	int height;

@@ -12,7 +12,7 @@ public class TestDrawing {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         int width = 280;
         int height = 150;
-        Map map = MapGenerator.generateMap(width, height, 30, 200);
+        Map map = MapGenerator.generateMap(width, height, 30, 5);
 
         Graph graph = GraphGenerator.generateGraph_v2(map);
 		Node n=ThetaStarAlgorithm.getPath(graph);
