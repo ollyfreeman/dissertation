@@ -1,6 +1,6 @@
 package engine.graph;
 
-public class Bresenham {
+public class LineOfSight {
 
 	private static Node from;
 	private static Node to;
@@ -14,6 +14,15 @@ public class Bresenham {
 	private static int x;
 	private static int y;
 
+	
+	/*
+	 * implements a line of sight check based on Bresenham's line drawing algorithm
+	 * Instead of using the pure line-drawing algorithm as advised in the Theta* web implementation
+	 * I have made sure that each node on the line of sight is reachable (i.e. a neighbour) of the 
+	 * node before it in the line of sight. This ensures that the line of sight check produces
+	 * straight paths that are walkable for the character (i.e. not slipping between and around blocks
+	 * on paths that aren't possible according to the graph)
+	 */
 	public static boolean isVisible(Node fromArg, Node toArg) {
 		if(fromArg == null || toArg == null) {
 			return false;
@@ -34,14 +43,10 @@ public class Bresenham {
 
 				double yActual = y0;
 				while(x < x1) {
-					//System.out.print("");
 					x++;
 					yActual += m;
 					y = (int) Math.round(yActual);
-					//System.out.print("("+ x + "," + y + ")");
-					temp = current.getReachable(x, y);
-					if(temp != null) {
-						//if((temp = current.getReachable(x,y)) != null) {
+					if((temp = current.getNeighbourIfExists(x,y)) != null) {	//aka: //temp = current.getReachable(x, y); if(temp != null) {
 						current = temp;
 					} else {
 						return false;
@@ -60,10 +65,7 @@ public class Bresenham {
 					y++;
 					xActual += m;
 					x = (int) Math.round(xActual);
-					//System.out.print("("+ x + "," + y + ")");
-					temp = current.getReachable(x, y);
-					if(temp != null) {
-						//if((temp = current.getReachable(x,y)) != null) {
+					if((temp = current.getNeighbourIfExists(x,y)) != null) {						//aka temp = current.getReachable(x, y); if(temp != null) {
 						current = temp;
 					} else {
 						return false;

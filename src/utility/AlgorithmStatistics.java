@@ -2,6 +2,9 @@ package utility;
 
 import engine.AlgorithmData;
 
+/*
+ * object to wrap up algorithm statistics when passing between the front end and back end
+ */
 public class AlgorithmStatistics {
 	
 	private final double distance;

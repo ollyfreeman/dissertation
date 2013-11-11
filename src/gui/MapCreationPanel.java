@@ -14,6 +14,9 @@ import javax.swing.JTextField;
 import utility.MapCreationParameters;
 import engine.Engine;
 
+/*
+ * Panel for creating Potential Maps
+ */
 public class MapCreationPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
@@ -54,6 +57,7 @@ public class MapCreationPanel extends JPanel {
 		this.add(coverageLabel,c);
 		c.gridx = 1;
 		coverageField = new JTextField(5);
+		coverageField.setText("30");
 		this.add(coverageField,c);
 		
 		c.gridx = 0;
@@ -62,6 +66,7 @@ public class MapCreationPanel extends JPanel {
 		this.add(clusteringLabel,c);
 		c.gridx = 1;
 		clusteringField = new JTextField(5);
+		clusteringField.setText("50");
 		this.add(clusteringField,c);
 		
 		c.gridx = 0;
@@ -80,10 +85,13 @@ public class MapCreationPanel extends JPanel {
 	
 	private void plotMap() {
 		MapCreationParameters mcp = getMapCreationParameters();
-		coordinator.resetAlgorithmPanel();
+		coordinator.resetAlgorithmPanel();						//plotting a new map so need to reset the Algorithm panel
 		engine.plotMap(mcp);
 	}
 	
+	/*
+	 * pack up parameters into a MapCreationParameters object
+	 */
 	private MapCreationParameters getMapCreationParameters() {
 		int index = resolution.getSelectedIndex();
 		int resolution = 1;

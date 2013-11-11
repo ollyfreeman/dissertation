@@ -1,5 +1,9 @@
 package utility;
 
+/*
+ * object to wrap up the parameters to specify Potential Map creation, when passing
+ * from the front end to the back end
+ */
 public class MapCreationParameters {
 	
 	//NEED TO CHANGE THIS LATER ON TO ALLOW FOR DIFFERENT WAYS OF MAKING MAPS, AND THEREFORE DIFFERENT PARAMETER SETS

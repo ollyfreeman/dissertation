@@ -12,7 +12,11 @@ import utility.Coordinate;
 import engine.graph.Node;
 import engine.map.Map;
 
-
+/*
+ * Panel that maps and paths are drawn onto
+ * calling draw map or draw path alter the state of this object, so that
+ * when paint is called (via a call to 'repaint') the behaviour is appropriate
+ */
 public class DrawingPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -24,7 +28,7 @@ public class DrawingPanel extends JPanel {
 	private List<Node> goalNodes;
 	private List<Color> pathColours;
 	
-	private Window window;					//need this because calling repaint on just this panel seems glitchy
+	private Window window;					//need this because calling repaint on just drawingPanel (this) seems glitchy, so call it on window
 
 	public DrawingPanel(int width, int height) {
 		this.width = width;
@@ -44,8 +48,8 @@ public class DrawingPanel extends JPanel {
 	public void drawMap(Map map, int resolution) {
 		this.resolution = resolution;
 		this.map = map;
-		goalNodes = new LinkedList<Node>();	//i.e. reset this for the new map
-		pathColours = new LinkedList<Color>();
+		goalNodes = new LinkedList<Node>();		//i.e. reset this for the new map
+		pathColours = new LinkedList<Color>();	//i.e. reset this for the new map
 		window.repaint();					//need this because calling repaint on just this panel seems glitchy
 	}
 
@@ -63,11 +67,11 @@ public class DrawingPanel extends JPanel {
 			for(int y=0;y < map.getHeight(); y++) {
 				for(int x=0; x < map.getWidth(); x++) {
 					if(map.getCell(x,y).isBlocked()) {
-						g.setColor(Color.BLACK);
 						g.fillRect(x*resolution, y*resolution, resolution, resolution);
 					}
 				}
 			}
+			g.fillRect(map.getWidth()*resolution, 0, width-map.getWidth()*resolution, height);	//fill the rest of the panel as black
 			for(int i = 0; i<goalNodes.size(); i++) {
 				Node node = goalNodes.get(i);
 				List<Coordinate> path = new LinkedList<Coordinate>();

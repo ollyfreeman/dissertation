@@ -5,14 +5,18 @@ import java.util.List;
 
 import utility.Coordinate;
 
+/*
+ * represents the node on a connected graph
+ */
 public class Node implements Comparable<Node> {
 
+	private final Coordinate coordinate;			//coordinate of the map Cell that this node represents
+	
 	private List<Node> neighbours;
-	private final Coordinate coordinate;
+	private Node parent;
 
 	private double f;
 	private double g;
-	private Node parent;
 
 	public Node(Coordinate coordinate) {
 		neighbours = new LinkedList<Node>();		//is this the best implementation?
@@ -66,7 +70,11 @@ public class Node implements Comparable<Node> {
 		this.parent = previous;
 	}
 
-	public Node getReachable(int x, int y) {
+	/*
+	 * if this node has a neighbour at the coordinate given, then return that neighbour
+	 * else return null
+	 */
+	public Node getNeighbourIfExists(int x, int y) {
 		for(Node n : neighbours) {
 			if((n.getCoordinate().getX() == x) && (n.getCoordinate().getY() == y)) {
 				return n;
@@ -76,7 +84,10 @@ public class Node implements Comparable<Node> {
 	}
 
 	@Override
-	//comparable by f score
+	/*
+	 * Makes nodes comparable by f-score, so they can be sorted in a priority queue
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	public int compareTo(Node other) {
 		Node node = (Node) other;
 		if(this.getF() < node.getF()) {

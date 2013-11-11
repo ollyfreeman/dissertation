@@ -17,7 +17,7 @@ public class MapInstance {
 	private final Map map;
 	private Graph graph; //other graphs are cloned from this - BUT not implemented graph cloning yet
 	
-	private DoesRouteExist doesRouteExist = null;
+	private DoesRouteExist doesRouteExist;
 	
 	private AlgorithmData aStarData;
 	private AlgorithmData aStarSmoothedData;
@@ -25,6 +25,7 @@ public class MapInstance {
 	
 	public MapInstance(Map map) {
 		this.map = map;
+		this.doesRouteExist = DoesRouteExist.DontKnow;
 	}
 	
 	protected Map getMap() {
@@ -39,7 +40,7 @@ public class MapInstance {
 	 * use AStar to determine whether or not a route exists
 	 */
 	protected DoesRouteExist doesRouteExist() {
-		if(this.doesRouteExist == null) {
+		if(!(this.doesRouteExist.equals(DoesRouteExist.No) || this.doesRouteExist.equals(DoesRouteExist.Yes))) {
 			if(aStarData == null) {
 				this.doesRouteExist = DoesRouteExist.DontKnow;
 			} else if (aStarData.getGoalNode() == null) {
@@ -51,6 +52,13 @@ public class MapInstance {
 		return this.doesRouteExist;
 	}
 	
+	/*
+	 * create a new AlgorithmData object (if it doesn't exist already) for the given algorithm type
+	 * note that the design of the UI should be such that this is only ever called once:
+	 * so: if (<algorithm>Data == null) will always evaluate to true, except for if the first algorithm we
+	 * have requested to calculate is not A*, but A* will have been called without alerting the user in order
+	 * to find out if there is a posssible route
+	 */
 	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType) {
 		//FOR NOW I WILL RE-GENERATE A NEW GRAPH FROM THE MAP, but I need to implement a graph cloning algorithm cos this will take to long
 		Graph graph = GraphGenerator.generateGraph(map);
@@ -81,18 +89,26 @@ public class MapInstance {
 		return algorithmStatistics;	
 	}
 	
+	/*
+	 * return the goal node for the given algorithm type
+	 */
 	protected Node getGoalNode(AlgorithmType algorithmType) {
+		Node goal;
 		switch (algorithmType) {
 		case AStar:
-			return aStarData.getGoalNode();
+			goal = aStarData.getGoalNode();
+			break;
 		case AStarSmoothed:
-			return aStarSmoothedData.getGoalNode();
+			goal = aStarSmoothedData.getGoalNode();
+			break;
 		case ThetaStar:
-			return thetaStarData.getGoalNode();
+			goal = thetaStarData.getGoalNode();
+			break;
 		default:
 			//TODO new algorithms	
-			return null;	
+			goal = null;	
 		}
+		return goal;
 	}
 
 }

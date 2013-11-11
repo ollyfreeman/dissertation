@@ -17,12 +17,16 @@ import utility.AlgorithmStatistics;
 import data.AlgorithmType;
 import engine.Engine;
 
+/*
+ * panel that displays the statistics for the algorithms on 
+ * the current map
+ */
 public class AlgorithmPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private Engine engine;
-	private Component[][] componentArray = new Component[4][6];		//will be 2D when I have option for more than one 
+	private Component[][] componentArray = new Component[4][6];
 
 	public AlgorithmPanel(Engine engine) {
 		
@@ -88,11 +92,24 @@ public class AlgorithmPanel extends JPanel {
 	    componentArray[index][5] = aStarDraw;
 	}
 	
+	/*
+	 * called by calculate button
+	 */
 	private void requestAlgorithmStatistics(AlgorithmType algorithmType) {
 		engine.getAlgorithmStatistics(algorithmType);
 	}
 	
-	public void setAlgorithmStatistics(AlgorithmStatistics algorithmStatistics, AlgorithmType algorithmType) {
+	/*
+	 * called by draw button
+	 */
+	private void drawAlgorithm(AlgorithmType algorithmType, Color color) {
+		engine.plotPath(algorithmType, color);
+	}
+	
+	/*
+	 * called by Coordinator to write statistics to this panel
+	 */
+	protected void setAlgorithmStatistics(AlgorithmStatistics algorithmStatistics, AlgorithmType algorithmType) {
 		if(algorithmStatistics == null) {
 			setNoPath();
 		} else {
@@ -119,21 +136,9 @@ public class AlgorithmPanel extends JPanel {
 		
 	}
 	
-	private void setNoPath() {
-		for(int i=1; i<componentArray.length; i++) {
-			JTextField distanceLabel = (JTextField) componentArray[i][1];
-			distanceLabel.setText("no path");
-			JTextField angleLabel = (JTextField) componentArray[i][2];
-			angleLabel.setText("no path");
-			JTextField timeLabel = (JTextField) componentArray[i][3];
-			timeLabel.setText("no path");
-			JButton calculateButton = (JButton) componentArray[i][4];
-			calculateButton.setEnabled(false);
-			JButton drawButton = (JButton) componentArray[i][5];
-			drawButton.setEnabled(false);
-		}
-	}
-	
+	/*
+	 * called by Coordinator to clear all fields when we load/generate a new map
+	 */
 	protected void reset() {
 		for(int i=1; i<componentArray.length; i++) {
 			JTextField distanceLabel = (JTextField) componentArray[i][1];
@@ -149,9 +154,22 @@ public class AlgorithmPanel extends JPanel {
 		}
 	}
 	
-	private void drawAlgorithm(AlgorithmType algorithmType, Color color) {
-		engine.plotPath(algorithmType, color);
+	/*
+	 * use by setAlgorithmStatistics() if there is no path
+	 */
+	private void setNoPath() {
+		for(int i=1; i<componentArray.length; i++) {
+			JTextField distanceLabel = (JTextField) componentArray[i][1];
+			distanceLabel.setText("no path");
+			JTextField angleLabel = (JTextField) componentArray[i][2];
+			angleLabel.setText("no path");
+			JTextField timeLabel = (JTextField) componentArray[i][3];
+			timeLabel.setText("no path");
+			JButton calculateButton = (JButton) componentArray[i][4];
+			calculateButton.setEnabled(false);
+			JButton drawButton = (JButton) componentArray[i][5];
+			drawButton.setEnabled(false);
+		}
 	}
-	
 
 }

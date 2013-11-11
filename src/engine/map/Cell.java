@@ -2,6 +2,9 @@ package engine.map;
 
 import utility.Coordinate;
 
+/*
+ * represents a map cell
+ */
 public class Cell {
 	
 	private final Coordinate coordinate;

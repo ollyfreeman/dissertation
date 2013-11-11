@@ -4,14 +4,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-//NB MOST OF THIS IS COPY AND PASTED FROM AStarAlgorithm_v2, but I've deleted the comments etc
+//NB MOST OF THIS IS COPY AND PASTED FROM AStarAlgorithm, but I've deleted the comments etc
 //The only functional difference is in update cost
 
 public class ThetaStarAlgorithm {
 	
 	public static Node getPath(Graph graph) { 
 		
-		System.out.println("Starting search");
 		List<Node> closedSet = new LinkedList<Node>();
 		PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 		Node start = graph.getHead();
@@ -22,7 +21,6 @@ public class ThetaStarAlgorithm {
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();
 			if(current == goal) {
-				System.out.println("Found path");
 				return goal;
 			}
 			closedSet.add(current);
@@ -36,14 +34,13 @@ public class ThetaStarAlgorithm {
 				}
 			}
 		}
-		System.out.println("No path");
 		return null;
 	}
 	
 	private static boolean updateCost(Node current, Node neighbour, Node goal) {
 		double prosposedNewGScore;
 		Node parentOfCurrent = current.getParent();
-		if(Bresenham.isVisible(parentOfCurrent, neighbour)) {
+		if(LineOfSight.isVisible(parentOfCurrent, neighbour)) {
 			prosposedNewGScore = parentOfCurrent.getG() + getDistance(parentOfCurrent, neighbour);
 			if(prosposedNewGScore < neighbour.getG()) {
 				neighbour.setParent(parentOfCurrent);

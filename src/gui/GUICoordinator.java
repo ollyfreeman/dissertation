@@ -7,6 +7,10 @@ import engine.Engine;
 import engine.graph.Node;
 import engine.map.Map;
 
+/*
+ * Coordinates the GUI, is the entity to which the engine talks to
+ * Is also the location of the main method
+ */
 public class GUICoordinator {
 	
 	private Engine engine;
@@ -15,7 +19,7 @@ public class GUICoordinator {
 	private AlgorithmPanel algorithmPanel;
 	private DrawingPanel drawingPanel;
 	
-	public GUICoordinator() {
+	private GUICoordinator() {
 		super();
 	}
 	
@@ -29,6 +33,9 @@ public class GUICoordinator {
 		window.setVisible(true);
 	}
 	
+	/*
+	 * the next 4 methods are the interface presented to the engine 
+	 */
 	public void drawMap(Map map, int resolution) {
 		drawingPanel.drawMap(map, resolution);
 	}

@@ -8,7 +8,6 @@ public class AStarAlgorithm {
 	
 	public static Node getPath(Graph graph) { 
 		
-		System.out.println("Starting search");
 		List<Node> closedSet = new LinkedList<Node>();
 		PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 		Node start = graph.getHead();
@@ -20,13 +19,10 @@ public class AStarAlgorithm {
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();
 			if(current == goal) {
-				System.out.println("Found path");
 				return goal;
 			}
 			closedSet.add(current);
 			for(Node neighbour : current.getNeighbours()) {
-				//double gScore = current.getG() + getDistance(current, neighbour);
-				//double fScore = gScore + getDistance(neighbour,goal);
 				if(!closedSet.contains(neighbour)) {// && fScore >= neighbour.getF()) { 
 					/*next 4 lines are 'updateVertex', also I have renamed 'calculateCost' as 'updateCost'
 					 * and made it return a boolean to avoids lines 20&21 of the Theta* article pseudocode
@@ -40,7 +36,6 @@ public class AStarAlgorithm {
 				}
 			}
 		}
-		System.out.println("No path");
 		return null;
 	}
 	
@@ -56,6 +51,9 @@ public class AStarAlgorithm {
 		}
 	}
 	
+	/*
+	 * helper method to calculate Euclidean distance
+	 */
 	private static double getDistance(Node n1, Node n2) {
 		double xDiff = n1.getX() - n2.getX();
 		double yDiff = n1.getY() - n2.getY();

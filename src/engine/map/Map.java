@@ -2,10 +2,18 @@ package engine.map;
 
 import utility.Coordinate;
 
+/*
+ * represents a map
+ */
 public class Map {
 	
 	private Cell[][] map;
 	
+	/*
+	 * constructor creates a map from a 2D array of ints, where an array location 
+	 * with value of 0 represents a blocked cell, all other cells are unblocked
+	 * This is used for map creation from potential method
+	 */
 	public Map(int[][] input) {
 		map = new Cell[input.length][input[0].length];
 		
