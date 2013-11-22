@@ -1,9 +1,13 @@
 package engine;
 
 import java.awt.Color;
+import java.io.*;
+import java.util.List;
+
 import engine.graph.Node;
 import engine.map.MapGenerator;
 import utility.AlgorithmStatistics;
+import utility.Coordinate;
 import utility.MapCreationParameters;
 import data.AlgorithmType;
 import data.DoesRouteExist;
@@ -51,7 +55,7 @@ public class Engine {
 		 */
 		int width = mcp.getWidth();
 		int height = mcp.getHeight();
-		int resolution = mcp.getResolution();
+		//int resolution = mcp.getResolution();			not needed
 		int coveragePercentage = mcp.getCoverage();
 		int clusteringScore = mcp.getClustering();
 		
@@ -68,14 +72,14 @@ public class Engine {
 		/*
 		 * plot map
 		 */
-		coordinator.drawMap(mapInstance.getMap(), resolution);
+		coordinator.drawMap(mapInstance.getMap());
 	}
 	
 	/*
 	 * obtains the statistics for an algorithm.
 	 * If no algorithm has been run it will run A* first to see if a route even exists
 	 */
-	public void getAlgorithmStatistics(AlgorithmType algorithmType){
+	public void createAlgorithmStatistics(AlgorithmType algorithmType){
 		AlgorithmStatistics algorithmStatistics = null;
 		
 		/*
@@ -119,28 +123,52 @@ public class Engine {
 		/*
 		 * get the goal node for that algorithm
 		 */
-		Node n = mapInstance.getGoalNode(algorithmType);
-		assert n != null : "Should not be able to plot a route if that route hasn't been calculated";
+		List<Coordinate> path = mapInstance.getPath(algorithmType);
+		assert path != null : "Should not be able to plot a route if that route hasn't been calculated";
 		/*
 		 * plot the path in the specified colour
 		 */
-		coordinator.drawPath(mapInstance.getMap(), n, color);
+		coordinator.drawPath(mapInstance.getMap(), path, color);
 	}
 	
-	private void loadMapInstance(String filename) {
-		/*
-		 * TODO deserialize the map instance with the given filename
-		 * MapInstanceImportExport.load(filename)
-		 */
+	public void loadMapInstance(String filename) {
+		 try {
+			 FileInputStream fileIn = new FileInputStream(filename);
+			 ObjectInputStream in = new ObjectInputStream(fileIn);
+			 mapInstance = (MapInstance) in.readObject();
+			 in.close();
+			 fileIn.close();
+			 coordinator.drawMap(mapInstance.getMap());
+			 coordinator.resetAlgorithmPanel();
+			 for(AlgorithmType algorithmType: AlgorithmType.values()) {
+				 if(this.mapInstance.getAlgorithmData(algorithmType) != null) {
+					 coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType), algorithmType);
+				 }
+			 }
+			 
+		 } catch(IOException i) {
+			 i.printStackTrace();
+			 return;
+		 } catch (ClassNotFoundException c) {
+			 c.printStackTrace();
+			 return;
+		 }
 	}
 	
-	private String saveMapInstance() {
-		/*
-		 * TODO serialize the map instance with a descriptive filename
-		 * MapInstanceImportExport.save()
-		 * TODO return filename
-		 */
-		return "";
+
+	public String saveMapInstance() {
+		try {
+			long time = System.currentTimeMillis();
+			FileOutputStream fileOut = new FileOutputStream(time+".ser");
+			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
+			outStream.writeObject(mapInstance);
+			outStream.close();
+			fileOut.close();
+			return (time + ".ser");
+		} catch(IOException i) {
+			i.printStackTrace();
+			return null;
+		}
 	}
 
 

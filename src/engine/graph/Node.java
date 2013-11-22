@@ -8,7 +8,9 @@ import utility.Coordinate;
 /*
  * represents the node on a connected graph
  */
-public class Node implements Comparable<Node> {
+public class Node implements Comparable<Node>, java.io.Serializable {
+	
+	private static final long serialVersionUID = 1L;
 
 	private final Coordinate coordinate;			//coordinate of the map Cell that this node represents
 	
@@ -76,7 +78,7 @@ public class Node implements Comparable<Node> {
 	 */
 	public Node getNeighbourIfExists(int x, int y) {
 		for(Node n : neighbours) {
-			if((n.getCoordinate().getX() == x) && (n.getCoordinate().getY() == y)) {
+			if((n.getX() == x) && (n.getY() == y)) {
 				return n;
 			}
 		}

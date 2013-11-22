@@ -1,7 +1,9 @@
 package utility;
 
 //there is a Java class Point for this, but it only uses doubles or floats
-public class Coordinate {		
+public class Coordinate implements java.io.Serializable {
+	
+	private static final long serialVersionUID = 1L;		
 	
 	private int x;
 	private int y;

@@ -3,7 +3,9 @@ package engine.graph;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Graph {
+public class Graph implements java.io.Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	//Should we keep statistics about how long it took to create each graph, for later evaluation?
 	

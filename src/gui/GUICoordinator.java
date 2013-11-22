@@ -1,7 +1,10 @@
 package gui;
 
 import java.awt.Color;
+import java.util.List;
+
 import utility.AlgorithmStatistics;
+import utility.Coordinate;
 import data.AlgorithmType;
 import engine.Engine;
 import engine.graph.Node;
@@ -16,6 +19,7 @@ public class GUICoordinator {
 	private Engine engine;
 	private Window window;
 	private MapCreationPanel mapCreationPanel;
+	private SaveLoadPanel saveLoadPanel;
 	private AlgorithmPanel algorithmPanel;
 	private DrawingPanel drawingPanel;
 	
@@ -27,21 +31,29 @@ public class GUICoordinator {
 		engine = new Engine(this);
 		drawingPanel = new DrawingPanel(800,800);
 		mapCreationPanel = new MapCreationPanel(engine,this);
+		saveLoadPanel = new SaveLoadPanel(engine, this);
 		algorithmPanel = new AlgorithmPanel(engine);
-		window = new Window(engine, drawingPanel, mapCreationPanel, algorithmPanel);
+		window = new Window(engine, drawingPanel, mapCreationPanel, saveLoadPanel, algorithmPanel);
 		drawingPanel.setWindow(window);
 		window.setVisible(true);
 	}
 	
 	/*
-	 * the next 4 methods are the interface presented to the engine 
+	 * for dialog boxes
 	 */
-	public void drawMap(Map map, int resolution) {
-		drawingPanel.drawMap(map, resolution);
+	public Window getWindow() {
+		return window;
 	}
 	
-	public void drawPath(Map map, Node n, Color color) {
-		drawingPanel.drawPath(map, n, color);
+	/*
+	 * the next 4 methods are the interface presented to the engine 
+	 */
+	public void drawMap(Map map) {
+		drawingPanel.drawMap(map);
+	}
+	
+	public void drawPath(Map map, List<Coordinate> path, Color color) {
+		drawingPanel.drawPath(map, path, color);
 	}
 	
 	public void setAlgorithmStatistics(AlgorithmStatistics algorithmStatistics, AlgorithmType algorithmType) {

@@ -96,7 +96,7 @@ public class AlgorithmPanel extends JPanel {
 	 * called by calculate button
 	 */
 	private void requestAlgorithmStatistics(AlgorithmType algorithmType) {
-		engine.getAlgorithmStatistics(algorithmType);
+		engine.createAlgorithmStatistics(algorithmType);
 	}
 	
 	/*

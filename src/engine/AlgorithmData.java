@@ -1,19 +1,27 @@
 package engine;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import engine.graph.*;
 import data.AlgorithmType;
+
 import javax.vecmath.Vector2d;
+
+import utility.Coordinate;
 
 /*
  * Objects of this class contain all of the data relevant to a single running of
  * an algorithm over a map. The graph is a copy made purely for this algorithm on 
  * its associated map.
  */
-public class AlgorithmData {
+public class AlgorithmData implements java.io.Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private final AlgorithmType algorithmType;
-	private final Graph graph;
-	private final Node goalNode;
+	private transient final Graph graph;
+	private transient final Node goalNode;
 	
 	/*
 	 * these 3 are all redundant (i.e. can be calculated from the Graph and Node),
@@ -22,6 +30,7 @@ public class AlgorithmData {
 	private final double distance;
 	private final double angle;
 	private final double time;
+	private final List<Coordinate> path;
 	
 	public AlgorithmData(AlgorithmType algorithmType, Graph graph) {
 		this.algorithmType = algorithmType;
@@ -64,8 +73,10 @@ public class AlgorithmData {
 		Node n = goalNode;
 		double distanceAccumulator = 0.0;
 		double angleAccumulator = 0.0;
+		path = new LinkedList<Coordinate>();
 		while(n != null) {
 			try {
+				path.add(0,n.getCoordinate());
 				distanceAccumulator+=getDistance(n,n.getParent());
 			} catch (NullPointerException e) {
 				//when we get to the final (source) node
@@ -85,12 +96,14 @@ public class AlgorithmData {
 		return algorithmType;
 	}
 
+	/*
 	public Graph getGraph() {
 		return graph;
 	}
+	*/
 
-	public Node getGoalNode() {
-		return goalNode;
+	public boolean goalNodeExists() {
+		return (goalNode != null);
 	}
 
 	public double getDistance() {
@@ -103,6 +116,10 @@ public class AlgorithmData {
 
 	public double getTime() {
 		return time;
+	}
+	
+	public List<Coordinate> getPath() {
+		return path;
 	}
 	
 	/*

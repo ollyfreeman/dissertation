@@ -23,7 +23,6 @@ public class MapCreationPanel extends JPanel {
 	
 	private Engine engine;
 	private GUICoordinator coordinator;
-	String[] resolutionArray = {"800x800","400x800","400x400","200x400","200x200","100x200"};		//put this in data?
 	private JComboBox<String> resolution;
 	private JTextField coverageField;
 	private JTextField clusteringField;
@@ -48,7 +47,7 @@ public class MapCreationPanel extends JPanel {
 		JLabel resolutionLabel = new JLabel("Resolution");
 		this.add(resolutionLabel,c);
 		c.gridx = 1;
-		resolution = new JComboBox<String>(resolutionArray);
+		resolution = new JComboBox<String>(data.MapResolutions.getResolutionStringArray());
 		this.add(resolution,c);
 		
 		c.gridx = 0;
@@ -98,6 +97,7 @@ public class MapCreationPanel extends JPanel {
 		for(int i=0; i<(index/2); i++) {		
 			resolution*=2;
 		}
+		String[] resolutionArray = data.MapResolutions.getResolutionStringArray();
 		String resolutionString = resolutionArray[index];
 		String[] stringArray = resolutionString.split("x");
 		MapCreationParameters mcp = new MapCreationParameters(Integer.parseInt(stringArray[0]), Integer.parseInt(stringArray[1]), resolution, Integer.parseInt(coverageField.getText()), Integer.parseInt(clusteringField.getText()));

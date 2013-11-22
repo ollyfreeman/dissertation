@@ -1,5 +1,7 @@
 package utility;
 
+import java.util.List;
+
 import engine.AlgorithmData;
 
 /*
@@ -10,11 +12,13 @@ public class AlgorithmStatistics {
 	private final double distance;
 	private final double angle;
 	private final double time;
+	private final List<Coordinate> path;
 	
 	public AlgorithmStatistics(AlgorithmData algorithmData) {
 		this.distance = algorithmData.getDistance();
 		this.angle = algorithmData.getAngle();
 		this.time = algorithmData.getTime();
+		this.path = algorithmData.getPath();
 	}
 
 	public double getDistance() {
@@ -27,6 +31,10 @@ public class AlgorithmStatistics {
 
 	public double getTime() {
 		return time;
+	}
+	
+	public List<Coordinate> getPath() {
+		return path;
 	}
 	
 	

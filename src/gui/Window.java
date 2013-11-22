@@ -16,7 +16,7 @@ public class Window extends JFrame {
 	private final int width = 1500;
 	private final int height = 900;
 	
-	public Window(Engine engine, DrawingPanel drawingPanel, MapCreationPanel mapCreationPanel, AlgorithmPanel algorithmPanel) {
+	public Window(Engine engine, DrawingPanel drawingPanel, MapCreationPanel mapCreationPanel, SaveLoadPanel saveLoadPanel, AlgorithmPanel algorithmPanel) {
 		super("Algorithm Visualiser");	
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(width, height);
@@ -30,13 +30,16 @@ public class Window extends JFrame {
 	    mapCreationPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 	    this.add(mapCreationPanel, c);
 	    c.gridy = 1;
+	    saveLoadPanel.setBorder(BorderFactory.createLineBorder(Color.blue));
+	    this.add(saveLoadPanel, c);
+	    c.gridy = 2;
 	    algorithmPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 	    this.add(algorithmPanel,c);
 	    
 		
 	    c.gridy = 0;
 		c.gridx = 1;
-		c.gridheight = 2;
+		c.gridheight = 3;
 		drawingPanel.setBorder(BorderFactory.createLineBorder(Color.red));
 		this.add(drawingPanel, c);
 	}

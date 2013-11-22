@@ -5,7 +5,9 @@ import utility.Coordinate;
 /*
  * represents a map cell
  */
-public class Cell {
+public class Cell implements java.io.Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private final Coordinate coordinate;
 	private final boolean isBlocked;

@@ -25,7 +25,7 @@ public class DrawingPanel extends JPanel {
 	private int width;
 	private int height;
 	private int resolution;
-	private List<Node> goalNodes;
+	private List<List<Coordinate>> paths;
 	private List<Color> pathColours;
 	
 	private Window window;					//need this because calling repaint on just drawingPanel (this) seems glitchy, so call it on window
@@ -33,7 +33,7 @@ public class DrawingPanel extends JPanel {
 	public DrawingPanel(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.goalNodes = new LinkedList<Node>();
+		this.paths = new LinkedList<List<Coordinate>>();
 		this.pathColours = new LinkedList<Color>();
 	}
 	
@@ -45,17 +45,17 @@ public class DrawingPanel extends JPanel {
 		return new Dimension(width,height);
 	}
 
-	public void drawMap(Map map, int resolution) {
-		this.resolution = resolution;
+	public void drawMap(Map map) {
+		this.resolution = data.MapResolutions.getResolution(map.getHeight());
 		this.map = map;
-		goalNodes = new LinkedList<Node>();		//i.e. reset this for the new map
+		this.paths = new LinkedList<List<Coordinate>>();		//i.e. reset this for the new map
 		pathColours = new LinkedList<Color>();	//i.e. reset this for the new map
 		window.repaint();					//need this because calling repaint on just this panel seems glitchy
 	}
 
-	public void drawPath(Map map, Node n, Color color) {
-		if(!goalNodes.contains(n)) {
-			goalNodes.add(n);
+	public void drawPath(Map map, List<Coordinate> path, Color color) {
+		if(!pathColours.contains(color)) {
+			paths.add(path);
 			pathColours.add(color);
 		}
 		window.repaint();
@@ -72,19 +72,13 @@ public class DrawingPanel extends JPanel {
 				}
 			}
 			g.fillRect(map.getWidth()*resolution, 0, width-map.getWidth()*resolution, height);	//fill the rest of the panel as black
-			for(int i = 0; i<goalNodes.size(); i++) {
-				Node node = goalNodes.get(i);
-				List<Coordinate> path = new LinkedList<Coordinate>();
-				if(node==null) {
+			for(int i = 0; i<paths.size(); i++) {
+				List<Coordinate> path = paths.get(i);
+				if(path==null) {
 					//TODO should never enter get here, as a goal node shouldn't be added if it's null (i.e. no path possible/yet calculated
 					System.out.println("No path, exiting...");
 				} else {
 					g.setColor(pathColours.get(i));
-					while(node != null) {
-						Coordinate coordinate = new Coordinate(node.getX(), node.getY());
-						path.add(0, coordinate);
-						node = node.getParent();
-					}
 					int j = 0;
 					while(j+1 < path.size()) {
 						Coordinate from = path.get(j);
