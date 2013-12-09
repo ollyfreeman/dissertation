@@ -7,7 +7,6 @@ import utility.Coordinate;
 import data.AlgorithmType;
 import data.DoesRouteExist;
 import engine.graph.Graph;
-import engine.graph.Node;
 import engine.map.Map;
 import engine.graph.GraphGenerator;
 

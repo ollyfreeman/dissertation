@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.*;
 import java.util.List;
 
-import engine.graph.Node;
 import engine.map.MapGenerator;
 import utility.AlgorithmStatistics;
 import utility.Coordinate;
@@ -48,7 +47,7 @@ public class Engine {
 	/*
 	 * loads a map with the given parameters, and draws it to the GUI
 	 */
-	public void plotMap(MapCreationParameters mcp) {
+	public void plotMapFromParameters(MapCreationParameters mcp) {
 		/*
 		 * Parse the parameters
 		 * if I develop multiple ways to make maps then I'll have to change this parsing stage
@@ -73,7 +72,35 @@ public class Engine {
 		 * plot map
 		 */
 		coordinator.drawMap(mapInstance.getMap());
+		
+		/*
+		 * plotting a new map so need to reset the Algorithm panel
+		 */
+		coordinator.resetAlgorithmPanel();
+		coordinator.enableAlgorithmPanel();
 	}
+	
+	/*
+	 * loads a map with the given int 2D array, and draws it to the GUI
+	 */
+	public void plotMapFrom2DArray(int[][] array) {
+		
+		/*
+		 * create a map instance with the specific parameters
+		 */
+		Map map = new Map(array);
+		
+		/*
+		 * create a map instance with the specific map
+		 */
+		mapInstance = new MapInstance(map);
+		
+		/*
+		 * plot map
+		 */
+		coordinator.drawMap(mapInstance.getMap());
+	}
+	
 	
 	/*
 	 * obtains the statistics for an algorithm.
@@ -141,8 +168,12 @@ public class Engine {
 			 coordinator.drawMap(mapInstance.getMap());
 			 coordinator.resetAlgorithmPanel();
 			 for(AlgorithmType algorithmType: AlgorithmType.values()) {
-				 if(this.mapInstance.getAlgorithmData(algorithmType) != null) {
-					 coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType), algorithmType);
+				 switch (this.mapInstance.doesRouteExist()) {
+				 case Yes :	coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType), algorithmType);
+				 			break;
+				 case No:	coordinator.setAlgorithmStatistics(null, algorithmType);
+				 			break;
+				 default:	//donothing
 				 }
 			 }
 			 
@@ -156,18 +187,15 @@ public class Engine {
 	}
 	
 
-	public String saveMapInstance() {
+	public void saveMapInstance(String filename) {
 		try {
-			long time = System.currentTimeMillis();
-			FileOutputStream fileOut = new FileOutputStream(time+".ser");
+			FileOutputStream fileOut = new FileOutputStream(filename);
 			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
 			outStream.writeObject(mapInstance);
 			outStream.close();
 			fileOut.close();
-			return (time + ".ser");
 		} catch(IOException i) {
 			i.printStackTrace();
-			return null;
 		}
 	}
 

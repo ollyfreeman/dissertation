@@ -79,17 +79,18 @@ public class AlgorithmPanel extends JPanel {
 				requestAlgorithmStatistics(algType);
 			}
 		});
+	    calculateButton.setEnabled(false);
 	    componentArray[index][4] = calculateButton;
 	   
-	    JButton aStarDraw = new JButton("Draw");
-	    aStarDraw.addActionListener(new ActionListener() {
+	    JButton drawButton = new JButton("Draw");
+	    drawButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				drawAlgorithm(algType, c);
 			}
 		});
-	    aStarDraw.setEnabled(false);
-	    componentArray[index][5] = aStarDraw;
+	    drawButton.setEnabled(false);
+	    componentArray[index][5] = drawButton;
 	}
 	
 	/*
@@ -133,13 +134,12 @@ public class AlgorithmPanel extends JPanel {
 			JButton drawButton = (JButton) componentArray[index][5];
 			drawButton.setEnabled(true);
 		}
-		
 	}
 	
 	/*
 	 * called by Coordinator to clear all fields when we load/generate a new map
 	 */
-	protected void reset() {
+	protected void resetPanel() {
 		for(int i=1; i<componentArray.length; i++) {
 			JTextField distanceLabel = (JTextField) componentArray[i][1];
 			distanceLabel.setText("");
@@ -148,9 +148,19 @@ public class AlgorithmPanel extends JPanel {
 			JTextField timeLabel = (JTextField) componentArray[i][3];
 			timeLabel.setText("");
 			JButton calculateButton = (JButton) componentArray[i][4];
-			calculateButton.setEnabled(true);
+			calculateButton.setEnabled(false);
 			JButton drawButton = (JButton) componentArray[i][5];
 			drawButton.setEnabled(false);
+		}
+	}
+	
+	/*
+	 * called by Coordinator to enable all calculation buttons
+	 */
+	protected void enablePanel() {
+		for(int i=1; i<componentArray.length; i++) {
+			JButton calculateButton = (JButton) componentArray[i][4];
+			calculateButton.setEnabled(true);
 		}
 	}
 	

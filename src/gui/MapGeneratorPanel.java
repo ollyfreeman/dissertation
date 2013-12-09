@@ -17,7 +17,7 @@ import engine.Engine;
 /*
  * Panel for creating Potential Maps
  */
-public class MapCreationPanel extends JPanel {
+public class MapGeneratorPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -26,8 +26,9 @@ public class MapCreationPanel extends JPanel {
 	private JComboBox<String> resolution;
 	private JTextField coverageField;
 	private JTextField clusteringField;
+	private JButton createMapButton;
 
-	public MapCreationPanel(Engine engine, GUICoordinator coordinator) {
+	public MapGeneratorPanel(Engine engine, final GUICoordinator coordinator) {
 		
 		this.engine = engine;
 		this.coordinator = coordinator;
@@ -47,7 +48,7 @@ public class MapCreationPanel extends JPanel {
 		JLabel resolutionLabel = new JLabel("Resolution");
 		this.add(resolutionLabel,c);
 		c.gridx = 1;
-		resolution = new JComboBox<String>(data.MapResolutions.getResolutionStringArray());
+		resolution = new JComboBox<String>(data.MapResolutions.getMapResolutionArray());
 		this.add(resolution,c);
 		
 		c.gridx = 0;
@@ -71,21 +72,20 @@ public class MapCreationPanel extends JPanel {
 		c.gridx = 0;
 	    c.gridy = 4;
 	    c.gridwidth = 2;
-		JButton createMapButton = new JButton("GENERATE!");
+		createMapButton = new JButton("GENERATE!");
 		createMapButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				plotMap();
+				coordinator.enableSaveLoadPanel();
 			}
 		});
 		this.add(createMapButton,c);
-		
 	}
 	
 	private void plotMap() {
 		MapCreationParameters mcp = getMapCreationParameters();
-		coordinator.resetAlgorithmPanel();						//plotting a new map so need to reset the Algorithm panel
-		engine.plotMap(mcp);
+		engine.plotMapFromParameters(mcp);
 	}
 	
 	/*
@@ -97,11 +97,19 @@ public class MapCreationPanel extends JPanel {
 		for(int i=0; i<(index/2); i++) {		
 			resolution*=2;
 		}
-		String[] resolutionArray = data.MapResolutions.getResolutionStringArray();
+		String[] resolutionArray = data.MapResolutions.getMapResolutionArray();
 		String resolutionString = resolutionArray[index];
 		String[] stringArray = resolutionString.split("x");
 		MapCreationParameters mcp = new MapCreationParameters(Integer.parseInt(stringArray[0]), Integer.parseInt(stringArray[1]), resolution, Integer.parseInt(coverageField.getText()), Integer.parseInt(clusteringField.getText()));
 		return mcp;
+	}
+	
+	protected void enablePanel() {
+		createMapButton.setEnabled(true);
+	}
+	
+	protected void disablePanel() {
+		createMapButton.setEnabled(false);
 	}
 
 }

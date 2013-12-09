@@ -7,7 +7,6 @@ import utility.AlgorithmStatistics;
 import utility.Coordinate;
 import data.AlgorithmType;
 import engine.Engine;
-import engine.graph.Node;
 import engine.map.Map;
 
 /*
@@ -18,7 +17,8 @@ public class GUICoordinator {
 	
 	private Engine engine;
 	private Window window;
-	private MapCreationPanel mapCreationPanel;
+	private MapGeneratorPanel mapGeneratorPanel;
+	private MapCreatorPanel mapCreatorPanel;
 	private SaveLoadPanel saveLoadPanel;
 	private AlgorithmPanel algorithmPanel;
 	private DrawingPanel drawingPanel;
@@ -30,10 +30,11 @@ public class GUICoordinator {
 	private void run() {
 		engine = new Engine(this);
 		drawingPanel = new DrawingPanel(800,800);
-		mapCreationPanel = new MapCreationPanel(engine,this);
+		mapGeneratorPanel = new MapGeneratorPanel(engine,this);
+		mapCreatorPanel = new MapCreatorPanel(engine,this);
 		saveLoadPanel = new SaveLoadPanel(engine, this);
 		algorithmPanel = new AlgorithmPanel(engine);
-		window = new Window(engine, drawingPanel, mapCreationPanel, saveLoadPanel, algorithmPanel);
+		window = new Window(engine, drawingPanel, mapGeneratorPanel, mapCreatorPanel, saveLoadPanel, algorithmPanel);
 		drawingPanel.setWindow(window);
 		window.setVisible(true);
 	}
@@ -43,6 +44,13 @@ public class GUICoordinator {
 	 */
 	public Window getWindow() {
 		return window;
+	}
+	
+	/*
+	 * for map creation
+	 */
+	protected DrawingPanel getDrawingPanel(){
+		return drawingPanel;
 	}
 	
 	/*
@@ -60,8 +68,37 @@ public class GUICoordinator {
 		algorithmPanel.setAlgorithmStatistics(algorithmStatistics, algorithmType);
 	}
 	
+	public void startEditMode(int x, int y) {
+		drawingPanel.startEditMode(x,y);
+		window.editMode(true);
+		mapGeneratorPanel.disablePanel();
+		saveLoadPanel.disablePanel();
+		resetAlgorithmPanel();
+	}
+	
+	public int[][] stopEditMode() {
+		window.editMode(false);
+		mapGeneratorPanel.enablePanel();
+		saveLoadPanel.enablePanel();
+		enableAlgorithmPanel();
+		return drawingPanel.stopEditMode();
+	}
+	
 	public void resetAlgorithmPanel() {
-		algorithmPanel.reset();
+		algorithmPanel.resetPanel();
+	}
+	
+	public void enableAlgorithmPanel() {
+		algorithmPanel.enablePanel();
+	}
+	
+	//needed only by MapGenerationPanel to enable this after first map is generated
+	public void enableSaveLoadPanel() {
+		saveLoadPanel.enablePanel();
+	}
+	
+	public void setBrushSize(int brushSize) {
+		drawingPanel.setBrushSize(brushSize);
 	}
 	
 	public static void main(String args[]) {
