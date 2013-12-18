@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import engine.graph.*;
+import engine.map.Map;
 import data.AlgorithmType;
 
 import javax.vecmath.Vector2d;
@@ -20,7 +21,7 @@ public class AlgorithmData implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private final AlgorithmType algorithmType;
-	private transient final Graph graph;
+	//private transient final Graph graph;
 	private transient final Node goalNode;
 	
 	/*
@@ -32,9 +33,9 @@ public class AlgorithmData implements java.io.Serializable {
 	private final double time;
 	private final List<Coordinate> path;
 	
-	public AlgorithmData(AlgorithmType algorithmType, Graph graph) {
+	public AlgorithmData(AlgorithmType algorithmType, Graph graph, Map map) {
 		this.algorithmType = algorithmType;
-		this.graph = graph;
+		//this.graph = graph;
 		
 		//I have all of this in the constructor as a lot of the instance variables are final
 		/*
@@ -50,7 +51,7 @@ public class AlgorithmData implements java.io.Serializable {
 		case AStarSmoothed:
 			startTime = System.nanoTime();
 			goalNode = AStarAlgorithm.getPath(graph);
-			AStarSmoothed.smoothe(graph.getHead(), goalNode);
+			AStarSmoothed.smoothe_edge(graph.getSource(), goalNode,map);
 			endTime = System.nanoTime();
 			break;
 		case ThetaStar:

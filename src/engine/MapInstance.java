@@ -37,7 +37,7 @@ public class MapInstance implements java.io.Serializable{
 	}
 	
 	protected void setGraph() {
-		graph = GraphGenerator.generateGraph(map);
+		graph = GraphGenerator.generateGraph_visibility_edge_finiteWidth(map);
 	}
 	
 	/*
@@ -66,24 +66,24 @@ public class MapInstance implements java.io.Serializable{
 	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType) {
 		//FOR NOW I WILL RE-GENERATE A NEW GRAPH FROM THE MAP, but I need to implement a graph cloning algorithm cos this will take to long
 		//if I have loaded the graph it will have a null graph instance, so will need to consider this before cloning
-		Graph graph = GraphGenerator.generateGraph(map);
+		Graph graph = GraphGenerator.generateGraph_visibility_edge_finiteWidth(map);
 		AlgorithmStatistics algorithmStatistics;
 		switch (algorithmType) {
 		case AStar:
 			if(aStarData == null) {
-				aStarData = new AlgorithmData(AlgorithmType.AStar, graph);
+				aStarData = new AlgorithmData(AlgorithmType.AStar, graph, map);
 			}
 			algorithmStatistics = new AlgorithmStatistics(aStarData);
 			break;
 		case AStarSmoothed: 
 			if(aStarSmoothedData == null) {
-				aStarSmoothedData = new AlgorithmData(AlgorithmType.AStarSmoothed, graph);
+				aStarSmoothedData = new AlgorithmData(AlgorithmType.AStarSmoothed, graph, map);
 			}
 			algorithmStatistics = new AlgorithmStatistics(aStarSmoothedData);
 			break;
 		case ThetaStar:
 			if(thetaStarData == null) {
-				thetaStarData = new AlgorithmData(AlgorithmType.ThetaStar, graph);
+				thetaStarData = new AlgorithmData(AlgorithmType.ThetaStar, graph,map);
 			}
 			algorithmStatistics = new AlgorithmStatistics(thetaStarData);
 			break;

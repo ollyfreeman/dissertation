@@ -100,8 +100,7 @@ public class Node implements Comparable<Node>, java.io.Serializable {
 			return 0;
 		}
 	}
-
-	/*
+	
 	public String coordinateAsString() {
 		return "(" + coordinate.getX() +"," + coordinate.getY() + ")";
 	}
@@ -113,6 +112,6 @@ public class Node implements Comparable<Node>, java.io.Serializable {
 			s+= n.coordinateAsString() + " ";
 		}
 		return s;
-	}*/
+	}
 
 }

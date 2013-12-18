@@ -152,7 +152,10 @@ public class DrawingPanel extends JPanel{
 						while(j+1 < path.size()) {
 							Coordinate from = path.get(j);
 							Coordinate to = path.get(j+1);
-							g.drawLine((from.getX()*resolution)+(resolution/2), (from.getY()*resolution)+(resolution/2), (to.getX()*resolution)+(resolution/2), (to.getY()*resolution)+(resolution/2));
+							g.drawLine((from.getX()*resolution), (from.getY()*resolution), (to.getX()*resolution), (to.getY()*resolution));
+							
+							//when drawing in middle of cell: 
+							//g.drawLine((from.getX()*resolution)+(resolution/2), (from.getY()*resolution)+(resolution/2), (to.getX()*resolution)+(resolution/2), (to.getY()*resolution)+(resolution/2));
 							j++;
 						}
 					}

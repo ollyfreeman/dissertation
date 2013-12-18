@@ -13,7 +13,7 @@ public class ThetaStarAlgorithm {
 		
 		List<Node> closedSet = new LinkedList<Node>();
 		PriorityQueue<Node> openSet = new PriorityQueue<Node>();
-		Node start = graph.getHead();
+		Node start = graph.getSource();
 		openSet.add(start);
 		start.setG(0.0);
 		Node goal = graph.getGoal();
@@ -40,7 +40,7 @@ public class ThetaStarAlgorithm {
 	private static boolean updateCost(Node current, Node neighbour, Node goal) {
 		double prosposedNewGScore;
 		Node parentOfCurrent = current.getParent();
-		if(LineOfSight.isVisible(parentOfCurrent, neighbour)) {
+		if(LineOfSight.isVisible_centre_finiteWidth(parentOfCurrent, neighbour)) {
 			prosposedNewGScore = parentOfCurrent.getG() + getDistance(parentOfCurrent, neighbour);
 			if(prosposedNewGScore < neighbour.getG()) {
 				neighbour.setParent(parentOfCurrent);
