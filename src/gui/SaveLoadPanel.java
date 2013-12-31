@@ -24,6 +24,7 @@ public class SaveLoadPanel extends JPanel {
 	private final GUICoordinator coordinator;
 	
 	private JButton saveInstanceButton;
+	private JButton saveMapButton;
 	private JButton loadInstanceButton;
 
 	public SaveLoadPanel(Engine engine, GUICoordinator coordinator) {
@@ -64,6 +65,23 @@ public class SaveLoadPanel extends JPanel {
 		this.add(saveInstanceButton,c);
 		
 		c.gridy = 2;
+	    saveMapButton = new JButton("SAVEM!");
+	    saveMapButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				long time = System.currentTimeMillis();
+				JFileChooser fc = new JFileChooser();
+				fc.setSelectedFile(new File("/Users/olly_freeman/Dropbox/Part2Project/serialized/" + time + "MAP.ser"));
+				int returnVal = fc.showSaveDialog(coordinator.getWindow());
+	            if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            	engine.saveMapOnly(fc.getSelectedFile().getName());
+	            }
+			}
+		});
+	    this.saveMapButton.setEnabled(false);
+		this.add(saveMapButton,c);
+		
+		c.gridy = 3;
 		loadInstanceButton = new JButton("LOAD!");
 	    loadInstanceButton.addActionListener(new ActionListener() {
 			@Override
@@ -72,20 +90,23 @@ public class SaveLoadPanel extends JPanel {
 				int returnVal = fc.showOpenDialog(coordinator.getWindow());
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
 	            	engine.loadMapInstance(fc.getSelectedFile().getName());
-	            }
+	            	enablePanel();
+	            }     
 			}
 		});
-	    this.loadInstanceButton.setEnabled(false);
+	    this.loadInstanceButton.setEnabled(true);
 		this.add(loadInstanceButton,c);
 	}
 	
 	protected void enablePanel() {
 		saveInstanceButton.setEnabled(true);
+		saveMapButton.setEnabled(true);			//DELETE
 		loadInstanceButton.setEnabled(true);
 	}
 	
 	protected void disablePanel() {
 		saveInstanceButton.setEnabled(false);
+		saveMapButton.setEnabled(false);			//DELETE
 		loadInstanceButton.setEnabled(false);
 	}
 

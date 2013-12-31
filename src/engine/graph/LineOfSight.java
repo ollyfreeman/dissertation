@@ -1,6 +1,5 @@
 package engine.graph;
 
-import utility.Coordinate;
 import engine.map.Map;
 
 public class LineOfSight {
@@ -102,7 +101,7 @@ public class LineOfSight {
 				while(x<x1) {
 					x++;
 					yActual+=m;
-					int yActualInt = (int) yActual;
+					int yActualInt = (int) fp(yActual);
 					if(m==0.0) {
 						boolean oneAboveOrBelowIsFree = false;
 						try {
@@ -169,7 +168,7 @@ public class LineOfSight {
 				while(y < y1) {
 					y++;
 					xActual += m;
-					int xActualInt = (int) xActual;
+					int xActualInt = (int) fp(xActual);
 					if(m==0.0) {
 						boolean oneAboveOrBelowIsFree = false;
 						try {
@@ -243,7 +242,7 @@ public class LineOfSight {
 				while(x<x1) {
 					x++;
 					yActual+=m;
-					int yActualInt = (int) yActual;
+					int yActualInt = (int) fp(yActual);
 					if(m==0.0) {
 						// Cells are 	1 3	 2 nodes in question are at bottom right of 1 and bottom right of 3
 						//				2 4
@@ -282,8 +281,9 @@ public class LineOfSight {
 							return false;
 						}
 					} else if (m>0) {
-						if(Math.abs(yActual - yActualInt) <= 0.001) {
-							if(map.getCell(x-1,(int)(yActual-0.5)).isBlocked()) {
+						if(Math.abs(yActual - (int) Math.round(yActual)) <= 0.001) {
+							//yActualInt =(int) Math.round(yActual);
+							if(map.getCell(x-1,yActualInt-1).isBlocked()) {// if(map.getCell(x-1,(int)(yActual-0.5)).isBlocked()) {
 								return false;
 							}
 							try {
@@ -303,8 +303,9 @@ public class LineOfSight {
 							}
 						}
 					} else {
-						if(Math.abs(yActual - yActualInt) <= 0.001) {
-							if(map.getCell(x-1,(int)(yActual+0.5)).isBlocked()) {
+						if(Math.abs(yActual - (int) Math.round(yActual)) <= 0.001) {
+							//yActualInt = (int) Math.round(yActual);
+							if(map.getCell(x-1,yActualInt).isBlocked()) {//if(map.getCell(x-1,(int)(yActual+0.5)).isBlocked()) {
 								return false;
 							}
 							try {
@@ -313,7 +314,7 @@ public class LineOfSight {
 								}
 							} catch (ArrayIndexOutOfBoundsException e) {}
 						} else {
-							if((int) (yActual-m) == yActualInt) {
+							if((int) Math.ceil(yActual-m) == yActualInt+1) {		//if((int) (yActual-m) == yActualInt) {
 								if(map.getCell(x-1,yActualInt).isBlocked()) {
 									return false;
 								}
@@ -342,7 +343,7 @@ public class LineOfSight {
 				while(y < y1) {
 					y++;
 					xActual += m;
-					int xActualInt = (int) xActual;
+					int xActualInt = (int) fp(xActual);
 					if(m==0.0) {
 						boolean oneAboveOrBelowIsFree = false;
 						boolean cell1Blocked, cell2Blocked, cell3Blocked, cell4Blocked;
@@ -378,9 +379,10 @@ public class LineOfSight {
 						if(!oneAboveOrBelowIsFree || (cell1Blocked && cell3Blocked) || (cell2Blocked && cell4Blocked)) {
 							return false;
 						}
-					} else if (m>0) {
+					} else if (m>0) {	//i.e oct2
 						if(Math.abs(xActual - xActualInt) <= 0.001) {
-							if(map.getCell((int)(xActual-0.5),y-1).isBlocked()) {
+							//xActualInt = (int) Math.round(xActual);
+							if(map.getCell(xActualInt-1,y-1).isBlocked()) {
 								return false;
 							}
 							try {
@@ -399,9 +401,10 @@ public class LineOfSight {
 								}
 							}
 						}
-					} else {
+					} else {	//oct 3
 						if(Math.abs(xActual - xActualInt) <= 0.001) {
-							if(map.getCell((int)(xActual+0.5),y-1).isBlocked()) {
+							//xActualInt = (int) Math.round(xActual);
+							if(map.getCell(xActualInt,y-1).isBlocked()) {
 								return false;
 							}
 							try {
@@ -410,7 +413,7 @@ public class LineOfSight {
 								}
 							} catch (ArrayIndexOutOfBoundsException e) {}
 						} else {
-							if((int) (xActual-m) == xActualInt) {
+							if((int) Math.ceil((xActual-m))== xActualInt+1) {
 								if(map.getCell(xActualInt,y-1).isBlocked()) {
 									return false;
 								}
@@ -427,7 +430,14 @@ public class LineOfSight {
 		}
 	}
 	
-
+	//this function allows for rounding errors
+	private static double fp(double d) {
+		if(Math.abs(Math.round(d) - d) <= 0.001) {
+			return Math.round(d);
+		} else {
+			return d;
+		}
+	}
 
 
 	private static void initialiseVariables() {

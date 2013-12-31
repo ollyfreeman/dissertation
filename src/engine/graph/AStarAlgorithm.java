@@ -23,30 +23,23 @@ public class AStarAlgorithm {
 			}
 			closedSet.add(current);
 			for(Node neighbour : current.getNeighbours()) {
-				if(!closedSet.contains(neighbour)) {// && fScore >= neighbour.getF()) { 
+				if(!closedSet.contains(neighbour)) {
 					//The previous line: if(!closedSet.contains(neighbour)) { - doesn't affect outcome, but does improve speed
+					//On one vis graph i've seen the above line making a difference to outcome :/ !!
 					/*next 4 lines are 'updateVertex', also I have renamed 'calculateCost' as 'updateCost'
 					 * and made it return a boolean to avoids lines 20&21 of the Theta* article pseudocode
 					 * of A*
 					 */
-					if (updateCost(current, neighbour, goal)) {	
-						if(!openSet.contains(neighbour) && !closedSet.contains(neighbour)) {
+					/*if (updateCost(current, neighbour, goal)) {	
+						if(!openSet.contains(neighbour)){
 							openSet.add(neighbour);
 						}
+					}*/
+					updateCost(current,neighbour,goal);
+					if(!openSet.contains(neighbour)){
+						openSet.add(neighbour);
 					}
-					/* n.b. this only happens the first time the node is visited (i.e. expanded) 
-					 * because of monotonic heuristic- so this whole block could be replaced with either of the
-					 * suggestions below. Also - updateCost can be siplified because of this
-					 * if(!openSet.contains(neighbour) && !closedSet.contains(neighbour)) {
-					 *		updateCost(current, neighbour, goal);	
-					 *		openSet.add(neighbour);
-					 * }
-					 * or
-					 * if(neighbour.getG() == POSITIVE_INFINITY;) {
-					 *		updateCost(current, neighbour, goal);	
-					 *		openSet.add(neighbour);
-					 * }
-					 */
+					//ONCE EXPANDED (put in closed set) YOU ARE NEVER RECHOSEN, hence why if(!closedSet.contains(neighbour)) { should always hold
 				}
 			}
 		}

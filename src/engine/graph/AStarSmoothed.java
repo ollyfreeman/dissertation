@@ -29,7 +29,7 @@ public class AStarSmoothed {
 		Node current = goal;
 		Node target = current.getParent().getParent();
 		while(target != null) {
-			if(LineOfSight.isVisible_edge_zeroWidth(current,target,map)) {
+			if(LineOfSight.isVisible_edge_finiteWidth(current,target,map)) {
 				current.setParent(target);
 				target = target.getParent();
 				

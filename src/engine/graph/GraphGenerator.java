@@ -311,22 +311,86 @@ public class GraphGenerator {
 
 	}
 	
-	//NB TO HAVE VIS GRAPH WITH ZERO EDGES I WOULD NEED TO SPECIFICALLY ADD NODES WHEN YOU HAVE 2 BLOCKED CELLS ON A DIAGONAL
 	public static Graph generateGraph_visibility_edge_finiteWidth(Map map){ 
 		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
 		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
 		for(int j=0; j < map.getHeight()+1; j++) {
 			for(int i=0; i < map.getWidth()+1; i++) {
-				//nodes don't exist on boundaries except start and end
-				int cellsBlocked = 0;;
+				// nodes only exist on corners (i.e. when ONE of the surrounding 4 cells is blocked)
+				int cellsBlocked = 0;
 				try{
 					for(int k=0;k<4;k++) {
 						if(map.getCell(i+diagonalRelativeCellCoordinates[k].getX(),j+diagonalRelativeCellCoordinates[k].getY()).isBlocked()) {
 							cellsBlocked++;
 						}
 					}
-				} catch (ArrayIndexOutOfBoundsException e) {cellsBlocked = 10;}
+				} catch (ArrayIndexOutOfBoundsException e) {cellsBlocked = 10;} //i.e. nodes don't exist on boundaries of map except start and end
 				if(cellsBlocked == 1) {
+					graphArray2D[i][j] = new Node(new Coordinate(i,j));
+				}
+			}
+		}
+		//separately add Source and sink
+		graphArray2D[0][0] = new Node(new Coordinate(0,0));
+		graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1] = new Node(new Coordinate(graphArray2D.length-1,graphArray2D[0].length-1));
+		//add neighbour if LOS
+		for(int j=0; j < map.getHeight()+1; j++) {
+			for(int i=0; i < map.getWidth()+1; i++) {
+				for(int l=0; l < map.getHeight()+1; l++) {
+					for(int k=0; k < map.getWidth()+1; k++) {
+						if(!(i==k && j==l)) {
+							if(graphArray2D[i][j]!=null && graphArray2D[k][l]!=null && LineOfSight.isVisible_edge_finiteWidth(graphArray2D[i][j], graphArray2D[k][l], map)) {
+								graphArray2D[i][j].addNeighbour(graphArray2D[k][l]);
+							}
+						}
+					}
+				}
+			}
+		}
+		Graph graph = new Graph();
+		for(int j=0; j<graphArray2D[0].length; j++) {
+			for(int i=0; i<graphArray2D.length; i++) {
+				if(graphArray2D[i][j] != null) {
+					graph.addNode(graphArray2D[i][j]);
+				}
+			}
+		}
+		graph.setSource(graphArray2D[0][0]);
+		graph.setGoal(graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1]);
+		return graph;
+
+	}
+	
+	public static Graph generateGraph_visibility_edge_zeroWidth(Map map){ 
+		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
+		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
+		for(int j=0; j < map.getHeight()+1; j++) {
+			for(int i=0; i < map.getWidth()+1; i++) {
+				// nodes only exist on corners (i.e. when one of the surrounding 4 cells is blocked)
+				int cellsBlocked = 0;
+				int topLeftBottomRight = 0;
+				int topRightBottomLeft = 0;
+				try{
+					for(int k=0;k<4;k++) {
+						if(map.getCell(i+diagonalRelativeCellCoordinates[k].getX(),j+diagonalRelativeCellCoordinates[k].getY()).isBlocked()) {
+							cellsBlocked++;
+						}
+						if(k%2 == 0) {
+							if(map.getCell(i+diagonalRelativeCellCoordinates[k].getX(),j+diagonalRelativeCellCoordinates[k].getY()).isBlocked()) {
+								topLeftBottomRight++;
+							}
+						} else {
+							if(map.getCell(i+diagonalRelativeCellCoordinates[k].getX(),j+diagonalRelativeCellCoordinates[k].getY()).isBlocked()) {
+								topRightBottomLeft++;
+							}
+						}
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					cellsBlocked = 10; //i.e. nodes don't exist on boundaries of map except start and end
+					topLeftBottomRight = 10;
+					topRightBottomLeft = 10;
+				}
+				if(cellsBlocked == 1 || (topLeftBottomRight == 2 ^ topRightBottomLeft == 2)) {
 					graphArray2D[i][j] = new Node(new Coordinate(i,j));
 				}
 			}

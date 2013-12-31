@@ -43,6 +43,11 @@ public class AlgorithmData implements java.io.Serializable {
 		 */
 		double startTime, endTime;
 		switch (algorithmType) {
+		case Dijkstra:
+			startTime = System.nanoTime();
+			goalNode = DijkstraAlgorithm.getPath(graph);
+			endTime = System.nanoTime();	
+			break;
 		case AStar:
 			startTime = System.nanoTime();
 			goalNode = AStarAlgorithm.getPath(graph);
@@ -56,7 +61,7 @@ public class AlgorithmData implements java.io.Serializable {
 			break;
 		case ThetaStar:
 			startTime = System.nanoTime();
-			goalNode = ThetaStarAlgorithm.getPath(graph);
+			goalNode = ThetaStarAlgorithm.getPath(graph,map);
 			endTime = System.nanoTime();
 			break;
 		default:

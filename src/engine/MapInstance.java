@@ -23,6 +23,7 @@ public class MapInstance implements java.io.Serializable{
 	
 	private DoesRouteExist doesRouteExist;
 	
+	private AlgorithmData dijkstraData;
 	private AlgorithmData aStarData;
 	private AlgorithmData aStarSmoothedData;
 	private AlgorithmData thetaStarData;
@@ -61,7 +62,7 @@ public class MapInstance implements java.io.Serializable{
 	 * note that the design of the UI should be such that this is only ever called once:
 	 * so: if (<algorithm>Data == null) will always evaluate to true, except for if the first algorithm we
 	 * have requested to calculate is not A*, but A* will have been called without alerting the user in order
-	 * to find out if there is a posssible route
+	 * to find out if there is a possible route
 	 */
 	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType) {
 		//FOR NOW I WILL RE-GENERATE A NEW GRAPH FROM THE MAP, but I need to implement a graph cloning algorithm cos this will take to long
@@ -69,6 +70,12 @@ public class MapInstance implements java.io.Serializable{
 		Graph graph = GraphGenerator.generateGraph_visibility_edge_finiteWidth(map);
 		AlgorithmStatistics algorithmStatistics;
 		switch (algorithmType) {
+		case Dijkstra:
+			if(dijkstraData == null) {
+				dijkstraData = new AlgorithmData(AlgorithmType.Dijkstra, graph, map);
+			}
+			algorithmStatistics = new AlgorithmStatistics(dijkstraData);
+			break;
 		case AStar:
 			if(aStarData == null) {
 				aStarData = new AlgorithmData(AlgorithmType.AStar, graph, map);
@@ -112,19 +119,28 @@ public class MapInstance implements java.io.Serializable{
 	 */
 	protected List<Coordinate> getPath(AlgorithmType algorithmType) {
 		List<Coordinate> path;
-		switch (algorithmType) {
-		case AStar:
-			path = aStarData.getPath();
-			break;
-		case AStarSmoothed:
-			path = aStarSmoothedData.getPath();
-			break;
-		case ThetaStar:
-			path = thetaStarData.getPath();
-			break;
-		default:
-			//TODO new algorithms	
+		try {
+			switch (algorithmType) {
+			case Dijkstra :
+				path = dijkstraData.getPath();
+				break;
+			case AStar:
+				path = aStarData.getPath();
+				break;
+			case AStarSmoothed:
+				path = aStarSmoothedData.getPath();
+				break;
+			case ThetaStar:
+				path = thetaStarData.getPath();
+				break;
+			default:
+				//TODO new algorithms	
+				path = null;	
+				System.out.println("MapInstance.getPath(): alg type not found");
+			}
+		} catch (NullPointerException e) {
 			path = null;	
+			System.out.println("MapInstance.getPath(): no path of that type");
 		}
 		return path;
 	}

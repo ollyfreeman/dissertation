@@ -26,7 +26,7 @@ public class AlgorithmPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private Engine engine;
-	private Component[][] componentArray = new Component[4][6];
+	private Component[][] componentArray = new Component[5][6];
 
 	public AlgorithmPanel(Engine engine) {
 		
@@ -49,9 +49,10 @@ public class AlgorithmPanel extends JPanel {
 		componentArray[0][4] = new JLabel("");
 		componentArray[0][5] = new JLabel("");
 		
-		addAlgorithm("A*", AlgorithmType.AStar, Color.ORANGE, 1);
-		addAlgorithm("A*Smoothed", AlgorithmType.AStarSmoothed, Color.RED, 2);
-		addAlgorithm("Theta*", AlgorithmType.ThetaStar, Color.BLUE, 3);
+		addAlgorithm("Dijkstra", AlgorithmType.Dijkstra, Color.ORANGE, 1);
+		addAlgorithm("A*", AlgorithmType.AStar, Color.GREEN, 2);
+		addAlgorithm("A*Smoothed", AlgorithmType.AStarSmoothed, Color.RED, 3);
+		addAlgorithm("Theta*", AlgorithmType.ThetaStar, Color.BLUE, 4);
 	    
 	    for(int i=0; i<componentArray.length; i++) {
     		c.gridy = i;
@@ -68,6 +69,7 @@ public class AlgorithmPanel extends JPanel {
 	    componentArray[index][1] = new JTextField(6);
 	    componentArray[index][2] = new JTextField(6);
 	    componentArray[index][3] = new JTextField(6);
+	    componentArray[index][4] = new JTextField(6);
 	    
 	    final AlgorithmType algType = algorithmType;	//for inner classes
 	    final Color c = color;
@@ -115,12 +117,14 @@ public class AlgorithmPanel extends JPanel {
 			setNoPath();
 		} else {
 			int index;
-			if(algorithmType.equals(AlgorithmType.AStar)) {
+			if(algorithmType.equals(AlgorithmType.Dijkstra)) {
 				index = 1;
-			} else if (algorithmType.equals(AlgorithmType.AStarSmoothed)){
+			} else if (algorithmType.equals(AlgorithmType.AStar)){
 				index = 2;
-			} else { //Theta*
+			} else if (algorithmType.equals(AlgorithmType.AStarSmoothed)){
 				index = 3;
+			} else {
+				index = 4;
 			}
 			DecimalFormat f = new DecimalFormat("##.00");
 			JTextField distanceLabel = (JTextField) componentArray[index][1];

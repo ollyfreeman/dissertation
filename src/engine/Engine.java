@@ -167,14 +167,18 @@ public class Engine {
 			 fileIn.close();
 			 coordinator.drawMap(mapInstance.getMap());
 			 coordinator.resetAlgorithmPanel();
+			 coordinator.enableAlgorithmPanel();
+			 int unfoundPaths = 0;
 			 for(AlgorithmType algorithmType: AlgorithmType.values()) {
-				 switch (this.mapInstance.doesRouteExist()) {
-				 case Yes :	coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType), algorithmType);
-				 			break;
-				 case No:	coordinator.setAlgorithmStatistics(null, algorithmType);
-				 			break;
-				 default:	//donothing
+				 if (this.mapInstance.getPath(algorithmType) != null) {
+					 coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType), algorithmType);
+					 unfoundPaths++;
 				 }
+			 }
+			 if (unfoundPaths == 4) {
+				 coordinator.setAlgorithmStatistics(null, AlgorithmType.Dijkstra);
+				 coordinator.resetAlgorithmPanel();
+				 coordinator.enableAlgorithmPanel();
 			 }
 			 
 		 } catch(IOException i) {
@@ -192,6 +196,19 @@ public class Engine {
 			FileOutputStream fileOut = new FileOutputStream(filename);
 			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
 			outStream.writeObject(mapInstance);
+			outStream.close();
+			fileOut.close();
+		} catch(IOException i) {
+			i.printStackTrace();
+		}
+	}
+	
+	//FOR TESTING ONLY
+	public void saveMapOnly(String filename) {
+		try {
+			FileOutputStream fileOut = new FileOutputStream(filename);
+			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
+			outStream.writeObject(new MapInstance(mapInstance.getMap()));
 			outStream.close();
 			fileOut.close();
 		} catch(IOException i) {
