@@ -425,6 +425,106 @@ public class GraphGenerator {
 
 	}
 	
+	public static Graph generateBlockAStarGraph_visibility_edge_finiteWidth(Map map, Node source, Node goal){ 
+		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
+		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
+		for(int j=0; j < map.getHeight()+1; j++) {
+			for(int i=0; i < map.getWidth()+1; i++) {
+				// nodes only exist on corners (i.e. when ONE of the surrounding 4 cells is blocked)
+				int cellsBlocked = 0;
+				try{
+					for(int k=0;k<4;k++) {
+						if(map.getCell(i+diagonalRelativeCellCoordinates[k].getX(),j+diagonalRelativeCellCoordinates[k].getY()).isBlocked()) {
+							cellsBlocked++;
+						}
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {cellsBlocked = 10;} //i.e. nodes don't exist on boundaries of map except start and end
+				if(cellsBlocked == 1) {
+					graphArray2D[i][j] = new Node(new Coordinate(i,j));
+				}
+			}
+		}
+		//separately add Source and sink
+		graphArray2D[source.getX()][source.getY()] = source;
+		graphArray2D[goal.getX()][goal.getY()] = goal;
+		//add neighbour if LOS
+		for(int j=0; j < map.getHeight()+1; j++) {
+			for(int i=0; i < map.getWidth()+1; i++) {
+				for(int l=0; l < map.getHeight()+1; l++) {
+					for(int k=0; k < map.getWidth()+1; k++) {
+						if(!(i==k && j==l)) {
+							if(graphArray2D[i][j]!=null && graphArray2D[k][l]!=null && LineOfSight.isVisible_edge_finiteWidth(graphArray2D[i][j], graphArray2D[k][l], map)) {
+								graphArray2D[i][j].addNeighbour(graphArray2D[k][l]);
+							}
+						}
+					}
+				}
+			}
+		}
+		Graph graph = new Graph();
+		for(int j=0; j<graphArray2D[0].length; j++) {
+			for(int i=0; i<graphArray2D.length; i++) {
+				if(graphArray2D[i][j] != null) {
+					graph.addNode(graphArray2D[i][j]);
+				}
+			}
+		}
+		graph.setSource(source);
+		graph.setGoal(goal);
+		return graph;
+
+	}
+	
+	public static Graph generateBlockAStarGraph_visibility_edge_zeroWidth(Map map, Node source, Node goal){ 
+		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
+		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
+		for(int j=0; j < map.getHeight()+1; j++) {
+			for(int i=0; i < map.getWidth()+1; i++) {
+				// nodes only exist on corners (i.e. when ONE of the surrounding 4 cells is blocked)
+				int cellsBlocked = 0;
+				try{
+					for(int k=0;k<4;k++) {
+						if(map.getCell(i+diagonalRelativeCellCoordinates[k].getX(),j+diagonalRelativeCellCoordinates[k].getY()).isBlocked()) {
+							cellsBlocked++;
+						}
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {cellsBlocked = 10;} //i.e. nodes don't exist on boundaries of map except start and end
+				if(cellsBlocked == 1) {
+					graphArray2D[i][j] = new Node(new Coordinate(i,j));
+				}
+			}
+		}
+		//separately add Source and sink
+		graphArray2D[source.getX()][source.getY()] = source;
+		graphArray2D[goal.getX()][goal.getY()] = goal;
+		//add neighbour if LOS
+		for(int j=0; j < map.getHeight()+1; j++) {
+			for(int i=0; i < map.getWidth()+1; i++) {
+				for(int l=0; l < map.getHeight()+1; l++) {
+					for(int k=0; k < map.getWidth()+1; k++) {
+						if(!(i==k && j==l)) {
+							if(graphArray2D[i][j]!=null && graphArray2D[k][l]!=null && LineOfSight.isVisible_edge_zeroWidth(graphArray2D[i][j], graphArray2D[k][l], map)) {
+								graphArray2D[i][j].addNeighbour(graphArray2D[k][l]);
+							}
+						}
+					}
+				}
+			}
+		}
+		Graph graph = new Graph();
+		for(int j=0; j<graphArray2D[0].length; j++) {
+			for(int i=0; i<graphArray2D.length; i++) {
+				if(graphArray2D[i][j] != null) {
+					graph.addNode(graphArray2D[i][j]);
+				}
+			}
+		}
+		graph.setSource(source);
+		graph.setGoal(goal);
+		return graph;
+
+	}
+	
 
 }
 

@@ -28,4 +28,22 @@ public class Coordinate implements java.io.Serializable {
 	public void setY(int y) {
 		this.y = y;
 	}	
+	
+	public int hashCode() {
+		return x*50 + y;
+	}
+	
+	public boolean equals(Object o){
+		Coordinate c = (Coordinate) o;
+		if(this.x == c.x && this.y==c.y) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return "("+this.x+","+this.y+")";
+	}
 }

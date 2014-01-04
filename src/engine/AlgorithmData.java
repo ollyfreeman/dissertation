@@ -64,6 +64,11 @@ public class AlgorithmData implements java.io.Serializable {
 			goalNode = ThetaStarAlgorithm.getPath(graph,map);
 			endTime = System.nanoTime();
 			break;
+		case BlockAStar:
+			startTime = System.nanoTime();
+			goalNode = BlockAStarAlgorithm.getPath(map);
+			endTime = System.nanoTime();
+			break;
 		default:
 			//TODO for the further algorithms
 			startTime =  0.0;
@@ -80,6 +85,19 @@ public class AlgorithmData implements java.io.Serializable {
 		double distanceAccumulator = 0.0;
 		double angleAccumulator = 0.0;
 		path = new LinkedList<Coordinate>();
+		if(algorithmType.equals(AlgorithmType.BlockAStar)) {
+			Node n1 = n;
+			while(n1 != null && n1.getParent() !=null) {
+				if(!n1.getCoordinate().equals(n1.getParent().getCoordinate())) {
+					n1 = n1.getParent();
+				} else {
+					while(n1.getCoordinate().equals(n1.getParent().getCoordinate())) {
+						n1.setParent(n1.getParent().getParent());
+					}
+					n1 = n1.getParent();
+				}
+			}
+		}
 		while(n != null) {
 			try {
 				path.add(0,n.getCoordinate());
@@ -144,8 +162,8 @@ public class AlgorithmData implements java.io.Serializable {
 	private double getAngle(Node n) {
 		Node p = n.getParent();
 		Node pp = p.getParent();
-		Vector2d v0 = new Vector2d(p.getX()-n.getX(), p.getY()-n.getY());
-		Vector2d v1 = new Vector2d(pp.getX()-p.getX(), pp.getY()-p.getY());
+		Vector2d v0 = new Vector2d(n.getX()-p.getX(), n.getY()-p.getY());
+		Vector2d v1 = new Vector2d(p.getX()-pp.getX(), p.getY()-pp.getY());
 		return v0.angle(v1)*(180.00/Math.PI);
 	}
 

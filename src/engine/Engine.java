@@ -175,7 +175,7 @@ public class Engine {
 					 unfoundPaths++;
 				 }
 			 }
-			 if (unfoundPaths == 4) {
+			 if (unfoundPaths == 5) {
 				 coordinator.setAlgorithmStatistics(null, AlgorithmType.Dijkstra);
 				 coordinator.resetAlgorithmPanel();
 				 coordinator.enableAlgorithmPanel();

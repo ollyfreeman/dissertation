@@ -64,5 +64,10 @@ public class Graph implements java.io.Serializable {
 		 */
 		return null;
 	}
+	
+	//DELETE ME
+	public HashMap<Coordinate,Node> getHashMap() {
+		return graph;
+	}
 
 }

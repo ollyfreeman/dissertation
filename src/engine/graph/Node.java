@@ -90,8 +90,7 @@ public class Node implements Comparable<Node>, java.io.Serializable {
 	 * Makes nodes comparable by f-score, so they can be sorted in a priority queue
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Node other) {
-		Node node = (Node) other;
+	public int compareTo(Node node) {
 		if(this.getF() < node.getF()) {
 			return -1;
 		} else if(this.getF() > node.getF()) {

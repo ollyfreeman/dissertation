@@ -43,5 +43,20 @@ public class Map implements java.io.Serializable {
 	public int getHeight() {
 		return map[0].length;
 	}
+	
+	//for testing only
+	public void print() {
+		for(int j=0; j<map[0].length; j++) {
+			for(int i=0;i<map.length;i++) {
+				if(map[i][j].isBlocked()) {
+					System.out.print("X");
+				} else {
+					System.out.print("-");
+				}
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 
 }
