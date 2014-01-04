@@ -63,7 +63,7 @@ public class ldbbCreator {
 	private static void f(HashMap<PairOfCoords,Double> hm, Map m, Coordinate sourceCoord, Coordinate goalCoord, int size, int mapCounter) {
 		Node sourceNode = new Node(sourceCoord);
 		Node goalNode = new Node(goalCoord);
-		Graph g = GraphGenerator.generateBlockAStarGraph_visibility_edge_finiteWidth(m, sourceNode, goalNode);
+		Graph g = GraphGenerator.generateBlockAStarGraph_visibility_edge_zeroWidth(m, sourceNode, goalNode);
 
 		double distanceAccumulator = 0.0;
 		g.setSource(g.getNode(sourceCoord));
@@ -90,7 +90,7 @@ public class ldbbCreator {
 	}
 	
 	private static void saveDB(LinkedList<HashMap<PairOfCoords,Double>> db) {
-		String filename = "/Users/olly_freeman/Dropbox/Part2Project/3by3db.ser";
+		String filename = "/Users/olly_freeman/Dropbox/Part2Project/2by2db.ser";
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename);
 			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);

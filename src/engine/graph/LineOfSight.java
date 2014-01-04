@@ -118,8 +118,9 @@ public class LineOfSight {
 							return false;
 						}
 					} else if (m>0) {
-						if(Math.abs(yActual - yActualInt) <= 0.001) {
-							if(map.getCell(x-1,(int)(yActual-0.5)).isBlocked()) {
+						if(Math.abs(yActual - (int) Math.round(yActual)) <= 0.001) {
+							//yActualInt =(int) Math.round(yActual);
+							if(map.getCell(x-1,yActualInt-1).isBlocked()) {// if(map.getCell(x-1,(int)(yActual-0.5)).isBlocked()) {
 								return false;
 							}
 						} else { 
@@ -134,12 +135,13 @@ public class LineOfSight {
 							}
 						}
 					} else {
-						if(Math.abs(yActual - yActualInt) <= 0.001) {
-							if(map.getCell(x-1,(int)(yActual+0.5)).isBlocked()) {
+						if(Math.abs(yActual - (int) Math.round(yActual)) <= 0.001) {
+							//yActualInt = (int) Math.round(yActual);
+							if(map.getCell(x-1,yActualInt).isBlocked()) {//if(map.getCell(x-1,(int)(yActual+0.5)).isBlocked()) {
 								return false;
 							}
 						} else {
-							if((int) (yActual-m) == yActualInt) {
+							if((int) Math.ceil(yActual-m) == yActualInt+1) {		//if((int) (yActual-m) == yActualInt) {
 								if(map.getCell(x-1,yActualInt).isBlocked()) {
 									return false;
 								}
@@ -184,9 +186,10 @@ public class LineOfSight {
 						if(!oneAboveOrBelowIsFree) {
 							return false;
 						}
-					} else if (m>0) {
+					} else if (m>0) {	//i.e oct2
 						if(Math.abs(xActual - xActualInt) <= 0.001) {
-							if(map.getCell((int)(xActual-0.5),y-1).isBlocked()) {
+							//xActualInt = (int) Math.round(xActual);
+							if(map.getCell(xActualInt-1,y-1).isBlocked()) {
 								return false;
 							}
 						} else {
@@ -200,13 +203,14 @@ public class LineOfSight {
 								}
 							}
 						}
-					} else {
+					} else {	//oct 3
 						if(Math.abs(xActual - xActualInt) <= 0.001) {
-							if(map.getCell((int)(xActual+0.5),y-1).isBlocked()) {
+							//xActualInt = (int) Math.round(xActual);
+							if(map.getCell(xActualInt,y-1).isBlocked()) {
 								return false;
 							}
 						} else {
-							if((int) (xActual-m) == xActualInt) {
+							if((int) Math.ceil((xActual-m))== xActualInt+1) {
 								if(map.getCell(xActualInt,y-1).isBlocked()) {
 									return false;
 								}
