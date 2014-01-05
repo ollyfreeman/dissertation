@@ -54,9 +54,9 @@ public class AlgorithmData implements java.io.Serializable {
 			endTime = System.nanoTime();	
 			break;
 		case AStarSmoothed:
-			startTime = System.nanoTime();
 			goalNode = AStarAlgorithm.getPath(graph);
-			AStarSmoothed.smoothe_edge(graph.getSource(), goalNode,map);
+			startTime = System.nanoTime();
+			AStarSmoothed.smoothe_edge(graph.getSource(),goalNode,map);
 			endTime = System.nanoTime();
 			break;
 		case ThetaStar:
@@ -66,7 +66,7 @@ public class AlgorithmData implements java.io.Serializable {
 			break;
 		case BlockAStar:
 			startTime = System.nanoTime();
-			goalNode = BlockAStarAlgorithm.getPath(map);
+			goalNode = BlockAStarAlgorithm_v2.getPath(map);
 			endTime = System.nanoTime();
 			break;
 		default:
@@ -85,19 +85,6 @@ public class AlgorithmData implements java.io.Serializable {
 		double distanceAccumulator = 0.0;
 		double angleAccumulator = 0.0;
 		path = new LinkedList<Coordinate>();
-		if(algorithmType.equals(AlgorithmType.BlockAStar)) {
-			Node n1 = n;
-			while(n1 != null && n1.getParent() !=null) {
-				if(!n1.getCoordinate().equals(n1.getParent().getCoordinate())) {
-					n1 = n1.getParent();
-				} else {
-					while(n1.getCoordinate().equals(n1.getParent().getCoordinate())) {
-						n1.setParent(n1.getParent().getParent());
-					}
-					n1 = n1.getParent();
-				}
-			}
-		}
 		while(n != null) {
 			try {
 				path.add(0,n.getCoordinate());

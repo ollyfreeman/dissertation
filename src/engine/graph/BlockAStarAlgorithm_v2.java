@@ -12,15 +12,16 @@ import java.util.PriorityQueue;
 
 import engine.map.Map;
 import utility.Coordinate;
-import engine.graph.Node;
+import engine.graph.BASNode;
 import engine.graph.Block;
+import engine.graph.LDBB.LengthAndIntermediateNodes;
 import engine.graph.LDBB.PairOfCoords;
 
-public class BlockAStarAlgorithm {
+public class BlockAStarAlgorithm_v2 {
 
 	private static PriorityQueue<Block> openSet = new PriorityQueue<Block>();
 	private final static int blockSize = 4;
-	private static ArrayList<HashMap<PairOfCoords,Double>> db = loadDB();
+	private static ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>> db = loadDB();
 	private static Map map;
 	
 	public static Node getPath(Map m) {
@@ -68,21 +69,39 @@ public class BlockAStarAlgorithm {
 		if(length!=Double.POSITIVE_INFINITY) {
 			System.out.println("Found path of length " + length);
 			//return goalBlock.getNode(new Coordinate(map.getWidth()-goalBlock.getTopLeft().getX(),map.getHeight()-goalBlock.getTopLeft().getY()));//return goalBlock.getNode(new Coordinate(blockSize,blockSize));//return goalBlock.getNode(new Coordinate(map.getWidth()-goalBlock.getTopLeft().getX(),map.getHeight()-goalBlock.getTopLeft().getY()));
-			
+		
+			BASNode goal = goalBlock.getNode(new Coordinate(map.getWidth()-goalBlock.getTopLeft().getX(),map.getHeight()-goalBlock.getTopLeft().getY()));
 			//post processing
-			Node goal = goalBlock.getNode(new Coordinate(map.getWidth()-goalBlock.getTopLeft().getX(),map.getHeight()-goalBlock.getTopLeft().getY()));
-			Node n = goal;
+			//add in intermediate nodes
+			BASNode n = goal;
+			BASNode nNew;
+			while(n != null && n.getParent() !=null) {
+				BASNode parent = (BASNode) n.getParent();
+				if(n.getBlock() == parent.getBlock()) {
+					LinkedList<Coordinate> ll = db.get(n.getBlock().getCode()).get(new PairOfCoords(new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY()),new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY()))).getIntermediateNodes();
+					for(int i=ll.size()-1;i>=0;i--) {
+						Coordinate c = ll.get(i);
+						nNew = new BASNode(new Coordinate(c.getX()+n.getBlock().getTopLeft().getX(),c.getY()+n.getBlock().getTopLeft().getY()),n.getBlock());
+						n.setParent(nNew);
+						n = nNew;
+					}
+					n.setParent(parent);
+				}
+				n = parent;
+			}
+			//remove duplicates
+			n = goal;
 			while(n != null && n.getParent() !=null) {
 				if(!n.getCoordinate().equals(n.getParent().getCoordinate())) {
-					n = n.getParent();
+					n = (BASNode) n.getParent();
 				} else {
 					while(n.getCoordinate().equals(n.getParent().getCoordinate())) {
 						n.setParent(n.getParent().getParent());
 					}
-					n = n.getParent();
+					n = (BASNode) n.getParent();
 				}
 			}
-			return goal;
+			return (Node) goal;
 		} else {
 			System.out.println("NO PATH!");
 			return null;
@@ -120,7 +139,7 @@ public class BlockAStarAlgorithm {
 			}
 			
 			//this next section should only run if we have FINITE WIDTH AGENTS - to avoid diagonal blockages
-			boolean TL,TR,BL,BR;
+			/*boolean TL,TR,BL,BR;
 			Iterator<Coordinate> listXIt = ListX.iterator();
 			Iterator<Coordinate> listXPrimeIt = ListXPrime.iterator();
 			while(listXIt.hasNext()){
@@ -152,14 +171,14 @@ public class BlockAStarAlgorithm {
 					listXIt.remove();
 					listXPrimeIt.remove();
 				}
-			}
+			}*/
 			//extra section for finite width ends here
 			
 			LinkedList<Coordinate> ListXPrimeUpdated = new LinkedList<Coordinate>();
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
 				for(Coordinate c : y) {
-					double length = db.get(currentBlock.getCode()).get(new PairOfCoords(x,c)) != null ? db.get(currentBlock.getCode()).get(new PairOfCoords(x,c)) : Double.POSITIVE_INFINITY;
+					double length = db.get(currentBlock.getCode()).get(new PairOfCoords(x,c)) != null ? db.get(currentBlock.getCode()).get(new PairOfCoords(x,c)).getLength() : Double.POSITIVE_INFINITY;
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
 						//parent of x is c
@@ -216,7 +235,7 @@ public class BlockAStarAlgorithm {
 		for(int i=0; i<blockSize;i++) {
 			Coordinate[] outArray = {new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize)};
 			for(Coordinate c : outArray) {
-				double length = db.get(code).get(new PairOfCoords(startCoord,c)) != null ? db.get(code).get(new PairOfCoords(startCoord,c)) : Double.POSITIVE_INFINITY;
+				double length = db.get(code).get(new PairOfCoords(startCoord,c)) != null ? db.get(code).get(new PairOfCoords(startCoord,c)).getLength() : Double.POSITIVE_INFINITY;
 				block.setGValue(c, length);
 				block.setParent(c, block.getNode(startCoord));
 			}
@@ -229,7 +248,7 @@ public class BlockAStarAlgorithm {
 		for(int i=0; i<=blockSize;i++) {
 			Coordinate[] outArray = {new Coordinate(0,i),new Coordinate(i,0)};
 			for(Coordinate c : outArray) {
-				double length = db.get(code).get(new PairOfCoords(c,endCoord)) != null ? db.get(code).get(new PairOfCoords(c,endCoord)) : Double.POSITIVE_INFINITY;
+				double length = db.get(code).get(new PairOfCoords(c,endCoord)) != null ? db.get(code).get(new PairOfCoords(c,endCoord)).getLength() : Double.POSITIVE_INFINITY;
 				block.setHValue(c, length);
 			}
 		}
@@ -259,12 +278,12 @@ public class BlockAStarAlgorithm {
 		}
 	}
 	
-	private static ArrayList<HashMap<PairOfCoords,Double>> loadDB() {
+	private static ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>> loadDB() {
 		try {
-			String filename = "/Users/olly_freeman/Dropbox/Part2Project/4x4zerodb.ser";
+			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"x"+blockSize+"zerofulldb.ser";
 			FileInputStream fileIn = new FileInputStream(filename);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			ArrayList<HashMap<PairOfCoords,Double>> db = (ArrayList<HashMap<PairOfCoords,Double>>) in.readObject();
+			ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>> db = (ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>>) in.readObject();
 			in.close();
 			fileIn.close();
 			return db;

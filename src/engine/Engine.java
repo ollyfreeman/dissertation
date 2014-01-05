@@ -118,7 +118,7 @@ public class Engine {
 		 * if one even exists
 		 */
 		if(doesRouteExist.equals(DoesRouteExist.DontKnow)) {
-			mapInstance.createAlgorithmData(AlgorithmType.AStar);
+			mapInstance.createAlgorithmData(AlgorithmType.Dijkstra);		//OR AStar? if you change this need to change MapInstance.doesRouteExist()
 		}
 		/*
 		 * recheck doesRouteExist now that we've actually tried to find one.

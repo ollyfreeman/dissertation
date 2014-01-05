@@ -1,4 +1,4 @@
-package engine.graph;
+package engine.graph.LDBB;
 
 import utility.Coordinate;
 

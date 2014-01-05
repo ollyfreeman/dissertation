@@ -150,7 +150,7 @@ public class GraphGenerator {
         return graph;
 	}
 	
-	public static Graph generateGraph_edge_zeroWidth(Map map){ 
+	public static Graph generateGraph_edge_zeroWidth(Map map, Node source, Node goal){ 
 		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
 		Coordinate[] diagonalRelativeNodeCoordinates = {new Coordinate(-1,-1), new Coordinate(1,-1), new Coordinate(1,1), new Coordinate(-1,1)};
 		Coordinate[] adjacentRelativeNodeCoordinates = {new Coordinate(0,-1), new Coordinate(1,0), new Coordinate(0,1), new Coordinate(-1,0)};
@@ -173,9 +173,8 @@ public class GraphGenerator {
 			}
 		}
 		//separately add Source and sink
-		graphArray2D[0][0] = new Node(new Coordinate(0,0));
-		graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1] = new Node(new Coordinate(graphArray2D.length-1,graphArray2D[0].length-1));
-				
+		graphArray2D[source.getX()][source.getY()] = source;
+		graphArray2D[goal.getX()][goal.getY()] = goal;		
 		for(int j=0; j < map.getHeight()+1; j++) {
 			for(int i=0; i < map.getWidth()+1; i++) {
 				if(graphArray2D[i][j] != null) {
@@ -222,13 +221,13 @@ public class GraphGenerator {
 				}
 			}
 		}
-		graph.setSource(graphArray2D[0][0]);
-		graph.setGoal(graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1]);
+		graph.setSource(source);
+		graph.setGoal(goal);
 		return graph;
 
 	}
 	
-	public static Graph generateGraph_edge_finiteWidth(Map map){ 
+	public static Graph generateGraph_edge_finiteWidth(Map map, Node source, Node goal){ 
 		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
 		Coordinate[] diagonalRelativeNodeCoordinates = {new Coordinate(-1,-1), new Coordinate(1,-1), new Coordinate(1,1), new Coordinate(-1,1)};
 		Coordinate[] adjacentRelativeNodeCoordinates = {new Coordinate(0,-1), new Coordinate(1,0), new Coordinate(0,1), new Coordinate(-1,0)};
@@ -256,9 +255,8 @@ public class GraphGenerator {
 			}
 		}
 		//separately add Source and sink
-		graphArray2D[0][0] = new Node(new Coordinate(0,0));
-		graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1] = new Node(new Coordinate(graphArray2D.length-1,graphArray2D[0].length-1));
-		
+		graphArray2D[source.getX()][source.getY()] = source;
+		graphArray2D[goal.getX()][goal.getY()] = goal;
 		for(int j=0; j < map.getHeight()+1; j++) {
 			for(int i=0; i < map.getWidth()+1; i++) {
 				if(graphArray2D[i][j] != null) {
@@ -305,13 +303,13 @@ public class GraphGenerator {
 				}
 			}
 		}
-		graph.setSource(graphArray2D[0][0]);
-		graph.setGoal(graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1]);
+		graph.setSource(source);
+		graph.setGoal(goal);
 		return graph;
 
 	}
 	
-	public static Graph generateGraph_visibility_edge_finiteWidth(Map map){ 
+	public static Graph generateGraph_visibility_edge_finiteWidth(Map map, Node source, Node goal){ 
 		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
 		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
 		for(int j=0; j < map.getHeight()+1; j++) {
@@ -331,8 +329,8 @@ public class GraphGenerator {
 			}
 		}
 		//separately add Source and sink
-		graphArray2D[0][0] = new Node(new Coordinate(0,0));
-		graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1] = new Node(new Coordinate(graphArray2D.length-1,graphArray2D[0].length-1));
+		graphArray2D[source.getX()][source.getY()] = source;
+		graphArray2D[goal.getX()][goal.getY()] = goal;
 		//add neighbour if LOS
 		for(int j=0; j < map.getHeight()+1; j++) {
 			for(int i=0; i < map.getWidth()+1; i++) {
@@ -355,13 +353,13 @@ public class GraphGenerator {
 				}
 			}
 		}
-		graph.setSource(graphArray2D[0][0]);
-		graph.setGoal(graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1]);
+		graph.setSource(source);
+		graph.setGoal(goal);
 		return graph;
 
 	}
 	
-	public static Graph generateGraph_visibility_edge_zeroWidth(Map map){ 
+	public static Graph generateGraph_visibility_edge_zeroWidth(Map map, Node source, Node goal){ 
 		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
 		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
 		for(int j=0; j < map.getHeight()+1; j++) {
@@ -396,8 +394,8 @@ public class GraphGenerator {
 			}
 		}
 		//separately add Source and sink
-		graphArray2D[0][0] = new Node(new Coordinate(0,0));
-		graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1] = new Node(new Coordinate(graphArray2D.length-1,graphArray2D[0].length-1));
+		graphArray2D[source.getX()][source.getY()] = source;
+		graphArray2D[goal.getX()][goal.getY()] = goal;
 		for(int j=0; j < map.getHeight()+1; j++) {
 			for(int i=0; i < map.getWidth()+1; i++) {
 				for(int l=0; l < map.getHeight()+1; l++) {
@@ -419,8 +417,8 @@ public class GraphGenerator {
 				}
 			}
 		}
-		graph.setSource(graphArray2D[0][0]);
-		graph.setGoal(graphArray2D[graphArray2D.length-1][graphArray2D[0].length-1]);
+		graph.setSource(source);
+		graph.setGoal(goal);
 		return graph;
 
 	}

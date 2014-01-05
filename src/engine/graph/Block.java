@@ -12,7 +12,7 @@ public class Block implements Comparable<Block>{
 	private double[][] gArray;
 	private boolean[][] updatedGArray;
 	private double[][] hArray;
-	private Node[][] parentArray;
+	private BASNode[][] parentArray;
 	private LinkedList<Block> neighbours = new LinkedList<Block>();
 	private int code;
 	
@@ -22,14 +22,14 @@ public class Block implements Comparable<Block>{
 		gArray = new double[size+1][size+1];
 		updatedGArray = new boolean[size+1][size+1];
 		hArray = new double[size+1][size+1];
-		parentArray = new Node[size+1][size+1];
+		parentArray = new BASNode[size+1][size+1];
 		heapValue = Double.POSITIVE_INFINITY;
 		for(int i=0;i<=size;i++) {
 			for(int j=0;j<=size;j++) {
 				gArray[i][j] = Double.POSITIVE_INFINITY;
 				updatedGArray[i][j] = false;
 				hArray[i][j] = getDistance(topLeft.getX()+i,topLeft.getY()+j,goal);
-				parentArray[i][j] = new Node(new Coordinate(this.topLeft.getX()+i,this.topLeft.getY()+j));
+				parentArray[i][j] = new BASNode(new Coordinate(this.topLeft.getX()+i,this.topLeft.getY()+j),this);
 			}
 		}
 	}
@@ -89,11 +89,12 @@ public class Block implements Comparable<Block>{
 		return hArray[c.getX()][c.getY()];
 	}
 	
+	//sets the parent of the node (with Coordinate c) to Node n
 	public void setParent(Coordinate c, Node n) {
 		parentArray[c.getX()][c.getY()].setParent(n);
 	}
 	
-	public Node getNode(Coordinate c) {
+	public BASNode getNode(Coordinate c) {
 		return parentArray[c.getX()][c.getY()];
 	}
 	

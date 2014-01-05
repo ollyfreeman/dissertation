@@ -5,8 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import engine.map.Map;
@@ -14,21 +15,23 @@ import engine.graph.DijkstraAlgorithm;
 import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
-import engine.graph.PairOfCoords;
+import engine.graph.LDBB.LengthAndIntermediateNodes;
+import engine.graph.LDBB.PairOfCoords;
 import utility.Coordinate;
 
-public class ldbbCreator {
+public class LDBBCreator {
 
+	private static int blockSize= 4;
+	
 	public static void main(String[] args) {
-		int size = 2;
-		int totalMaps = (int) Math.pow(2,size*size);
-		LinkedList<HashMap<PairOfCoords,Double>> db = new LinkedList<HashMap<PairOfCoords,Double>>();
+		
+		int totalMaps = (int) Math.pow(2,blockSize*blockSize);
+		ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>> db = new ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>>();
 		for(int mapCounter=0;mapCounter<totalMaps;mapCounter++) {
-			//System.out.println(mapCounter+1 + " of " + totalMaps);
 			int mapRep = mapCounter;
-			int[][] map = new int[size][size];
-			for(int j=size-1;j>=0;j--) {
-				for(int i=size-1;i>=0;i--) {
+			int[][] map = new int[blockSize][blockSize];
+			for(int j=blockSize-1;j>=0;j--) {
+				for(int i=blockSize-1;i>=0;i--) {
 					if((mapRep & 1) == 1) {
 						map[i][j] = 1;			//1 in all reps means unblocked
 					} else {
@@ -38,17 +41,17 @@ public class ldbbCreator {
 				}
 			}
 			Map m = new Map(map);
-			HashMap<PairOfCoords,Double> hm = new HashMap<PairOfCoords,Double>();
-			/*if(mapCounter==10) {
+			HashMap<PairOfCoords,LengthAndIntermediateNodes> hm = new HashMap<PairOfCoords,LengthAndIntermediateNodes>();
+			if(mapCounter==11) {
 				m.print();
-			}*/
-			for(int i=0; i<size;i++) {
-				for(int j=0;j<size;j++) {
-					Coordinate[] sourceArray = {new Coordinate(i,0),new Coordinate(size,i),new Coordinate(size-i,size),new Coordinate(0,size-i)};
-					Coordinate[] goalArray = {new Coordinate(j,0),new Coordinate(size,j),new Coordinate(size-j,size),new Coordinate(0,size-j)};
+			}
+			for(int i=0; i<blockSize;i++) {
+				for(int j=0;j<blockSize;j++) {
+					Coordinate[] sourceArray = {new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
+					Coordinate[] goalArray = {new Coordinate(j,0),new Coordinate(blockSize,j),new Coordinate(blockSize-j,blockSize),new Coordinate(0,blockSize-j)};
 					for(Coordinate sourceCoord : sourceArray) {
 						for(Coordinate goalCoord : goalArray) {
-							f(hm,m,sourceCoord,goalCoord,size,mapCounter);
+							f(hm,m,sourceCoord,goalCoord,blockSize,mapCounter);
 						}
 					}
 				}
@@ -60,7 +63,7 @@ public class ldbbCreator {
 	}
 
 	//mapCounter parameter only for debugging
-	private static void f(HashMap<PairOfCoords,Double> hm, Map m, Coordinate sourceCoord, Coordinate goalCoord, int size, int mapCounter) {
+	private static void f(HashMap<PairOfCoords,LengthAndIntermediateNodes> hm, Map m, Coordinate sourceCoord, Coordinate goalCoord, int size, int mapCounter) {
 		Node sourceNode = new Node(sourceCoord);
 		Node goalNode = new Node(goalCoord);
 		Graph g = GraphGenerator.generateBlockAStarGraph_visibility_edge_zeroWidth(m, sourceNode, goalNode);
@@ -69,6 +72,7 @@ public class ldbbCreator {
 		g.setSource(g.getNode(sourceCoord));
 		g.setGoal(g.getNode(goalCoord));
 		Node n = DijkstraAlgorithm.getPath(g);
+		LinkedList<Coordinate> intermediateCoordinates = new LinkedList<Coordinate>();
 		if(n!=null) {
 			while(n != null) {
 				try {
@@ -76,21 +80,25 @@ public class ldbbCreator {
 				} catch (NullPointerException e) {
 					//when we get to the final (source) node
 				}
+				if(n.getParent() !=null && n.getParent().getParent()!=null) {
+					intermediateCoordinates.add(n.getParent().getCoordinate());
+				}
 				n = n.getParent();
 			}
-			hm.put(new PairOfCoords(sourceCoord,goalCoord),distanceAccumulator);
+			hm.put(new PairOfCoords(sourceCoord,goalCoord),new LengthAndIntermediateNodes(distanceAccumulator,intermediateCoordinates));
 		}
 
-		/*if(mapCounter==10) {
+		if(mapCounter==11) {
 			String c1 = "("+sourceCoord.getX() + "," + sourceCoord.getY() +") ";
 			String c2 = "("+goalCoord.getX() + "," + goalCoord.getY() +") ";
-			System.out.println("Making: "+c1 + c2 + distanceAccumulator);
+			System.out.println("Making: "+c1 + c2 + distanceAccumulator+", with intermediate coords: " +intermediateCoordinates);
 			
-		}*/
+			
+		}
 	}
 	
-	private static void saveDB(LinkedList<HashMap<PairOfCoords,Double>> db) {
-		String filename = "/Users/olly_freeman/Dropbox/Part2Project/2by2db.ser";
+	private static void saveDB(ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>> db) {
+		String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"x"+blockSize+"zerofulldb.ser";
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename);
 			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
@@ -104,14 +112,14 @@ public class ldbbCreator {
 	
 	private static void loadDB() {
 		try {
-			String filename = "/Users/olly_freeman/Dropbox/Part2Project/2by2db.ser";
+			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"x"+blockSize+"zerofulldb.ser";
 			FileInputStream fileIn = new FileInputStream(filename);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			LinkedList<HashMap<PairOfCoords,Double>> db = (LinkedList<HashMap<PairOfCoords,Double>>) in.readObject();
+			ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>> db = (ArrayList<HashMap<PairOfCoords,LengthAndIntermediateNodes>>) in.readObject();
 			in.close();
 			fileIn.close();
-			for(Entry<PairOfCoords, Double> e : db.get(10).entrySet()) {
-				System.out.println("Loading: " + e.getKey().toString() + ", " + e.getValue());
+			for(Entry<PairOfCoords, LengthAndIntermediateNodes> e : db.get(11).entrySet()) {
+				System.out.println("Loading: " + e.getKey().toString() + ", " + e.getValue().getLength() +" with code " + e.getValue().getIntermediateNodes());
 			}
 		} catch(IOException i) {
 			i.printStackTrace();

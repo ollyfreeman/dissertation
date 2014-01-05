@@ -57,7 +57,7 @@ public class AStarAlgorithm {
 			return false;
 		}
 	}
-	/* According to comments in getPath, updateCost can be simplified to the below if we alter
+	/* As per my comments in getPath, updateCost can be simplified to the below if we alter
 	 * the code in getPath accordingly:
 	 * 
 	 * private static void updateCost(Node current, Node neighbour, Node goal) {

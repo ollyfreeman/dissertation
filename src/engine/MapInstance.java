@@ -49,9 +49,9 @@ public class MapInstance implements java.io.Serializable{
 	 */
 	protected DoesRouteExist doesRouteExist() {
 		if(!(this.doesRouteExist.equals(DoesRouteExist.No) || this.doesRouteExist.equals(DoesRouteExist.Yes))) {
-			if(aStarData == null) {
+			if(dijkstraData == null) {
 				this.doesRouteExist = DoesRouteExist.DontKnow;
-			} else if (!aStarData.goalNodeExists()) {
+			} else if (!dijkstraData.goalNodeExists()) {
 				this.doesRouteExist = DoesRouteExist.No;
 			} else {
 				this.doesRouteExist = DoesRouteExist.Yes;
@@ -70,7 +70,7 @@ public class MapInstance implements java.io.Serializable{
 	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType) {
 		//FOR NOW I WILL RE-GENERATE A NEW GRAPH FROM THE MAP, but I need to implement a graph cloning algorithm cos this will take to long
 		//if I have loaded the graph it will have a null graph instance, so will need to consider this before cloning
-		Graph graph = GraphGenerator.generateGraph_edge_zeroWidth(map);
+		Graph graph = GraphGenerator.generateGraph_edge_zeroWidth(map, new Node(new Coordinate(10,5)), new Node(new Coordinate(map.getWidth()-5,map.getHeight()-2)));
 		AlgorithmStatistics algorithmStatistics;
 		switch (algorithmType) {
 		case Dijkstra:
