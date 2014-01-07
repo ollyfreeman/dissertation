@@ -29,7 +29,7 @@ public class GUICoordinator {
 	
 	private void run() {
 		engine = new Engine(this);
-		drawingPanel = new DrawingPanel(800,800);
+		drawingPanel = new DrawingPanel(800,800,this);
 		mapGeneratorPanel = new MapGeneratorPanel(engine,this);
 		mapCreatorPanel = new MapCreatorPanel(engine,this);
 		saveLoadPanel = new SaveLoadPanel(engine, this);
@@ -68,12 +68,13 @@ public class GUICoordinator {
 		algorithmPanel.setAlgorithmStatistics(algorithmStatistics, algorithmType);
 	}
 	
+	//where x and y are the width and height in cells (not pixels)
 	public void startEditMode(int x, int y) {
 		drawingPanel.startEditMode(x,y);
 		window.editMode(true);
 		mapGeneratorPanel.disablePanel();
 		saveLoadPanel.disablePanel();
-		resetAlgorithmPanel();
+		resetAlgorithmPanel(x,y);
 	}
 	
 	public int[][] stopEditMode() {
@@ -84,8 +85,8 @@ public class GUICoordinator {
 		return drawingPanel.stopEditMode();
 	}
 	
-	public void resetAlgorithmPanel() {
-		algorithmPanel.resetPanel();
+	public void resetAlgorithmPanel(int x, int y) {
+		algorithmPanel.resetPanel(x,y);
 	}
 	
 	public void enableAlgorithmPanel() {

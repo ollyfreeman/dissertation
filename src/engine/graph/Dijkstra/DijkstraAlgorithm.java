@@ -1,8 +1,11 @@
-package engine.graph;
+package engine.graph.Dijkstra;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+
+import engine.graph.Graph;
+import engine.graph.Node;
 
 public class DijkstraAlgorithm {
 	
@@ -29,7 +32,7 @@ public class DijkstraAlgorithm {
 				}
 			}
 		}
-		if(goal.getParent() == null) {
+		if(goal.getParent() == null && (!goal.getCoordinate().equals(start.getCoordinate()))) {
 			return null;
 		} else {
 			return goal;

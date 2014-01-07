@@ -1,9 +1,12 @@
-package engine.graph;
+package engine.graph.ThetaStar;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import engine.graph.Graph;
+import engine.graph.LineOfSight;
+import engine.graph.Node;
 import engine.map.Map;
 
 //NB MOST OF THIS IS COPY AND PASTED FROM AStarAlgorithm, but I've deleted the comments etc

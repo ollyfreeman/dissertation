@@ -1,8 +1,9 @@
-package engine.graph;
+package engine.graph.BlockAStar;
 
 import java.util.List;
 import java.util.LinkedList;
 
+import engine.graph.Node;
 import utility.Coordinate;
 
 public class Block implements Comparable<Block>{
@@ -26,10 +27,9 @@ public class Block implements Comparable<Block>{
 		heapValue = Double.POSITIVE_INFINITY;
 		for(int i=0;i<=size;i++) {
 			for(int j=0;j<=size;j++) {
-				gArray[i][j] = Double.POSITIVE_INFINITY;
 				updatedGArray[i][j] = false;
-				hArray[i][j] = getDistance(topLeft.getX()+i,topLeft.getY()+j,goal);
 				parentArray[i][j] = new BASNode(new Coordinate(this.topLeft.getX()+i,this.topLeft.getY()+j),this);
+				setHValue(new Coordinate(i,j),(getDistance(topLeft.getX()+i,topLeft.getY()+j,goal)));
 			}
 		}
 	}
@@ -72,21 +72,21 @@ public class Block implements Comparable<Block>{
 	}
 	
 	public void setGValue(Coordinate c, double value) {
-		gArray[c.getX()][c.getY()] = value;
+		parentArray[c.getX()][c.getY()].setG(value);
 		updatedGArray[c.getX()][c.getY()]  = true;
 	}
 	
 	public double getGValue(Coordinate c) {
-		return gArray[c.getX()][c.getY()];
+		return parentArray[c.getX()][c.getY()].getG();
 	}
 	
 	//only to be used if goal block - I should subclass block to have goal block and put this method in there
 	public void setHValue(Coordinate c, double value) {
-		hArray[c.getX()][c.getY()] = value;
+		parentArray[c.getX()][c.getY()].setF(value);		//im using f for h
 	}
 	
 	public double getHValue(Coordinate c) {
-		return hArray[c.getX()][c.getY()];
+		return parentArray[c.getX()][c.getY()].getF();
 	}
 	
 	//sets the parent of the node (with Coordinate c) to Node n

@@ -1,15 +1,23 @@
-package engine.graph;
+package engine.graph.AStar;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import engine.graph.Graph;
+import engine.graph.LineOfSight;
+import engine.graph.Node;
+import engine.graph.BlockAStar.LDBB.LengthAndIntermediateNodes;
+import engine.map.Map;
 import utility.Coordinate;
 
 public class AStarAlgorithm {
 	
-	public static Node getPath(Graph graph) { 
-		
+	private static int counter;
+	
+	public static Node getPath(Graph graph, Map map) { 
+		counter=0;
 		List<Node> closedSet = new LinkedList<Node>();				//see line 27 - the closed set isn't needed for functionality, but helps speed up the code - n.b. closed set != Universe \ OpenSet
 		PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 		Node start = graph.getSource();
@@ -20,6 +28,7 @@ public class AStarAlgorithm {
 		
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();
+			counter++;
 			if(current.getCoordinate().equals(goal.getCoordinate())) {
 				return goal;
 			}
@@ -37,7 +46,7 @@ public class AStarAlgorithm {
 							openSet.add(neighbour);
 						}
 					}*/
-					updateCost(current,neighbour,goal);
+					updateCost(current,neighbour,goal,map);
 					if(!openSet.contains(neighbour)){
 						openSet.add(neighbour);
 					}
@@ -48,7 +57,7 @@ public class AStarAlgorithm {
 		return null;
 	}
 	
-	private static boolean updateCost(Node current, Node neighbour, Node goal) {
+	private static boolean updateCost(Node current, Node neighbour, Node goal, Map map) {
 		double prosposedNewGScore = current.getG() + getDistance(current, neighbour);
 		if(prosposedNewGScore < neighbour.getG()) {
 			neighbour.setParent(current);
@@ -80,11 +89,14 @@ public class AStarAlgorithm {
 		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
 	}
 	
-	public static double getLength(Graph g) {
-		Node n = getPath(g);
+	//for traceback in BlockAStar
+	public static LengthAndIntermediateNodes getLengthAndIntermediateNodes(Graph g, Map m) {
+		Node n = getPath(g,m);
+		Node n1 = n;
+		
 		double distanceAccumulator = 0.0;
 		if(n == null) {
-			return -1;
+			distanceAccumulator = -1;
 		} else {
 			while(n != null) {
 				try {
@@ -92,22 +104,18 @@ public class AStarAlgorithm {
 				} catch (NullPointerException e) {}
 				n = n.getParent();
 			}
-			return distanceAccumulator;
 		}
-	}
-	public static LinkedList<Coordinate> getIntermediateNodes(Graph g) {
-		LinkedList<Coordinate> list = new LinkedList<Coordinate>();
-		Node n = getPath(g);
-		if(n != null) {
-			while(n.getParent()!=null) {
-				list.add(n.getParent().getCoordinate());
-				n = n.getParent();
+		ArrayList<Coordinate> list = new ArrayList<Coordinate>();
+		if(n1 != null) {
+			while(n1.getParent()!=null) {
+				list.add(n1.getParent().getCoordinate());
+				n1 = n1.getParent();
 			}
 		}
 		if(list.size()!=0) {
-			list.removeLast();
+			list.remove(list.size()-1);
 		}
-		return list;
+		return new LengthAndIntermediateNodes(distanceAccumulator,list);
 	}
 
 }

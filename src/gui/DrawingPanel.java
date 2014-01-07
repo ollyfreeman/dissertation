@@ -3,6 +3,8 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +18,7 @@ import engine.map.Map;
  * calling draw map or draw path alter the state of this object, so that
  * when paint is called (via a call to 'repaint') the behaviour is appropriate
  */
-public class DrawingPanel extends JPanel{
+public class DrawingPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,13 +38,15 @@ public class DrawingPanel extends JPanel{
 	private int brushSize;
 	
 	private Window window;					//need this because calling repaint on just drawingPanel (this) seems glitchy, so call it on window
-
-	public DrawingPanel(int width, int height) {
+	private GUICoordinator coordinator;
+	
+	public DrawingPanel(int width, int height, GUICoordinator coordinator) {
 		this.width = width;
 		this.height = height;
 		this.paths = new LinkedList<List<Coordinate>>();
 		this.pathColours = new LinkedList<Color>();
 		this.creationMode = false;
+		this.coordinator = coordinator;
 	}
 	
 	public void setWindow(Window window) {
@@ -163,6 +167,5 @@ public class DrawingPanel extends JPanel{
 			}
 		}
 	} 
-	
 }
 

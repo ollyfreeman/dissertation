@@ -1,4 +1,4 @@
-package engine.graph.LDBB;
+package engine.graph.BlockAStar.LDBB;
 
 import java.util.ArrayList;
 

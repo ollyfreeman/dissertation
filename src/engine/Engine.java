@@ -76,7 +76,7 @@ public class Engine {
 		/*
 		 * plotting a new map so need to reset the Algorithm panel
 		 */
-		coordinator.resetAlgorithmPanel();
+		coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
 		coordinator.enableAlgorithmPanel();
 	}
 	
@@ -106,7 +106,7 @@ public class Engine {
 	 * obtains the statistics for an algorithm.
 	 * If no algorithm has been run it will run A* first to see if a route even exists
 	 */
-	public void createAlgorithmStatistics(AlgorithmType algorithmType){
+	public void createAlgorithmStatistics(AlgorithmType algorithmType, Coordinate source, Coordinate goal){
 		AlgorithmStatistics algorithmStatistics = null;
 		
 		/*
@@ -118,7 +118,7 @@ public class Engine {
 		 * if one even exists
 		 */
 		if(doesRouteExist.equals(DoesRouteExist.DontKnow)) {
-			mapInstance.createAlgorithmData(AlgorithmType.Dijkstra);		//OR AStar? if you change this need to change MapInstance.doesRouteExist()
+			mapInstance.createAlgorithmData(AlgorithmType.Dijkstra, source, goal);		//OR AStar? if you change this need to change MapInstance.doesRouteExist()
 		}
 		/*
 		 * recheck doesRouteExist now that we've actually tried to find one.
@@ -130,7 +130,7 @@ public class Engine {
 			/*
 			 * actually do the algorithm if it hasn't already been done
 			 */
-			algorithmStatistics = mapInstance.createAlgorithmData(algorithmType);
+			algorithmStatistics = mapInstance.createAlgorithmData(algorithmType, source, goal);
 		} else {
 			/*
 			 * do nothing, i.e. algorithmStatistics = null tells the algorithmPanel that no path was found
@@ -166,18 +166,18 @@ public class Engine {
 			 in.close();
 			 fileIn.close();
 			 coordinator.drawMap(mapInstance.getMap());
-			 coordinator.resetAlgorithmPanel();
+			 coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
 			 coordinator.enableAlgorithmPanel();
 			 int unfoundPaths = 0;
 			 for(AlgorithmType algorithmType: AlgorithmType.values()) {
 				 if (this.mapInstance.getPath(algorithmType) != null) {
-					 coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType), algorithmType);
+					 coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType, mapInstance.getAlgorithmData(algorithmType).getSource(),mapInstance.getAlgorithmData(algorithmType).getGoal()), algorithmType);
 					 unfoundPaths++;
 				 }
 			 }
 			 if (unfoundPaths == 5) {
 				 coordinator.setAlgorithmStatistics(null, AlgorithmType.Dijkstra);
-				 coordinator.resetAlgorithmPanel();
+				 coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
 				 coordinator.enableAlgorithmPanel();
 			 }
 			 
@@ -203,7 +203,6 @@ public class Engine {
 		}
 	}
 	
-	//FOR TESTING ONLY
 	public void saveMapOnly(String filename) {
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename);

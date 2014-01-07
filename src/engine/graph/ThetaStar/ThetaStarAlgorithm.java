@@ -1,9 +1,12 @@
-package engine.graph;
+package engine.graph.ThetaStar;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import engine.graph.Graph;
+import engine.graph.LineOfSight;
+import engine.graph.Node;
 import engine.map.Map;
 
 //NB MOST OF THIS IS COPY AND PASTED FROM AStarAlgorithm, but I've deleted the comments etc
@@ -11,8 +14,10 @@ import engine.map.Map;
 
 public class ThetaStarAlgorithm {
 	
+	private static int counter;
+	
 	public static Node getPath(Graph graph, Map map) { 
-		
+		counter=0;
 		List<Node> closedSet = new LinkedList<Node>();
 		PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 		Node start = graph.getSource();
@@ -22,6 +27,7 @@ public class ThetaStarAlgorithm {
 		
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();
+			counter++;
 			if(current.equals(goal)) {
 				return goal;
 			}

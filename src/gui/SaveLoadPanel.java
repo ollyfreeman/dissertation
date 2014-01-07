@@ -48,7 +48,7 @@ public class SaveLoadPanel extends JPanel {
 		
 		c.gridx = 0;
 	    c.gridy = 1;
-	    saveInstanceButton = new JButton("SAVE!");
+	    saveInstanceButton = new JButton("Save...");
 	    saveInstanceButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -65,7 +65,7 @@ public class SaveLoadPanel extends JPanel {
 		this.add(saveInstanceButton,c);
 		
 		c.gridy = 2;
-	    saveMapButton = new JButton("SAVEM!");
+	    saveMapButton = new JButton("Save map only...");
 	    saveMapButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -82,7 +82,7 @@ public class SaveLoadPanel extends JPanel {
 		this.add(saveMapButton,c);
 		
 		c.gridy = 3;
-		loadInstanceButton = new JButton("LOAD!");
+		loadInstanceButton = new JButton("Load...");
 	    loadInstanceButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

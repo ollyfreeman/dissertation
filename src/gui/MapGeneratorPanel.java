@@ -72,7 +72,7 @@ public class MapGeneratorPanel extends JPanel {
 		c.gridx = 0;
 	    c.gridy = 4;
 	    c.gridwidth = 2;
-		createMapButton = new JButton("GENERATE!");
+		createMapButton = new JButton("Generate...");
 		createMapButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

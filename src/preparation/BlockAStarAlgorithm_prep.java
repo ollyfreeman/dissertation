@@ -12,7 +12,7 @@ import engine.map.Map;
 import utility.Coordinate;
 import engine.graph.Graph;
 import engine.graph.Node;
-import engine.graph.LDBB.PairOfCoords;
+import engine.graph.BlockAStar.LDBB.PairOfCoords;
 
 public class BlockAStarAlgorithm_prep {
 

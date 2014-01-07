@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import engine.map.Map;
-import engine.graph.DijkstraAlgorithm;
 import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
-import engine.graph.LDBB.PairOfCoords;
+import engine.graph.BlockAStar.LDBB.PairOfCoords;
+import engine.graph.Dijkstra.DijkstraAlgorithm;
 import utility.Coordinate;
 
 public class LDDBCreatorORIG {

@@ -1,4 +1,4 @@
-package engine.graph.LDBB;
+package engine.graph.BlockAStar.LDBB;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -7,19 +7,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import engine.map.Map;
-import engine.graph.DijkstraAlgorithm;
 import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
+import engine.graph.Dijkstra.DijkstraAlgorithm;
+import engine.graph.BlockAStar.LDBB.PairOfCoords;
 import utility.Coordinate;
 
 public class LDDBCreator {
 
-	private static int blockSize = 2;
+	private static int blockSize = 3;
 	
 	public static void createLengthDB() {
 		int totalMaps = (int) Math.pow(2,blockSize*blockSize);
@@ -56,7 +56,7 @@ public class LDDBCreator {
 			db.add(hm);
 			System.out.println(mapCounter + " of " + totalMaps);
 		}
-		//saveLengthDB(db);
+		saveLengthDB(db);
 		//loadDB();
 	}
 
@@ -139,7 +139,7 @@ public class LDDBCreator {
 			db.add(hm);
 			System.out.println(mapCounter + " of " + totalMaps);
 		}
-		//saveIntermediatesDB(db);
+		saveIntermediatesDB(db);
 		//loadDB();
 	}
 
@@ -214,7 +214,7 @@ public class LDDBCreator {
 	
 	public static void main(String[] args) {
 		createLengthDB();
-		//createIntermediatesDB();
+		createIntermediatesDB();
 	}
 
 }

@@ -4,6 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import engine.graph.*;
+import engine.graph.AStar.AStarAlgorithm;
+import engine.graph.AStar.AStarSmoothed;
+import engine.graph.BlockAStar.BlockAStarAlgorithm;
+import engine.graph.Dijkstra.DijkstraAlgorithm;
+import engine.graph.ThetaStar.LazyThetaStarAlgorithm;
+import engine.graph.ThetaStar.ThetaStarAlgorithm;
 import engine.map.Map;
 import data.AlgorithmType;
 
@@ -21,8 +27,9 @@ public class AlgorithmData implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private final AlgorithmType algorithmType;
-	//private transient final Graph graph;
 	private transient final Node goalNode;
+	private final Coordinate source;
+	private final Coordinate goal;
 	
 	/*
 	 * these 3 are all redundant (i.e. can be calculated from the Graph and Node),
@@ -35,7 +42,8 @@ public class AlgorithmData implements java.io.Serializable {
 	
 	public AlgorithmData(AlgorithmType algorithmType, Graph graph, Map map) {
 		this.algorithmType = algorithmType;
-		//this.graph = graph;
+		this.source = graph.getSource().getCoordinate();
+		this.goal = graph.getGoal().getCoordinate();
 		
 		//I have all of this in the constructor as a lot of the instance variables are final
 		/*
@@ -50,11 +58,11 @@ public class AlgorithmData implements java.io.Serializable {
 			break;
 		case AStar:
 			startTime = System.nanoTime();
-			goalNode = AStarAlgorithm.getPath(graph);
+			goalNode = AStarAlgorithm.getPath(graph,map);
 			endTime = System.nanoTime();	
 			break;
 		case AStarSmoothed:
-			goalNode = AStarAlgorithm.getPath(graph);
+			goalNode = AStarAlgorithm.getPath(graph,map);
 			startTime = System.nanoTime();
 			AStarSmoothed.smoothe_edge(graph.getSource(),goalNode,map);
 			endTime = System.nanoTime();
@@ -71,7 +79,12 @@ public class AlgorithmData implements java.io.Serializable {
 			break;
 		case BlockAStar:
 			startTime = System.nanoTime();
-			goalNode = BlockAStarAlgorithm_v2.getPath(map,new Coordinate(1,1), new Coordinate(map.getWidth(),map.getHeight()));
+			goalNode = BlockAStarAlgorithm.getPath(graph,map);
+			endTime = System.nanoTime();
+			break;
+		case AStarVis:
+			startTime = System.nanoTime();
+			goalNode = AStarAlgorithm.getPath(graph,map);
 			endTime = System.nanoTime();
 			break;
 		default:
@@ -158,5 +171,13 @@ public class AlgorithmData implements java.io.Serializable {
 		Vector2d v1 = new Vector2d(p.getX()-pp.getX(), p.getY()-pp.getY());
 		return v0.angle(v1)*(180.00/Math.PI);
 	}
+	
+	public Coordinate getSource() {
+		return source;
+	}
+	public Coordinate getGoal() {
+		return goal;
+	}
+
 
 }

@@ -57,9 +57,9 @@ public class MapCreatorPanel extends JPanel implements ActionListener{
 				saveMapButton.setEnabled(true);
 				String[] resolutionArray = data.MapResolutions.getMapResolutionArray();
 				String resolutionString = resolutionArray[resolutionComboBox.getSelectedIndex()];
-				String[] stringArray = resolutionString.split("x");int counter = 0;
+				String[] widthAndHeightInCells = resolutionString.split("x");int counter = 0;
 				
-				for(int i = 64; i >= 800/Integer.parseInt(stringArray[1]); i /=2) {
+				for(int i = 64; i >= 800/Integer.parseInt(widthAndHeightInCells[1]); i /=2) {
 					counter++;
 				}
 				String[] generalBrushResolutionArray = data.MapResolutions.getBrushResolutionArray();
@@ -73,7 +73,7 @@ public class MapCreatorPanel extends JPanel implements ActionListener{
 				brushComboBox.setEnabled(true);
 				eraserComboBox.setEnabled(true);
 				
-				coordinator.startEditMode(Integer.parseInt(stringArray[0]),Integer.parseInt(stringArray[1]));
+				coordinator.startEditMode(Integer.parseInt(widthAndHeightInCells[0]),Integer.parseInt(widthAndHeightInCells[1]));
 			}
 		});
 		this.add(createMapButton,c);

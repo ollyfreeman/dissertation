@@ -1,5 +1,7 @@
-package engine.graph;
+package engine.graph.AStar;
 
+import engine.graph.LineOfSight;
+import engine.graph.Node;
 import engine.map.Map;
 
 public class AStarSmoothed {
@@ -27,7 +29,12 @@ public class AStarSmoothed {
 	
 	public static void smoothe_edge(Node start, Node goal, Map map) { //i.e. start of path and goal of path, but we go in reverse so we start at the goal!
 		Node current = goal;
-		Node target = current.getParent().getParent();
+		Node target;
+		try {
+			target = current.getParent().getParent();
+		} catch (NullPointerException e) {
+			target = null;
+		}
 		while(target != null) {
 			if(LineOfSight.isVisible_edge_finiteWidth(current,target,map)) {
 				current.setParent(target);
