@@ -64,9 +64,14 @@ public class AlgorithmData implements java.io.Serializable {
 			goalNode = ThetaStarAlgorithm.getPath(graph,map);
 			endTime = System.nanoTime();
 			break;
+		case LazyThetaStar:
+			startTime = System.nanoTime();
+			goalNode = LazyThetaStarAlgorithm.getPath(graph,map);
+			endTime = System.nanoTime();
+			break;
 		case BlockAStar:
 			startTime = System.nanoTime();
-			goalNode = BlockAStarAlgorithm_v2.getPath(map);
+			goalNode = BlockAStarAlgorithm_v2.getPath(map,new Coordinate(1,1), new Coordinate(map.getWidth(),map.getHeight()));
 			endTime = System.nanoTime();
 			break;
 		default:

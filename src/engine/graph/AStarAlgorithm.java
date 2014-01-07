@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import utility.Coordinate;
+
 public class AStarAlgorithm {
 	
 	public static Node getPath(Graph graph) { 
@@ -18,7 +20,7 @@ public class AStarAlgorithm {
 		
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();
-			if(current == goal) {
+			if(current.getCoordinate().equals(goal.getCoordinate())) {
 				return goal;
 			}
 			closedSet.add(current);
@@ -76,6 +78,36 @@ public class AStarAlgorithm {
 		double xDiff = n1.getX() - n2.getX();
 		double yDiff = n1.getY() - n2.getY();
 		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+	}
+	
+	public static double getLength(Graph g) {
+		Node n = getPath(g);
+		double distanceAccumulator = 0.0;
+		if(n == null) {
+			return -1;
+		} else {
+			while(n != null) {
+				try {
+					distanceAccumulator+=getDistance(n,n.getParent());
+				} catch (NullPointerException e) {}
+				n = n.getParent();
+			}
+			return distanceAccumulator;
+		}
+	}
+	public static LinkedList<Coordinate> getIntermediateNodes(Graph g) {
+		LinkedList<Coordinate> list = new LinkedList<Coordinate>();
+		Node n = getPath(g);
+		if(n != null) {
+			while(n.getParent()!=null) {
+				list.add(n.getParent().getCoordinate());
+				n = n.getParent();
+			}
+		}
+		if(list.size()!=0) {
+			list.removeLast();
+		}
+		return list;
 	}
 
 }

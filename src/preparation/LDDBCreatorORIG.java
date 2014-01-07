@@ -17,7 +17,7 @@ import engine.graph.GraphGenerator;
 import engine.graph.LDBB.PairOfCoords;
 import utility.Coordinate;
 
-public class LDBBCreatorORIG {
+public class LDDBCreatorORIG {
 
 	public static void main(String[] args) {
 		int size = 4;
@@ -63,7 +63,7 @@ public class LDBBCreatorORIG {
 	private static void f(HashMap<PairOfCoords,Double> hm, Map m, Coordinate sourceCoord, Coordinate goalCoord, int size, int mapCounter) {
 		Node sourceNode = new Node(sourceCoord);
 		Node goalNode = new Node(goalCoord);
-		Graph g = GraphGenerator.generateBlockAStarGraph_visibility_edge_finiteWidth(m, sourceNode, goalNode);
+		Graph g = GraphGenerator.generateGraph_visibility_edge_finiteWidth(m, sourceNode, goalNode);
 
 		double distanceAccumulator = 0.0;
 		g.setSource(g.getNode(sourceCoord));

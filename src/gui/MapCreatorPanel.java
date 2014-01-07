@@ -69,6 +69,7 @@ public class MapCreatorPanel extends JPanel implements ActionListener{
 				}
 				brushComboBox.setModel(new DefaultComboBoxModel<String>(currentBrushSizeArray));
 				eraserComboBox.setModel(new DefaultComboBoxModel<String>(currentBrushSizeArray));
+				coordinator.setBrushSize(Integer.parseInt(data.MapResolutions.getBrushResolutionArray()[0]));
 				brushComboBox.setEnabled(true);
 				eraserComboBox.setEnabled(true);
 				

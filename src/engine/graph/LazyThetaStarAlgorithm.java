@@ -9,7 +9,7 @@ import engine.map.Map;
 //NB MOST OF THIS IS COPY AND PASTED FROM AStarAlgorithm, but I've deleted the comments etc
 //The only functional difference is in update cost
 
-public class ThetaStarAlgorithm {
+public class LazyThetaStarAlgorithm {
 	
 	public static Node getPath(Graph graph, Map map) { 
 		
@@ -22,13 +22,14 @@ public class ThetaStarAlgorithm {
 		
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();
+			setNode(current, map, closedSet);
 			if(current.equals(goal)) {
 				return goal;
 			}
 			closedSet.add(current);
 			for(Node neighbour : current.getNeighbours()) {
 				if(!closedSet.contains(neighbour)) {
-					if (updateCost(current, neighbour, goal,map)) {
+					if (updateCost(current, neighbour, goal, map)) {
 						if(!openSet.contains(neighbour)) {
 							openSet.add(neighbour);
 						}
@@ -42,10 +43,17 @@ public class ThetaStarAlgorithm {
 	private static boolean updateCost(Node current, Node neighbour, Node goal, Map map) {
 		double prosposedNewGScore;
 		Node parentOfCurrent = current.getParent();
-		if(LineOfSight.isVisible_edge_zeroWidth(parentOfCurrent, neighbour, map)) {
+		if(parentOfCurrent == null) {	//i.e. for start node
+			prosposedNewGScore = getDistance(current, neighbour); //+current.getG() - but this should be 0
+			neighbour.setParent(current);
+			neighbour.setG(prosposedNewGScore);
+			neighbour.setF(prosposedNewGScore + getDistance(neighbour,goal));
+			return true;
+		} else {
 			prosposedNewGScore = parentOfCurrent.getG() + getDistance(parentOfCurrent, neighbour);
 			if(prosposedNewGScore < neighbour.getG()) {
 				neighbour.setParent(parentOfCurrent);
+				//System.out.println(parentOfCurrent.coordinateAsString() + " is now parent of " + neighbour.coordinateAsString());
 				neighbour.setG(prosposedNewGScore);
 				neighbour.setF(prosposedNewGScore + getDistance(neighbour,goal));
 				return true;
@@ -53,15 +61,26 @@ public class ThetaStarAlgorithm {
 				return false;
 			}
 		}
-		else {
-			prosposedNewGScore = current.getG() + getDistance(current, neighbour);
-			if(prosposedNewGScore < neighbour.getG()) {
-				neighbour.setParent(current);
-				neighbour.setG(prosposedNewGScore);
-				neighbour.setF(prosposedNewGScore + getDistance(neighbour,goal));
-				return true;
-			} else {
-				return false;
+	}
+	
+	private static void setNode(Node current, Map map, List<Node> closedSet) {
+		if(current.getParent()!=null) {
+			if(!LineOfSight.isVisible_edge_zeroWidth(current.getParent(), current, map)) {
+				Node bestNeighbour = null;
+				double lowestScore = Double.POSITIVE_INFINITY;
+				for(Node n : current.getNeighbours()) {
+					double score = n.getG()+getDistance(current,n);
+					if(score < lowestScore && closedSet.contains(n)) {
+						//System.out.println("Updating" + current.coordinateAsString());
+						bestNeighbour = n;
+						lowestScore = score;
+					}
+				}
+				if(bestNeighbour==null){
+					System.out.println("Oops" + current.coordinateAsString());
+				}
+				current.setParent(bestNeighbour);
+				current.setG(lowestScore);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 package data;
 
 public enum AlgorithmType {
-	Dijkstra, AStar, AStarSmoothed, ThetaStar, BlockAStar
+	Dijkstra, AStar, AStarSmoothed, ThetaStar, LazyThetaStar, BlockAStar
 }

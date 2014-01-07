@@ -28,6 +28,7 @@ public class MapInstance implements java.io.Serializable{
 	private AlgorithmData aStarData;
 	private AlgorithmData aStarSmoothedData;
 	private AlgorithmData thetaStarData;
+	private AlgorithmData lazyThetaStarData;
 	private AlgorithmData blockAStarData;
 	
 	public MapInstance(Map map) {
@@ -70,7 +71,7 @@ public class MapInstance implements java.io.Serializable{
 	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType) {
 		//FOR NOW I WILL RE-GENERATE A NEW GRAPH FROM THE MAP, but I need to implement a graph cloning algorithm cos this will take to long
 		//if I have loaded the graph it will have a null graph instance, so will need to consider this before cloning
-		Graph graph = GraphGenerator.generateGraph_edge_zeroWidth(map, new Node(new Coordinate(10,5)), new Node(new Coordinate(map.getWidth()-5,map.getHeight()-2)));
+		Graph graph = GraphGenerator.generateGraph_edge_zeroWidth(map, new Node(new Coordinate(1,1)), new Node(new Coordinate(map.getWidth(),map.getHeight())));
 		AlgorithmStatistics algorithmStatistics;
 		switch (algorithmType) {
 		case Dijkstra:
@@ -96,6 +97,12 @@ public class MapInstance implements java.io.Serializable{
 				thetaStarData = new AlgorithmData(AlgorithmType.ThetaStar, graph,map);
 			}
 			algorithmStatistics = new AlgorithmStatistics(thetaStarData);
+			break;
+		case LazyThetaStar:
+			if(lazyThetaStarData == null) {
+				lazyThetaStarData = new AlgorithmData(AlgorithmType.LazyThetaStar, graph,map);
+			}
+			algorithmStatistics = new AlgorithmStatistics(lazyThetaStarData);
 			break;
 		case BlockAStar:
 			if(blockAStarData == null) {
@@ -147,6 +154,9 @@ public class MapInstance implements java.io.Serializable{
 				break;
 			case ThetaStar:
 				path = thetaStarData.getPath();
+				break;
+			case LazyThetaStar:
+				path = lazyThetaStarData.getPath();
 				break;
 			case BlockAStar:
 				path = blockAStarData.getPath();

@@ -26,7 +26,7 @@ public class AlgorithmPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private Engine engine;
-	private Component[][] componentArray = new Component[6][6];
+	private Component[][] componentArray = new Component[7][6];
 
 	public AlgorithmPanel(Engine engine) {
 		
@@ -53,7 +53,8 @@ public class AlgorithmPanel extends JPanel {
 		addAlgorithm("A*", AlgorithmType.AStar, Color.GREEN, 2);
 		addAlgorithm("A*Smoothed", AlgorithmType.AStarSmoothed, Color.RED, 3);
 		addAlgorithm("Theta*", AlgorithmType.ThetaStar, Color.BLUE, 4);
-		addAlgorithm("Block A*", AlgorithmType.BlockAStar, Color.MAGENTA, 5);
+		addAlgorithm("Lazy Theta*", AlgorithmType.LazyThetaStar, Color.GRAY, 5);
+		addAlgorithm("Block A*", AlgorithmType.BlockAStar, Color.MAGENTA, 6);
 	    
 	    for(int i=0; i<componentArray.length; i++) {
     		c.gridy = i;
@@ -126,8 +127,10 @@ public class AlgorithmPanel extends JPanel {
 				index = 3;
 			} else if (algorithmType.equals(AlgorithmType.ThetaStar)){
 				index = 4;
-			} else {
+			} else if (algorithmType.equals(AlgorithmType.LazyThetaStar)){
 				index = 5;
+			} else {
+				index = 6;
 			}
 			DecimalFormat f = new DecimalFormat("##.00");
 			JTextField distanceLabel = (JTextField) componentArray[index][1];

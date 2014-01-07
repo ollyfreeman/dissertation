@@ -401,7 +401,7 @@ public class GraphGenerator {
 				for(int l=0; l < map.getHeight()+1; l++) {
 					for(int k=0; k < map.getWidth()+1; k++) {
 						if(!(i==k && j==l)) {
-							if(graphArray2D[i][j]!=null && graphArray2D[k][l]!=null && LineOfSight.isVisible_edge_finiteWidth(graphArray2D[i][j], graphArray2D[k][l], map)) {
+							if(graphArray2D[i][j]!=null && graphArray2D[k][l]!=null && LineOfSight.isVisible_edge_zeroWidth(graphArray2D[i][j], graphArray2D[k][l], map)) {
 								graphArray2D[i][j].addNeighbour(graphArray2D[k][l]);
 							}
 						}
@@ -423,7 +423,7 @@ public class GraphGenerator {
 
 	}
 	
-	public static Graph generateBlockAStarGraph_visibility_edge_finiteWidth(Map map, Node source, Node goal){ 
+	/*public static Graph generateBlockAStarGraph_visibility_edge_finiteWidth(Map map, Node source, Node goal){ 
 		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
 		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
 		for(int j=0; j < map.getHeight()+1; j++) {
@@ -475,6 +475,7 @@ public class GraphGenerator {
 	
 	public static Graph generateBlockAStarGraph_visibility_edge_zeroWidth(Map map, Node source, Node goal){ 
 		Coordinate[] diagonalRelativeCellCoordinates = {new Coordinate(-1,-1), new Coordinate(0,-1), new Coordinate(0,0), new Coordinate(-1,0)};
+		boolean[] diagonalCoordsBlocked = {false,false,false,false};
 		Node[][] graphArray2D = new Node[map.getWidth()+1][map.getHeight()+1];
 		for(int j=0; j < map.getHeight()+1; j++) {
 			for(int i=0; i < map.getWidth()+1; i++) {
@@ -484,10 +485,11 @@ public class GraphGenerator {
 					for(int k=0;k<4;k++) {
 						if(map.getCell(i+diagonalRelativeCellCoordinates[k].getX(),j+diagonalRelativeCellCoordinates[k].getY()).isBlocked()) {
 							cellsBlocked++;
+							diagonalCoordsBlocked[k] = true;
 						}
 					}
 				} catch (ArrayIndexOutOfBoundsException e) {cellsBlocked = 10;} //i.e. nodes don't exist on boundaries of map except start and end
-				if(cellsBlocked == 1) {
+				if(cellsBlocked == 1 || (diagonalCoordsBlocked[0]&&diagonalCoordsBlocked[2]) ^ (diagonalCoordsBlocked[1]&&diagonalCoordsBlocked[3])) {//if(cellsBlocked == 1 || (diagonalCoordsBlocked[0]&&diagonalCoordsBlocked[2]) || (diagonalCoordsBlocked[1]&&diagonalCoordsBlocked[3])) {
 					graphArray2D[i][j] = new Node(new Coordinate(i,j));
 				}
 			}
@@ -521,7 +523,7 @@ public class GraphGenerator {
 		graph.setGoal(goal);
 		return graph;
 
-	}
+	}*/
 	
 
 }
