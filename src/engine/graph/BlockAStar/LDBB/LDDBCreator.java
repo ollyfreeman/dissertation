@@ -185,7 +185,7 @@ public class LDDBCreator {
 		}
 	}
 	
-	private static void loadDB() {
+	/*private static void loadDB() {
 		try {
 			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"x"+blockSize+"zerofulldb.ser";
 			FileInputStream fileIn = new FileInputStream(filename);
@@ -204,7 +204,7 @@ public class LDDBCreator {
 			return;
 		}
 
-	}
+	}*/
 
 	private static double getDistance(Node n1, Node n2) {
 		double xDiff = n1.getX() - n2.getX();

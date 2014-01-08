@@ -8,9 +8,9 @@ import java.util.PriorityQueue;
 import engine.graph.Graph;
 import engine.graph.LineOfSight;
 import engine.graph.Node;
-import engine.graph.BlockAStar.LDBB.LengthAndIntermediateNodes;
 import engine.map.Map;
 import utility.Coordinate;
+import utility.Pair;
 
 public class AStarAlgorithm {
 	
@@ -97,7 +97,7 @@ public class AStarAlgorithm {
 	}
 	
 	//for traceback in BlockAStar
-	public static LengthAndIntermediateNodes getLengthAndIntermediateNodes(Graph g, Map m) {
+	public static Pair<Double,ArrayList<Coordinate>> getLengthAndIntermediateNodes(Graph g, Map m) {
 		Node n = getPath(g,m);
 		Node n1 = n;
 		
@@ -122,7 +122,7 @@ public class AStarAlgorithm {
 		if(list.size()!=0) {
 			list.remove(list.size()-1);
 		}
-		return new LengthAndIntermediateNodes(distanceAccumulator,list);
+		return new Pair(distanceAccumulator,list);
 	}
 
 }

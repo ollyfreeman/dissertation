@@ -12,13 +12,13 @@ import java.util.PriorityQueue;
 
 import engine.map.Map;
 import utility.Coordinate;
+import utility.Pair;
 import engine.graph.Graph;
 import engine.graph.GraphGenerator;
 import engine.graph.Node;
 import engine.graph.AStar.AStarAlgorithm;
 import engine.graph.BlockAStar.BASNode;
 import engine.graph.BlockAStar.Block;
-import engine.graph.BlockAStar.LDBB.LengthAndIntermediateNodes;
 import engine.graph.BlockAStar.LDBB.PairOfCoords;
 
 public class BlockAStarAlgorithm {
@@ -204,9 +204,9 @@ public class BlockAStarAlgorithm {
         	Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(startInBlock), new Node(c));
-				LengthAndIntermediateNodes lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
-				double length = lAIN.getLength() != -1 ? lAIN.getLength() : Double.POSITIVE_INFINITY;
-				ArrayList<Coordinate> intermediateNodes = lAIN.getIntermediateNodes();
+				Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
+				double length = lAIN.get1() != -1 ? lAIN.get1() : Double.POSITIVE_INFINITY;
+				ArrayList<Coordinate> intermediateNodes = lAIN.get2();
 				startBlock.setGValue(c, length);
 				if(!c.equals(startInBlock)) {
 					Node n = startBlock.getNode(c);
@@ -243,8 +243,8 @@ public class BlockAStarAlgorithm {
         	Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(c),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
-				LengthAndIntermediateNodes lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
-				double length = lAIN.getLength() != -1 ? lAIN.getLength() : Double.POSITIVE_INFINITY;
+				Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
+				double length = lAIN.get1() != -1 ? lAIN.get1() : Double.POSITIVE_INFINITY;
 				//ArrayList<Coordinate> intermediateNodes = lAIN.getIntermediateNodes();
 				goalBlock.setHValue(c, length);
 				/*if(!c.equals(goalInBlock)) {
@@ -263,8 +263,8 @@ public class BlockAStarAlgorithm {
 	private static Node startAndGoalInSameBlock(Block startBlock, Block goalBlock) {
 		Map m = new Map(map,goalBlock.getTopLeft(),blockSize,blockSize);
 		Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(startInBlock),new Node(goalInBlock));
-		LengthAndIntermediateNodes lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
-		ArrayList<Coordinate> intermediateNodes = lAIN.getIntermediateNodes();
+		Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
+		ArrayList<Coordinate> intermediateNodes = lAIN.get2();
 		Node n = goalBlock.getNode(goalInBlock);
 		if(!startInBlock.equals(goalInBlock)) {
 			for(Coordinate c1 : intermediateNodes) {
@@ -313,8 +313,8 @@ public class BlockAStarAlgorithm {
 			}
         }
         Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(minGplusHCoordinate),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
-		LengthAndIntermediateNodes lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
-		ArrayList<Coordinate> intermediateNodes = lAIN.getIntermediateNodes();
+		Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
+		ArrayList<Coordinate> intermediateNodes = lAIN.get2();
 		if(!minGplusHCoordinate.equals(goalInBlock)) {
 			for(Coordinate c1 : intermediateNodes) {
 				n.setParent(goalBlock.getNode(c1));
