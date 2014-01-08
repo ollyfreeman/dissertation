@@ -193,6 +193,7 @@ public class AlgorithmPanel extends JPanel {
 			calculateButton.setEnabled(false);
 			JButton drawButton = (JButton) componentArray[index][5];
 			drawButton.setEnabled(true);
+			//add source and goal coord, and nodes expanded and load time
 		}
 	}
 
