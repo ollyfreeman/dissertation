@@ -1,15 +1,15 @@
-package engine.graph.BlockAStar.LDBB;
+package engine.graph.BlockAStar.LDDB;
 
 import utility.Coordinate;
 
 public class PairOfCoords implements java.io.Serializable{
 	
-	private final int coordCode;
+	private final byte coordCode;
 	private final int blockSize;
 	
 	public PairOfCoords(Coordinate c1, Coordinate c2, int blockSize) {
 		this.blockSize = blockSize;
-		this.coordCode = c1.getX() + 6*c1.getY() + 6*6*c2.getX() + 6*6*6*c2.getY();
+		this.coordCode = (byte) (c1.getX() + (blockSize+1)*c1.getY() + (blockSize+1)*(blockSize+1)*c2.getX() + (blockSize+1)*(blockSize+1)*(blockSize+1)*c2.getY());
 	}
 	
 	public int hashCode() {

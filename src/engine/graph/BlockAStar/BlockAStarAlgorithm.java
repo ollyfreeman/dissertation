@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -19,14 +18,14 @@ import engine.graph.Node;
 import engine.graph.AStar.AStarAlgorithm;
 import engine.graph.BlockAStar.BASNode;
 import engine.graph.BlockAStar.Block;
-import engine.graph.BlockAStar.LDBB.PairOfCoords;
+import engine.graph.BlockAStar.LDDB.LDDB;
+import engine.graph.BlockAStar.LDDB.PairOfCoords;
 
 public class BlockAStarAlgorithm {
 
 	private static PriorityQueue<Block> openSet;
-	private final static int blockSize = 3;
-	private static ArrayList<HashMap<PairOfCoords,Double>> dbLENGTH = loadLENGTHDB();
-	private static ArrayList<HashMap<PairOfCoords,ArrayList<Coordinate>>> dbINTERMEDIATES = loadINTERMEDIATESDB();
+	private final static int blockSize = 2;
+	private static LDDB lddb = loadDB();
 	private static Map map;
 	private static Coordinate startInBlock,goalInBlock;
 	
@@ -139,7 +138,7 @@ public class BlockAStarAlgorithm {
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
 				for(Coordinate c : y) {
-					double length = dbLENGTH.get(currentBlock.getCode()).get(new PairOfCoords(x,c,blockSize)) != null ? dbLENGTH.get(currentBlock.getCode()).get(new PairOfCoords(x,c,blockSize)) : Double.POSITIVE_INFINITY;
+					double length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(x,c,blockSize));
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
 						//parent of x is c
@@ -245,16 +244,16 @@ public class BlockAStarAlgorithm {
 				Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(c),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
 				Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
 				double length = lAIN.get1() != -1 ? lAIN.get1() : Double.POSITIVE_INFINITY;
-				//ArrayList<Coordinate> intermediateNodes = lAIN.getIntermediateNodes();
+				ArrayList<Coordinate> intermediateNodes = lAIN.get2();
 				goalBlock.setHValue(c, length);
-				/*if(!c.equals(goalInBlock)) {
+				if(!c.equals(goalInBlock)) {
 					Node n = goalBlock.getNode(goalInBlock);
 					for(Coordinate c1 : intermediateNodes) {
 						n.setParent(goalBlock.getNode(c1));
 						n = goalBlock.getNode(c1);
 					}
 					n.setParent(goalBlock.getNode(c));//HAD ---> before but surely wrong?! goalBlock.getNode(c).setParent(n);
-				}*/
+				}
 			}
 		}
 		return goalBlock;
@@ -319,26 +318,23 @@ public class BlockAStarAlgorithm {
 			for(Coordinate c1 : intermediateNodes) {
 				n.setParent(goalBlock.getNode(c1));
 				n = goalBlock.getNode(c1);
-				System.out.println("n:"+n+" ser parent to "+ c1);
 			}
 			n.setParent(goalBlock.getNode(minGplusHCoordinate));
-			BASNode p = (BASNode) n.getParent();
 			n = (BASNode) goalBlock.getNode(minGplusHCoordinate).getParent();
 		}
 		BASNode nNew;
 		while(n != null && n.getParent() != null) {
 			BASNode parent = (BASNode) n.getParent();
 			if(n.getBlock() == parent.getBlock() && !n.getBlock().equals(startBlock)) {
-				ArrayList<Coordinate> ll = dbINTERMEDIATES.get(n.getBlock().getCode()).get(new PairOfCoords(new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY()),new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY()),blockSize));
-				for(int i=ll.size()-1;i>=0;i--) {
-					Coordinate c = ll.get(i);
+				intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords(new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY()),new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY()),blockSize)));
+				for(int i=(intermediateNodes.size()-1);i>=0;i--) {
+					Coordinate c = intermediateNodes.get(i);
 					nNew = new BASNode(new Coordinate(c.getX()+n.getBlock().getTopLeft().getX(),c.getY()+n.getBlock().getTopLeft().getY()),n.getBlock());
 					n.setParent(nNew);
 					n = nNew;
 				}
 				n.setParent(parent);
 				n = parent;
-				BASNode p = (BASNode) n.getParent();
 			} else {
 				n = parent;
 			}
@@ -360,38 +356,17 @@ public class BlockAStarAlgorithm {
 		return (Node) goal;
 	}
 	
-	private static ArrayList<HashMap<PairOfCoords,Double>> loadLENGTHDB() {
+	private static LDDB loadDB() {
 		try {
-			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"zeroLENGTH.ser";
+			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"zero.ser";
 			FileInputStream fileIn = new FileInputStream(filename);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			System.out.print("Loading length DB...");
-			ArrayList<HashMap<PairOfCoords,Double>> db = (ArrayList<HashMap<PairOfCoords,Double>>) in.readObject();
+			System.out.print("Loading DB...");
+			LDDB lddb = (LDDB) in.readObject();
 			System.out.println("Done");
 			in.close();
 			fileIn.close();
-			return db;
-		} catch(IOException i) {
-			i.printStackTrace();
-			return null;
-		} catch (ClassNotFoundException c) {
-			c.printStackTrace();
-			return null;
-		}
-
-	}
-	
-	private static ArrayList<HashMap<PairOfCoords,ArrayList<Coordinate>>> loadINTERMEDIATESDB() {
-		try {
-			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"zeroINTERMEDIATES.ser";
-			FileInputStream fileIn = new FileInputStream(filename);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			System.out.print("Loading intermediates DB...");
-			ArrayList<HashMap<PairOfCoords,ArrayList<Coordinate>>> db = (ArrayList<HashMap<PairOfCoords,ArrayList<Coordinate>>>) in.readObject();
-			System.out.println("Done");
-			in.close();
-			fileIn.close();
-			return db;
+			return lddb;
 		} catch(IOException i) {
 			i.printStackTrace();
 			return null;

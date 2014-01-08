@@ -62,8 +62,8 @@ public class AlgorithmData implements java.io.Serializable {
 			endTime = System.nanoTime();	
 			break;
 		case AStarSmoothed:
-			goalNode = AStarAlgorithm.getPath(graph,map);
 			startTime = System.nanoTime();
+			goalNode = AStarAlgorithm.getPath(graph,map);
 			AStarSmoothed.smoothe_edge(graph.getSource(),goalNode,map);
 			endTime = System.nanoTime();
 			break;

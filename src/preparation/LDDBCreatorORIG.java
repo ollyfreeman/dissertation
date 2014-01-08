@@ -13,7 +13,7 @@ import engine.map.Map;
 import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
-import engine.graph.BlockAStar.LDBB.PairOfCoords;
+import engine.graph.BlockAStar.LDDB.PairOfCoords;
 import engine.graph.Dijkstra.DijkstraAlgorithm;
 import utility.Coordinate;
 
