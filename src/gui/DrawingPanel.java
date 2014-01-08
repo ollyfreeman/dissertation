@@ -69,6 +69,9 @@ public class DrawingPanel extends JPanel {
 		if(!pathColours.contains(color)) {
 			paths.add(path);
 			pathColours.add(color);
+		} else {
+			paths.remove(path);
+			pathColours.remove(color);
 		}
 		window.repaint();
 	}

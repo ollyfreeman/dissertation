@@ -258,10 +258,12 @@ public class AlgorithmPanel extends JPanel {
 			if(coordinatesEditable) {
 				int w = 800;
 				int h = 800;
+				/* had this in when I had some maps with half width
 				if(this.mapWidth < this.mapHeight) {
 					w = 400;
 				}
 				if(x<=w) {
+				*/
 					Coordinate c = new Coordinate((x*mapWidth)/w,(y*mapHeight)/h);
 					if(sourceButton.isSelected()) {
 						sourceCoordinate = c;
@@ -270,7 +272,7 @@ public class AlgorithmPanel extends JPanel {
 						goalCoordinate = c;
 						goalCoordinateField.setText("("+c.getX()+","+c.getY()+")");
 					}
-				}
+				//}
 			}
 		}
 	}

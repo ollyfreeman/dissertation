@@ -54,7 +54,7 @@ public class BlockAStarAlgorithm {
 						length = goalBlock.getGValue(c)+goalBlock.getHValue(c);
 						//parent of goal is c
 						//goalBlock.setParent(goalInBlock, goalBlock.getNode(c));
-						System.out.println("Length:" + length + " from " + c);
+						System.out.println("Length:" + length + " from goalBlock ingress " + c);
 					}
 				}
 			}
@@ -139,7 +139,7 @@ public class BlockAStarAlgorithm {
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
 				for(Coordinate c : y) {
-					double length = dbLENGTH.get(currentBlock.getCode()).get(new PairOfCoords(x,c)) != null ? dbLENGTH.get(currentBlock.getCode()).get(new PairOfCoords(x,c)) : Double.POSITIVE_INFINITY;
+					double length = dbLENGTH.get(currentBlock.getCode()).get(new PairOfCoords(x,c,blockSize)) != null ? dbLENGTH.get(currentBlock.getCode()).get(new PairOfCoords(x,c,blockSize)) : Double.POSITIVE_INFINITY;
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
 						//parent of x is c
@@ -230,8 +230,8 @@ public class BlockAStarAlgorithm {
 			y=0;
 		} else if (goalCoord.equals(new Coordinate(map.getWidth(),map.getHeight()))){
 			goalBlock = blockArray[blockArray.length-1][blockArray[0].length-1];
-			x = goalCoord.getX()%blockSize != 0 ? goalCoord.getX()%blockSize : 0;
-			y = goalCoord.getY()%blockSize != 0 ? goalCoord.getY()%blockSize : 0;
+			x = goalCoord.getX()%blockSize != 0 ? goalCoord.getX()%blockSize : blockSize;
+			y = goalCoord.getY()%blockSize != 0 ? goalCoord.getY()%blockSize : blockSize;
 		} else {
 			goalBlock = blockArray[(goalCoord.getX())/blockSize][(goalCoord.getY())/blockSize];
 			x = goalCoord.getX()%blockSize;
@@ -308,31 +308,28 @@ public class BlockAStarAlgorithm {
 			for(Coordinate c : outArray) {
 				if(goalBlock.getNode(c).getF()+goalBlock.getNode(c).getG()<minGPlusH) {
 					minGplusHCoordinate = c;
+					minGPlusH = goalBlock.getNode(c).getF()+goalBlock.getNode(c).getG();
 				}
 			}
         }
-		Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(minGplusHCoordinate),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
+        Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(minGplusHCoordinate),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
 		LengthAndIntermediateNodes lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
 		ArrayList<Coordinate> intermediateNodes = lAIN.getIntermediateNodes();
 		if(!minGplusHCoordinate.equals(goalInBlock)) {
 			for(Coordinate c1 : intermediateNodes) {
 				n.setParent(goalBlock.getNode(c1));
 				n = goalBlock.getNode(c1);
-				//System.out.println("n:"+n+" ser parent "+ c1);
+				System.out.println("n:"+n+" ser parent to "+ c1);
 			}
 			n.setParent(goalBlock.getNode(minGplusHCoordinate));
 			BASNode p = (BASNode) n.getParent();
-			System.out.println("n is " + n.getCoordinate() + " from block " + n.getBlock().getTopLeft() + " with parent " + n.getParent() + " from block " + p.getBlock().getTopLeft());
-			
 			n = (BASNode) goalBlock.getNode(minGplusHCoordinate).getParent();
-			//p = (BASNode) n.getParent();
-			System.out.println("n is " + n.getCoordinate() + " from block " + n.getBlock().getTopLeft() + " with parent " + n.getParent() + " from block " + p.getBlock().getTopLeft());
 		}
 		BASNode nNew;
 		while(n != null && n.getParent() != null) {
 			BASNode parent = (BASNode) n.getParent();
 			if(n.getBlock() == parent.getBlock() && !n.getBlock().equals(startBlock)) {
-				ArrayList<Coordinate> ll = dbINTERMEDIATES.get(n.getBlock().getCode()).get(new PairOfCoords(new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY()),new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY())));
+				ArrayList<Coordinate> ll = dbINTERMEDIATES.get(n.getBlock().getCode()).get(new PairOfCoords(new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY()),new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY()),blockSize));
 				for(int i=ll.size()-1;i>=0;i--) {
 					Coordinate c = ll.get(i);
 					nNew = new BASNode(new Coordinate(c.getX()+n.getBlock().getTopLeft().getX(),c.getY()+n.getBlock().getTopLeft().getY()),n.getBlock());
@@ -346,7 +343,6 @@ public class BlockAStarAlgorithm {
 				n = parent;
 			}
 		}
-		System.out.println("oook");
 		//remove duplicates
 		n = goal;
 		while(n != null && n.getParent() !=null) {

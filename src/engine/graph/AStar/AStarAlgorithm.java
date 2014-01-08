@@ -41,16 +41,23 @@ public class AStarAlgorithm {
 					 * and made it return a boolean to avoids lines 20&21 of the Theta* article pseudocode
 					 * of A*
 					 */
-					/*if (updateCost(current, neighbour, goal)) {	
+					if (updateCost(current, neighbour, goal,map)) {	
+						if(openSet.contains(neighbour)){
+							openSet.remove(neighbour);
+						}
+						openSet.add(neighbour);
+					}
+					/*Used to use the below but the Java priority queue doesn't update quick enough
+					 * if (updateCost(current, neighbour, goal,map)) {	
 						if(!openSet.contains(neighbour)){
 							openSet.add(neighbour);
 						}
 					}*/
-					updateCost(current,neighbour,goal,map);
+					/*Before the above I used the below - din't change result but resulted in loads of extra expansions duh!
+					 * updateCost(current,neighbour,goal,map);
 					if(!openSet.contains(neighbour)){
 						openSet.add(neighbour);
-					}
-					//ONCE EXPANDED (put in closed set) YOU ARE NEVER RECHOSEN, hence why if(!closedSet.contains(neighbour)) { should always hold
+					}*/
 				}
 			}
 		}

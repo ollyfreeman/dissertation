@@ -19,7 +19,7 @@ import utility.Coordinate;
 
 public class LDDBCreator {
 
-	private static int blockSize = 3;
+	private static int blockSize = 2;
 	
 	public static void createLengthDB() {
 		int totalMaps = (int) Math.pow(2,blockSize*blockSize);
@@ -79,7 +79,7 @@ public class LDDBCreator {
 				}
 				n = n.getParent();
 			}
-			hm.put(new PairOfCoords(sourceCoord,goalCoord),distanceAccumulator);
+			hm.put(new PairOfCoords(sourceCoord,goalCoord,blockSize),distanceAccumulator);
 		}
 
 		if(mapCounter==8) {
@@ -160,7 +160,7 @@ public class LDDBCreator {
 				}
 				n = n.getParent();
 			}
-			hm.put(new PairOfCoords(sourceCoord,goalCoord),intermediateCoordinates);
+			hm.put(new PairOfCoords(sourceCoord,goalCoord,blockSize),intermediateCoordinates);
 		}
 
 		/*if(mapCounter==9) {

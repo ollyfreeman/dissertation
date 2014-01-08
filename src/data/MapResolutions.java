@@ -2,7 +2,7 @@ package data;
 
 public class MapResolutions {
 	
-	private static final String[] mapResolutionArray = {"25x50", "50x50", "50x100", "100x100", "100x200", "200x200"};// , "200x400", "400x400", "400x800", "800x800"};
+	private static final String[] mapResolutionArray = {"50x50", "100x100", "200x200"};// , "200x400", "400x400", "400x800", "800x800"};
 	
 	private static final String[] brushResolutionArray = {"64","32","16","8","4","2","1"};
 	

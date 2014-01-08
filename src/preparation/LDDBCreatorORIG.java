@@ -78,7 +78,7 @@ public class LDDBCreatorORIG {
 				}
 				n = n.getParent();
 			}
-			hm.put(new PairOfCoords(sourceCoord,goalCoord),distanceAccumulator);
+			hm.put(new PairOfCoords(sourceCoord,goalCoord,4),distanceAccumulator);
 		}
 
 		/*if(mapCounter==10) {
