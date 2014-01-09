@@ -30,7 +30,7 @@ public class AStarAlgorithm {
 			Node current = openSet.remove();
 			counter++;
 			if(current.getCoordinate().equals(goal.getCoordinate())) {
-				return goal;
+				return current;
 			}
 			closedSet.add(current);
 			for(Node neighbour : current.getNeighbours()) {

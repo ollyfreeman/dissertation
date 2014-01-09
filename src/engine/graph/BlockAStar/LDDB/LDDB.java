@@ -19,12 +19,12 @@ public class LDDB implements java.io.Serializable {
 		if(list.get(mapCode).get(p) == null) {
 			return Double.POSITIVE_INFINITY;
 		} else {
-			return list.get(mapCode).get(p).get1().doubleValue();
+			return list.get(mapCode).get(p).get0().doubleValue();
 		}
 	}
 	
 	public ArrayList<Coordinate> getIntermediateNodes(int mapCode, PairOfCoords p) {
-		int listCode = list.get(mapCode).get(p).get2();
+		int listCode = list.get(mapCode).get(p).get1();
 		ArrayList<Coordinate> aL = new ArrayList<Coordinate>();
 		while(listCode !=0) {	//we will never have (0,0) as a coordinate in intermediate nodes so this is OK
 			int y = listCode & 7;

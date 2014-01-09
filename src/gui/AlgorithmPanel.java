@@ -63,7 +63,7 @@ public class AlgorithmPanel extends JPanel {
 		addAlgorithm("Basic Theta*", AlgorithmType.ThetaStar, Color.BLUE, 4);
 		addAlgorithm("Lazy Theta*", AlgorithmType.LazyThetaStar, Color.CYAN, 5);
 		addAlgorithm("Block A*", AlgorithmType.BlockAStar, Color.MAGENTA, 6);
-		addAlgorithm("A* - visibility graph", AlgorithmType.AStarVis, Color.GREEN, 7);
+		addAlgorithm("A* - visibility graph", AlgorithmType.AStarVisibility, Color.GREEN, 7);
 
 		for(int i=0; i<componentArray.length; i++) {
 			c.gridy=i;

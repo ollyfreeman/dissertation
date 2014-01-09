@@ -10,11 +10,11 @@ public class Pair<S,T> implements java.io.Serializable{
 		this.t = t;
 	}
 	
-	public S get1() {
+	public S get0() {
 		return this.s;
 	}
 	
-	public T get2() {
+	public T get1() {
 		return this.t;
 	}
 

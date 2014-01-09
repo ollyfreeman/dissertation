@@ -19,9 +19,10 @@ public class DijkstraAlgorithm {
 		start.setF(0.0);
 		openSet.add(start);
 		Node goal = graph.getGoal();
-		
+		int nodesExpanded = 0;
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();
+			nodesExpanded++;
 			closedSet.add(current);
 			for(Node neighbour : current.getNeighbours()) {
 				if(!closedSet.contains(neighbour)) {
@@ -32,6 +33,7 @@ public class DijkstraAlgorithm {
 				}
 			}
 		}
+		System.out.println("nodes expanded: " + nodesExpanded);
 		if(goal.getParent() == null && (!goal.getCoordinate().equals(start.getCoordinate()))) {
 			return null;
 		} else {

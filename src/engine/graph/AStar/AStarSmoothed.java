@@ -4,47 +4,41 @@ import engine.graph.LineOfSight;
 import engine.graph.Node;
 import engine.map.Map;
 
-public class AStarSmoothed {
-	
-	/*
-	 * simple method that implements smoothing.
-	 * Starts at goal node and do line of sight on parent of parent: 
-	 * if in LoS we reparent to the parent of its parent and go again
-	 * else we start LoS tests from parent
-	 */
-	public static void smoothe_centre(Node start, Node goal) { //i.e. start of path and goal of path, but we go in reverse so we start at the goal!
-		Node current = goal;
-		Node target = current.getParent().getParent();
-		while(target != null) {
-			if(LineOfSight.isVisible_centre_finiteWidth(current, target)) {
-				current.setParent(target);
-				target = target.getParent();
-				
-			} else {
-				current = current.getParent();
-				target = current.getParent().getParent();
-			}
-		}
-	}
-	
-	public static void smoothe_edge(Node start, Node goal, Map map) { //i.e. start of path and goal of path, but we go in reverse so we start at the goal!
-		Node current = goal;
-		Node target;
-		try {
-			target = current.getParent().getParent();
-		} catch (NullPointerException e) {
-			target = null;
-		}
-		while(target != null) {
-			if(LineOfSight.isVisible_edge_finiteWidth(current,target,map)) {
-				current.setParent(target);
-				target = target.getParent();
-				
-			} else {
-				current = current.getParent();
-				target = current.getParent().getParent();
-			}
-		}
-	}
+public class AStarSmoothed extends AStar {
 
+	private static final long serialVersionUID = 1L;
+	
+	public AStarSmoothed() {
+		super();
+	}
+	
+	@Override
+	protected boolean goalTest(Node current, Node goal, Map map) {
+		if(!current.getCoordinate().equals(goal.getCoordinate())) {
+			return false;
+		} else {
+			Node n = goal;
+			Node target;
+			try {
+				target = n.getParent().getParent();
+			} catch (NullPointerException e) {
+				target = null;
+			}
+			while(target != null) {
+				if(LineOfSight.isVisible_edge_zeroWidth(current,target,map)) {
+					n.setParent(target);
+					target = target.getParent();
+					
+				} else {
+					n = n.getParent();
+					target = n.getParent().getParent();
+				}
+			}
+			return true;
+		}
+	}
+	
 }
+
+
+

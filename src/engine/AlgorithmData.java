@@ -1,111 +1,73 @@
 package engine;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import engine.graph.*;
-import engine.graph.AStar.AStarAlgorithm;
-import engine.graph.AStar.AStarSmoothed;
-import engine.graph.BlockAStar.BlockAStarAlgorithm;
-import engine.graph.Dijkstra.DijkstraAlgorithm;
-import engine.graph.ThetaStar.LazyThetaStarAlgorithm;
-import engine.graph.ThetaStar.ThetaStarAlgorithm;
 import engine.map.Map;
-import data.AlgorithmType;
 
 import javax.vecmath.Vector2d;
 
 import utility.Coordinate;
+import utility.Pair;
 
 /*
  * Objects of this class contain all of the data relevant to a single running of
  * an algorithm over a map. The graph is a copy made purely for this algorithm on 
  * its associated map.
  */
-public class AlgorithmData implements java.io.Serializable {
+public abstract class AlgorithmData implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private final AlgorithmType algorithmType;
-	private transient final Node goalNode;
-	private final Coordinate source;
-	private final Coordinate goal;
+	private transient Node goalNode;
+	private Coordinate source;
+	private Coordinate goal;
 	
 	/*
 	 * these 3 are all redundant (i.e. can be calculated from the Graph and Node),
 	 * but certainly worth being cached
 	 */
-	private final double distance;
-	private final double angle;
-	private final double time;
-	private final List<Coordinate> path;
+	private double distance;
+	private double angle;
+	private double time;
+	private int nodesExpanded;
+	private LinkedList<Coordinate> path;
 	
-	public AlgorithmData(AlgorithmType algorithmType, Graph graph, Map map) {
-		this.algorithmType = algorithmType;
+	public AlgorithmData() {
+	}
+	
+	public void go(Graph graph, Map map) {
 		this.source = graph.getSource().getCoordinate();
 		this.goal = graph.getGoal().getCoordinate();
+		Pair<Node,Integer> p0;
+		double startTime = System.nanoTime();
+		p0  = this.getPath(graph, map);
+		double endTime = System.nanoTime();	
+		this.goalNode = p0.get0();
+		this.nodesExpanded = p0.get1();
+		System.out.println("Nodes Expanded "+nodesExpanded);
+		this.time = (endTime - startTime)/1000000;
 		
-		//I have all of this in the constructor as a lot of the instance variables are final
-		/*
-		 * Do the algorithm to get the goal node and the time
-		 */
-		double startTime, endTime;
-		switch (algorithmType) {
-		case Dijkstra:
-			startTime = System.nanoTime();
-			goalNode = DijkstraAlgorithm.getPath(graph);
-			endTime = System.nanoTime();	
-			break;
-		case AStar:
-			startTime = System.nanoTime();
-			goalNode = AStarAlgorithm.getPath(graph,map);
-			endTime = System.nanoTime();	
-			break;
-		case AStarSmoothed:
-			startTime = System.nanoTime();
-			goalNode = AStarAlgorithm.getPath(graph,map);
-			AStarSmoothed.smoothe_edge(graph.getSource(),goalNode,map);
-			endTime = System.nanoTime();
-			break;
-		case ThetaStar:
-			startTime = System.nanoTime();
-			goalNode = ThetaStarAlgorithm.getPath(graph,map);
-			endTime = System.nanoTime();
-			break;
-		case LazyThetaStar:
-			startTime = System.nanoTime();
-			goalNode = LazyThetaStarAlgorithm.getPath(graph,map);
-			endTime = System.nanoTime();
-			break;
-		case BlockAStar:
-			startTime = System.nanoTime();
-			goalNode = BlockAStarAlgorithm.getPath(graph,map);
-			endTime = System.nanoTime();
-			break;
-		case AStarVis:
-			startTime = System.nanoTime();
-			goalNode = AStarAlgorithm.getPath(graph,map);
-			endTime = System.nanoTime();
-			break;
-		default:
-			//TODO for the further algorithms
-			startTime =  0.0;
-			endTime = 0.0;
-			goalNode = null;
-			System.out.println("Oops");
-		}
-		time = (endTime - startTime)/1000000;
-		
-		/*
-		 * calculate the distance and angle by tracing back through path from goal to source
-		 */
+		Pair<Pair<Double,Double>,LinkedList<Coordinate>> p1 = calculateDistanceAnglePath();
+		this.distance = p1.get0().get0();
+		this.angle = p1.get0().get1();
+		this.path = p1.get1();
+		System.out.println("Done");
+	}
+	
+	/*
+	 * returns the number of nodes expanded during execution
+	 */
+	protected abstract Pair<Node,Integer> getPath(Graph graph, Map map);
+
+	private Pair<Pair<Double,Double>,LinkedList<Coordinate>> calculateDistanceAnglePath() {
 		Node n = goalNode;
 		double distanceAccumulator = 0.0;
 		double angleAccumulator = 0.0;
-		path = new LinkedList<Coordinate>();
+		LinkedList<Coordinate> path = new LinkedList<Coordinate>();
 		while(n != null) {
 			try {
-				path.add(0,n.getCoordinate());
+				path.add(n.getCoordinate());
 				distanceAccumulator+=getDistance(n,n.getParent());
 			} catch (NullPointerException e) {
 				//when we get to the final (source) node
@@ -117,19 +79,9 @@ public class AlgorithmData implements java.io.Serializable {
 			}
 			n = n.getParent();
 		}
-		this.distance = distanceAccumulator;
-		this.angle = angleAccumulator;
+		Pair<Double,Double> doubles = new Pair<Double,Double>(distanceAccumulator,angleAccumulator);
+		return new Pair<Pair<Double,Double>,LinkedList<Coordinate>>(doubles,path);
 	}
-	
-	public AlgorithmType getAlgorithmType() {
-		return algorithmType;
-	}
-
-	/*
-	public Graph getGraph() {
-		return graph;
-	}
-	*/
 
 	public boolean goalNodeExists() {
 		return (goalNode != null);
@@ -147,22 +99,25 @@ public class AlgorithmData implements java.io.Serializable {
 		return time;
 	}
 	
-	public List<Coordinate> getPath() {
+	public LinkedList<Coordinate> getPath() {
 		return path;
+	}
+	
+	public int getNodesExpanded() {
+		return nodesExpanded;
 	}
 	
 	/*
 	 * helper method - gets Euclidean distance between 2 nodes
 	 */
-	private double getDistance(Node n1, Node n2) {
+	protected double getDistance(Node n1, Node n2) {
 		double xDiff = n1.getX() - n2.getX();
 		double yDiff = n1.getY() - n2.getY();
 		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
 	}
 	
 	/*
-	 * helper method - implemented dot product myself in 'preparation.TestAlgorithms'
-	 * but have used a library here
+	 * helper method - gets angle between the lines joining a node and its parent, and the node's parent and the node's parent's parent
 	 */
 	private double getAngle(Node n) {
 		Node p = n.getParent();
