@@ -1,11 +1,5 @@
 package engine.graph.AStar;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-
-import utility.Pair;
-import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.Dijkstra.Dijkstra;
 import engine.map.Map;

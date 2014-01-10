@@ -52,13 +52,13 @@ public class BlockAStar extends AlgorithmData {
 			Block currentBlock = openSet.remove();
 			currentBlock.setHeapValue(Double.POSITIVE_INFINITY);					//!!
 			List<Coordinate> ingressNodes = currentBlock.getIngressNodes();
+			nodesExpanded+=ingressNodes.size();
 			if(currentBlock == goalBlock) {
 				for(Coordinate c : ingressNodes) {
 					if(goalBlock.getGValue(c)+goalBlock.getHValue(c) < length) {
 						length = goalBlock.getGValue(c)+goalBlock.getHValue(c);
 						//parent of goal is c
 						//goalBlock.setParent(goalInBlock, goalBlock.getNode(c));
-						System.out.println("Length:" + length + " from goalBlock ingress " + c);
 					}
 				}
 			}
@@ -143,7 +143,6 @@ public class BlockAStar extends AlgorithmData {
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
 				for(Coordinate c : y) {
-					nodesExpanded++;
 					double length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(x,c,blockSize));
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);

@@ -13,8 +13,7 @@ import engine.graph.GraphGenerator;
 import engine.graph.AStar.*;
 import engine.graph.BlockAStar.BlockAStar;
 import engine.graph.Dijkstra.Dijkstra;
-import engine.graph.ThetaStar.LazyThetaStar;
-import engine.graph.ThetaStar.ThetaStar;
+import engine.graph.ThetaStar.*;;
 
 /*
  * this class represents all of the data about a particular map
@@ -37,7 +36,7 @@ public class MapInstance implements java.io.Serializable{
 	private AlgorithmData lazyThetaStarData;
 	private AlgorithmData blockAStarData;
 	
-	public MapInstance(Map map) {
+	protected MapInstance(Map map) {
 		this.map = map;
 		this.doesRouteExist = DoesRouteExist.DontKnow;
 	}
@@ -130,6 +129,7 @@ public class MapInstance implements java.io.Serializable{
 				//TODO new algorithms	
 				algorithmStatistics = null;
 			}
+			graph = null;			// to try to ensure results aren't affected by previous algorithms run on this map instance
 			return algorithmStatistics;
 		}
 			

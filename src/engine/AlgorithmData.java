@@ -45,14 +45,13 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		double endTime = System.nanoTime();	
 		this.goalNode = p0.get0();
 		this.nodesExpanded = p0.get1();
-		System.out.println("Nodes Expanded "+nodesExpanded);
+		System.out.println("Node expanded: " + nodesExpanded);
 		this.time = (endTime - startTime)/1000000;
 		
 		Pair<Pair<Double,Double>,LinkedList<Coordinate>> p1 = calculateDistanceAnglePath();
 		this.distance = p1.get0().get0();
 		this.angle = p1.get0().get1();
 		this.path = p1.get1();
-		System.out.println("Done");
 	}
 	
 	/*

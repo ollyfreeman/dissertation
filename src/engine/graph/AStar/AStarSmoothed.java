@@ -25,7 +25,7 @@ public class AStarSmoothed extends AStar {
 				target = null;
 			}
 			while(target != null) {
-				if(LineOfSight.isVisible_edge_zeroWidth(current,target,map)) {
+				if(LineOfSight.isVisible_edge_zeroWidth(n,target,map)) {
 					n.setParent(target);
 					target = target.getParent();
 					

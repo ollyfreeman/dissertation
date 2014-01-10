@@ -2,6 +2,7 @@ package utility;
 
 import java.util.List;
 
+import engine.AlgorithmData_Static;
 import engine.AlgorithmData;
 
 /*
@@ -15,6 +16,13 @@ public class AlgorithmStatistics {
 	private final List<Coordinate> path;
 	
 	public AlgorithmStatistics(AlgorithmData algorithmData) {
+		this.distance = algorithmData.getDistance();
+		this.angle = algorithmData.getAngle();
+		this.time = algorithmData.getTime();
+		this.path = algorithmData.getPath();
+	}
+	
+	public AlgorithmStatistics(AlgorithmData_Static algorithmData) {
 		this.distance = algorithmData.getDistance();
 		this.angle = algorithmData.getAngle();
 		this.time = algorithmData.getTime();

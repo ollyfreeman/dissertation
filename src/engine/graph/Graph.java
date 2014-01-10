@@ -12,7 +12,12 @@ public class Graph implements java.io.Serializable {
 	
 	//Later I may need to subclass this as GridGraph and VisibilityGraph
 	
-	private HashMap<Coordinate,Node> graph;
+	/*
+	 * this could be any searchable data structure, as searching for nodes "getNode" is only 
+	 * done during the creation of the LDDB which is not time critical
+	 */
+	private HashMap<Coordinate,Node> graph;		
+	
 	private Node source;
 	private Node goal;
 	
@@ -47,14 +52,14 @@ public class Graph implements java.io.Serializable {
 		return graph.get(c);
 	}
 	
-	public boolean doesEdgeExist(Coordinate c1, Coordinate c2) {
+	/*public boolean doesEdgeExist(Coordinate c1, Coordinate c2) {
 		Node n1 = getNode(c1);
 		if(n1 != null) {
 			return (n1.getNeighbourIfExists(c2.getX(), c2.getY()) != null);
 		} else {
 			return false;
 		}
-	}
+	}*/
 	
 	public Graph cloneMe() {
 		/*

@@ -18,11 +18,11 @@ import gui.GUICoordinator;
  * This class is the coordinator for the back end. It is the interface to which
  * the front end (usually buttons in JPanels) sends messages.
  * 
- * Its main job is to create, load, save and delegate to the current mapInstance.
+ * Its main job is to create, load, save and delegate to the current MapInstance.
  */
 public class Engine {
 	
-	private MapInstance mapInstance;
+	private MapInstance MapInstance;
 	private GUICoordinator coordinator;
 	
 	public Engine(GUICoordinator coordinator) {
@@ -66,17 +66,17 @@ public class Engine {
 		/*
 		 * create a map instance with the specific map
 		 */
-		mapInstance = new MapInstance(map);
+		MapInstance = new MapInstance(map);
 		
 		/*
 		 * plot map
 		 */
-		coordinator.drawMap(mapInstance.getMap());
+		coordinator.drawMap(MapInstance.getMap());
 		
 		/*
 		 * plotting a new map so need to reset the Algorithm panel
 		 */
-		coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
+		coordinator.resetAlgorithmPanel(MapInstance.getMap().getWidth(),MapInstance.getMap().getHeight());
 		coordinator.enableAlgorithmPanel();
 	}
 	
@@ -93,12 +93,12 @@ public class Engine {
 		/*
 		 * create a map instance with the specific map
 		 */
-		mapInstance = new MapInstance(map);
+		MapInstance = new MapInstance(map);
 		
 		/*
 		 * plot map
 		 */
-		coordinator.drawMap(mapInstance.getMap());
+		coordinator.drawMap(MapInstance.getMap());
 	}
 	
 	
@@ -112,25 +112,25 @@ public class Engine {
 		/*
 		 * find out if a route on this map exists: DontKnow means not yet calculated
 		 */
-		DoesRouteExist doesRouteExist = mapInstance.doesRouteExist();
+		DoesRouteExist doesRouteExist = MapInstance.doesRouteExist();
 		/*
 		 * if a route has not yet been attempted on the map, we use (simple) A* to see
 		 * if one even exists
 		 */
 		if(doesRouteExist.equals(DoesRouteExist.DontKnow)) {
-			mapInstance.createAlgorithmData(AlgorithmType.Dijkstra, source, goal);		//OR AStar? if you change this need to change MapInstance.doesRouteExist()
+			MapInstance.createAlgorithmData(AlgorithmType.Dijkstra, source, goal);		//OR AStar? if you change this need to change MapInstance.doesRouteExist()
 		}
 		/*
 		 * recheck doesRouteExist now that we've actually tried to find one.
 		 */
-		doesRouteExist = mapInstance.doesRouteExist();
+		doesRouteExist = MapInstance.doesRouteExist();
 		assert !(doesRouteExist.equals(doesRouteExist.DontKnow)) : "Just attempted to calculate route. It should not be \"DontKnow\""; 
 		
 		if (doesRouteExist.equals(DoesRouteExist.Yes)) {
 			/*
 			 * actually do the algorithm if it hasn't already been done
 			 */
-			algorithmStatistics = mapInstance.createAlgorithmData(algorithmType, source, goal);
+			algorithmStatistics = MapInstance.createAlgorithmData(algorithmType, source, goal);
 		} else {
 			/*
 			 * do nothing, i.e. algorithmStatistics = null tells the algorithmPanel that no path was found
@@ -146,38 +146,38 @@ public class Engine {
 	 * draws the path given the algorithm type and a colour
 	 */
 	public void plotPath(AlgorithmType algorithmType, Color color) {
-		assert mapInstance.doesRouteExist().equals(DoesRouteExist.Yes) : "Should not be able to plot a route if either we don't know if a route exists or if a route doesn't exist";
+		assert MapInstance.doesRouteExist().equals(DoesRouteExist.Yes) : "Should not be able to plot a route if either we don't know if a route exists or if a route doesn't exist";
 		/*
 		 * get the goal node for that algorithm
 		 */
-		List<Coordinate> path = mapInstance.getPath(algorithmType);
+		List<Coordinate> path = MapInstance.getPath(algorithmType);
 		assert path != null : "Should not be able to plot a route if that route hasn't been calculated";
 		/*
 		 * plot the path in the specified colour
 		 */
-		coordinator.drawPath(mapInstance.getMap(), path, color);
+		coordinator.drawPath(MapInstance.getMap(), path, color);
 	}
 	
 	public void loadMapInstance(String filename) {
 		 try {
 			 FileInputStream fileIn = new FileInputStream(filename);
 			 ObjectInputStream in = new ObjectInputStream(fileIn);
-			 mapInstance = (MapInstance) in.readObject();
+			 MapInstance = (MapInstance) in.readObject();
 			 in.close();
 			 fileIn.close();
-			 coordinator.drawMap(mapInstance.getMap());
-			 coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
+			 coordinator.drawMap(MapInstance.getMap());
+			 coordinator.resetAlgorithmPanel(MapInstance.getMap().getWidth(),MapInstance.getMap().getHeight());
 			 coordinator.enableAlgorithmPanel();
 			 int unfoundPaths = 0;
 			 for(AlgorithmType algorithmType: AlgorithmType.values()) {
-				 if (this.mapInstance.getPath(algorithmType) != null) {
-					 coordinator.setAlgorithmStatistics(mapInstance.createAlgorithmData(algorithmType, mapInstance.getAlgorithmData(algorithmType).getSource(),mapInstance.getAlgorithmData(algorithmType).getGoal()), algorithmType);
+				 if (this.MapInstance.getPath(algorithmType) != null) {
+					 coordinator.setAlgorithmStatistics(MapInstance.createAlgorithmData(algorithmType, MapInstance.getAlgorithmData(algorithmType).getSource(),MapInstance.getAlgorithmData(algorithmType).getGoal()), algorithmType);
 					 unfoundPaths++;
 				 }
 			 }
 			 if (unfoundPaths == 5) {
 				 coordinator.setAlgorithmStatistics(null, AlgorithmType.Dijkstra);
-				 coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
+				 coordinator.resetAlgorithmPanel(MapInstance.getMap().getWidth(),MapInstance.getMap().getHeight());
 				 coordinator.enableAlgorithmPanel();
 			 }
 			 
@@ -195,7 +195,7 @@ public class Engine {
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename);
 			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
-			outStream.writeObject(mapInstance);
+			outStream.writeObject(MapInstance);
 			outStream.close();
 			fileOut.close();
 		} catch(IOException i) {
@@ -207,7 +207,7 @@ public class Engine {
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename);
 			ObjectOutputStream outStream = new ObjectOutputStream(fileOut);
-			outStream.writeObject(new MapInstance(mapInstance.getMap()));
+			outStream.writeObject(new MapInstance(MapInstance.getMap()));
 			outStream.close();
 			fileOut.close();
 		} catch(IOException i) {

@@ -122,7 +122,7 @@ public class AStarAlgorithm {
 		if(list.size()!=0) {
 			list.remove(list.size()-1);
 		}
-		return new Pair(distanceAccumulator,list);
+		return new Pair<Double,ArrayList<Coordinate>>(distanceAccumulator,list);
 	}
 
 }

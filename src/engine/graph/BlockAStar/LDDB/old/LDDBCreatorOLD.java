@@ -19,7 +19,7 @@ import utility.Pair;
 
 public class LDDBCreatorOLD {
 
-	private static int blockSize = 4;
+	private static int blockSize = 3;
 	
 	public static void createDB() {
 		int totalMaps = (int) Math.pow(2,blockSize*blockSize);
