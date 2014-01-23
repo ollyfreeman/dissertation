@@ -20,11 +20,13 @@ public class BlockAStar_semi extends BlockAStar_standard {
 		Block startBlock = blockArray[this.source.getX()/blockSize][this.source.getY()/blockSize];
 		startInBlock = new Coordinate(this.source.getX()%blockSize,this.source.getY()%blockSize);
 		startBlock.setHeapValue(0);        //doesn't actually matter what this is
+		//System.out.println(startBlock.getCode());
 		//Map m = new Map(map,startBlock.getTopLeft(),blockSize,blockSize); don't need
 		for(int i=0; i<blockSize;i++) {
 			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				double length = lddb.getLength(startBlock.getCode(),new PairOfCoords(startInBlock,c,blockSize));
+				//System.out.println("to " + c + " is " + length);
 				ArrayList<Coordinate> intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords(startInBlock,c,blockSize)));
 				//nodesExpanded+=aStar.getNodesExpanded(); don't need
 				startBlock.setGValue(c, length);

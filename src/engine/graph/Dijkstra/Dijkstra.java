@@ -43,6 +43,7 @@ public class Dijkstra extends AlgorithmData {
 			Node current = openSet.remove();		nodesExpanded++;
 			setNode(current,closedSet,map);									//for Lazy Theta Star
 			if(goalTest(current,goal,map)) {
+				//System.out.println(nodesExpanded);
 				return new Pair<Node,Integer>(current,nodesExpanded);
 			}
 			closedSet.add(current);
@@ -60,6 +61,7 @@ public class Dijkstra extends AlgorithmData {
 		if(goal.getParent() == null && (!goal.getCoordinate().equals(start.getCoordinate()))) {
 			return new Pair<Node,Integer>(null,nodesExpanded);
 		} else {
+			//System.out.println(nodesExpanded);
 			return new Pair<Node,Integer>(goal,nodesExpanded);
 		}
 	}

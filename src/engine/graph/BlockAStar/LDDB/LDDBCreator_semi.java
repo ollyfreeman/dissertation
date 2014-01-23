@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import engine.map.Map;
 import engine.graph.Graph;
@@ -14,6 +15,7 @@ import engine.graph.LineOfSight;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
 import engine.graph.Dijkstra.DijkstraAlgorithm;
+import engine.graph.AStar.AStar;
 import engine.graph.AStar.AStarAlgorithm;
 import engine.graph.BlockAStar.LDDB.PairOfCoords;
 import utility.Coordinate;
@@ -21,7 +23,7 @@ import utility.Pair;
 
 public class LDDBCreator_semi {
 
-	private static int blockSize = 2;
+	private static int blockSize = 4;
 
 	public static void createDB() {
 		int totalMaps = (int) Math.pow(2,blockSize*blockSize);
@@ -67,10 +69,18 @@ public class LDDBCreator_semi {
 
 		g.setSource(g.getNode(sourceCoord));
 		g.setGoal(g.getNode(goalCoord));
-		Node n = AStarAlgorithm.getPath(g,map);
+		//Node n = AStarAlgorithm.getPath(g,map);
+		AStar aStar = new AStar();	aStar.go(g,map);
 		Double distanceAccumulator = 0.0;
 		ArrayList<Coordinate> intermediateCoordinates = new ArrayList<Coordinate>();
-		if(n!=null) {
+		if(aStar.goalNodeExists()) {
+			distanceAccumulator = aStar.getDistance();
+			LinkedList<Coordinate> list = aStar.getPath();
+			for(int i=1; i<list.size()-1; i++) {
+				intermediateCoordinates.add(list.get(i));
+			}
+		
+		/*if(n!=null) {
 			while(n != null) {
 				try {
 					distanceAccumulator+=getDistance(n,n.getParent());
@@ -84,6 +94,9 @@ public class LDDBCreator_semi {
 					intermediateCoordinates.add(n.getParent().getCoordinate());
 				}
 				n = n.getParent();
+			}*/
+			if(mapCounter==375 && sourceCoord.equals(new Coordinate(1,0)) && goalCoord.equals(new Coordinate(3,3))) {
+				System.out.println(distanceAccumulator);
 			}
 			Pair<Double,Integer> pair = new Pair<Double,Integer>(distanceAccumulator,LDDB.getListCode(intermediateCoordinates));
 			//System.out.println("Putting " + sourceCoord + " to "+ goalCoord + " with dist " + distanceAccumulator);

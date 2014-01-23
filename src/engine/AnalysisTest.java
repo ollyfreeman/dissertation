@@ -21,7 +21,7 @@ public class AnalysisTest {
 
 	public static void main(String[] args) {
 		//generateMaps(100,30,50,100);
-		exportResults(200,10,0,100);
+		exportResults(200,10,0,10);
 	}
 	
 	public static void generateMaps(int size, int coverage, int clustering, int numberOfMaps) {
@@ -36,7 +36,7 @@ public class AnalysisTest {
 		String[] array = new String[7];
 		array[0] = "Map"; array[1] = "Algorithm"; array[2] = "GraphCreationTime"; array[3] = "AlgorithmTime"; array[4] = "Distance"; array[5] = "Angle"; array[6] = "NodesExpanded";
 		data.add(array);
-		AlgorithmType[] atArray = {AlgorithmType.BlockAStar};//AlgorithmType[] atArray = {AlgorithmType.Dijkstra, AlgorithmType.AStar, AlgorithmType.ThetaStar, AlgorithmType.BlockAStar};
+		AlgorithmType[] atArray = {AlgorithmType.Dijkstra, AlgorithmType.AStar, AlgorithmType.ThetaStar, AlgorithmType.BlockAStar};
 		for(AlgorithmType at : atArray) {
 			for(int i=0; i<numberOfMaps;i++) {
 				array = new String[7];
@@ -50,7 +50,6 @@ public class AnalysisTest {
 					array[4] = ""+mapInstance.getAlgorithmData(at).getDistance();
 					array[5] = ""+mapInstance.getAlgorithmData(at).getAngle();
 					array[6] = ""+mapInstance.getAlgorithmData(at).getNodesExpanded();
-					System.out.println("Dist: "+ mapInstance.getAlgorithmData(at).getDistance());
 				} else {
 					noPathCounter++;
 					continue;

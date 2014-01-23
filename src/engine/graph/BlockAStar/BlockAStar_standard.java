@@ -24,7 +24,7 @@ public class BlockAStar_standard extends AlgorithmData {
 
 	protected static final long serialVersionUID = 1L;
 
-	protected static final int blockSize = 3;
+	protected static final int blockSize = 4;
 	protected static LDDB lddb;
 
 	protected Coordinate startInBlock,goalInBlock;
@@ -71,6 +71,7 @@ public class BlockAStar_standard extends AlgorithmData {
 				for(Coordinate c : ingressNodes) {
 					if(goalBlock.getGValue(c)+goalBlock.getHValue(c) < length) {
 						length = goalBlock.getGValue(c)+goalBlock.getHValue(c);
+						//System.out.println("AT GOAL BLOCK: from " + c + ": " + goalBlock.getGValue(c) + " plus " + goalBlock.getHValue(c) + " = " +(goalBlock.getGValue(c) + goalBlock.getHValue(c)) );
 						//parent of goal is c
 						//goalBlock.setParent(goalInBlock, goalBlock.getNode(c));
 					}
@@ -82,7 +83,6 @@ public class BlockAStar_standard extends AlgorithmData {
 			//stopTime = System.nanoTime();
 			//System.out.println("Main time: = " +((stopTime-startTime)/1000000));
 			//System.out.println(nodesExpanded);
-			System.out.println(length);
 			return new Pair<Node,Integer>(postProcessing(startBlock,goalBlock,map),nodesExpanded);
 		} else {
 			return new Pair<Node,Integer>(null,nodesExpanded);
@@ -91,7 +91,7 @@ public class BlockAStar_standard extends AlgorithmData {
 
 	protected void expand(Block currentBlock, List<Coordinate> y, PriorityQueue<Block> openSet) {
 		for(Block neighbourBlock : currentBlock.getNeighbours()) {
-			//System.out.println("new neight");
+			//System.out.println("new neigh");
 			LinkedList<Coordinate> ListX = new LinkedList<Coordinate>();		//egress cells in currentBlock for this neighbourBlock
 			LinkedList<Coordinate> ListXPrime = new LinkedList<Coordinate>();	//corresponding ingress cell in the neighbourBlock
 			Coordinate neighbourTL = neighbourBlock.getTopLeft();				//i.e. the topLeft coordinate of the neighbour
@@ -101,7 +101,7 @@ public class BlockAStar_standard extends AlgorithmData {
 				ListX.add(new Coordinate(0,0));
 				ListXPrime.add(new Coordinate(blockSize,blockSize));
 			} else if(neighbourTL.getY() < currentTL.getY() && neighbourTL.getX() == currentTL.getX()) {
-				for(int i=0;i<=blockSize;i++) {
+				for(int i=1;i<blockSize;i++) {
 					ListX.add(new Coordinate(i,0));
 					ListXPrime.add(new Coordinate(i,blockSize));
 				}
@@ -109,7 +109,7 @@ public class BlockAStar_standard extends AlgorithmData {
 				ListX.add(new Coordinate(blockSize,0));
 				ListXPrime.add(new Coordinate(0,blockSize));
 			} else if(neighbourTL.getX() > currentTL.getX() && neighbourTL.getY() == currentTL.getY()) {
-				for(int i=0;i<=blockSize;i++) {
+				for(int i=1;i<blockSize;i++) {
 					ListX.add(new Coordinate(blockSize,i));
 					ListXPrime.add(new Coordinate(0,i));
 				}
@@ -117,7 +117,7 @@ public class BlockAStar_standard extends AlgorithmData {
 				ListX.add(new Coordinate(blockSize,blockSize));
 				ListXPrime.add(new Coordinate(0,0));
 			} else if(neighbourTL.getY() > currentTL.getY() && neighbourTL.getX() == currentTL.getX()) {
-				for(int i=0;i<=blockSize;i++) {
+				for(int i=1;i<blockSize;i++) {
 					ListX.add(new Coordinate(i,blockSize));
 					ListXPrime.add(new Coordinate(i,0));
 				} 
@@ -125,7 +125,7 @@ public class BlockAStar_standard extends AlgorithmData {
 				ListX.add(new Coordinate(0,blockSize));
 				ListXPrime.add(new Coordinate(blockSize,0));
 			} else if(neighbourTL.getX() < currentTL.getX() && neighbourTL.getY() == currentTL.getY()) {
-				for(int i=0;i<=blockSize;i++) {
+				for(int i=1;i<blockSize;i++) {
 					ListX.add(new Coordinate(0,i));
 					ListXPrime.add(new Coordinate(blockSize,i));
 				}
@@ -175,8 +175,10 @@ public class BlockAStar_standard extends AlgorithmData {
 				for(Coordinate c : y) {
 					//System.out.println("Expanding: (" + (currentBlock.getTopLeft().getX()+c.getX()) +","+ (currentBlock.getTopLeft().getY()+c.getY()) + ") to (" + (currentBlock.getTopLeft().getX()+x.getX()) +","+ (currentBlock.getTopLeft().getY()+x.getY()) +")");
 					double length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(c,x,blockSize));
+					//System.out.println("Code check:"+currentBlock.getCode());
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
+						//System.out.println(c + " to " + x + " in " + currentBlock.getTopLeft() + " --> " + currentBlock.getGValue(c) + " + " + length + "=" + (currentBlock.getGValue(c) + length));
 						//parent of x is c
 						currentBlock.setParent(x, currentBlock.getNode(c));
 					}
@@ -338,6 +340,9 @@ public class BlockAStar_standard extends AlgorithmData {
 				try{
 					if(!map.getCell(i+topLeft.getX(),j+topLeft.getY()).isBlocked()) {
 						code++;
+						//System.out.println(i + "," + j + " is free");
+					} else {
+						//System.out.println(i + "," + j + " is blocked");
 					}
 				} catch (ArrayIndexOutOfBoundsException e) {
 					//skip if part of this block is out of bounds, because we call those cells blocked!

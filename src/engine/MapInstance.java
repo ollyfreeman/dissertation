@@ -120,8 +120,8 @@ public class MapInstance implements java.io.Serializable{
 				break;
 			case BlockAStar:
 				if(blockAStarData == null) {
-					BlockAStar_standard.loadDB("standard");
-					blockAStarData =  new BlockAStar_standard(map,source,goal);
+					BlockAStar_standard.loadDB("semi");
+					blockAStarData =  new BlockAStar_semi(map,source,goal);
 					blockAStarData.go(graph,map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(blockAStarData);
