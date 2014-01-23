@@ -1,5 +1,6 @@
 package engine.graph.ThetaStar;
 
+import utility.Coordinate;
 import engine.graph.LineOfSight;
 import engine.graph.Node;
 import engine.graph.AStar.AStar;
@@ -13,11 +14,15 @@ public class ThetaStar extends AStar{
 		super();
 	}
 	
+	public ThetaStar (Map map, Coordinate source, Coordinate goal) {
+		super(map,source,goal);
+	}
+	
 	@Override
 	protected boolean updateCost(Node current, Node neighbour, Node goal, Map map) {
 		double prosposedNewGScore;
 		Node parentOfCurrent = current.getParent();
-		if(LineOfSight.isVisible_edge_zeroWidth(parentOfCurrent, neighbour, map)) {
+		if(LineOfSight.isVisible_edge_zeroWidth(parentOfCurrent, neighbour, map,false)) {
 			prosposedNewGScore = parentOfCurrent.getG() + getDistance(parentOfCurrent, neighbour);
 			if(prosposedNewGScore < neighbour.getG()) {
 				neighbour.setParent(parentOfCurrent);

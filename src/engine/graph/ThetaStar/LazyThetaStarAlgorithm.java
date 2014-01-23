@@ -68,7 +68,7 @@ public class LazyThetaStarAlgorithm {
 	
 	private static void setNode(Node current, Map map, List<Node> closedSet) {
 		if(current.getParent()!=null) {
-			if(!LineOfSight.isVisible_edge_zeroWidth(current.getParent(), current, map)) {
+			if(!LineOfSight.isVisible_edge_zeroWidth(current.getParent(), current, map,false)) {
 				Node bestNeighbour = null;
 				double lowestScore = Double.POSITIVE_INFINITY;
 				for(Node n : current.getNeighbours()) {

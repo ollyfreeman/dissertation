@@ -3,8 +3,123 @@ package engine.graph;
 import engine.map.Map;
 
 public class LineOfSight {
-
-	private static Node from;
+	
+	public static boolean isVisible_edge_zeroWidth(Node from, Node to, Map map, boolean centre) {
+		if(from == null || to == null) {
+			return false;
+		}
+		if(from.getCoordinate().equals(to.getCoordinate())) {
+			return true;
+		}
+		int x0 = from.getX();
+		int y0 = from.getY();
+		int x1 = to.getX();
+		int y1 = to.getY();
+		
+		int dy = y1-y0;
+		int dx = x1-x0;
+		
+		int f = 0;
+		
+		//sx and sy are the same as the paper - sxC and syC are in place of the (sx-1)/2 stuff
+		int sx, sxC, sy, syC;
+		if(dy<0) {
+			dy = -1*dy;
+			sy = -1; 
+			if(!centre) { syC = -1; } else { syC = 0; }
+		} else {
+			sy = 1; syC = 0;
+		}
+		if(dx<0) {
+			dx = -1*dx;
+			sx = -1;
+			if(!centre) { sxC = -1; } else { sxC = 0; }
+		} else {
+			sx = 1; sxC = 0;
+		}
+		
+		if(dx >= dy) {
+			while(x0 != x1) {
+				f+=dy;
+				if(f>=dx) {
+					if(map.getCell(x0+sxC, y0+syC).isBlocked()) {
+						return false;
+					}
+					y0+=sy;
+					f-=dx;
+				}
+				if(f!=0 && map.getCell(x0+sxC, y0+syC).isBlocked()) {
+					return false;
+				}
+				if(dy==0) {
+					boolean blocked1 = false;
+					boolean blocked2 = false;
+					try {
+						blocked1 = map.getCell(x0+sxC, y0).isBlocked();
+					} catch (ArrayIndexOutOfBoundsException e) {
+						blocked1 = true;
+					}
+					try{
+						blocked2 = map.getCell(x0+sxC, y0-1).isBlocked();
+					} catch (ArrayIndexOutOfBoundsException e) {
+						blocked2= true;
+					}
+					if(blocked1 && blocked2) {
+						return false;
+					}
+				}
+				x0+=sx;
+			}
+		} else {
+			while(y0 != y1) {
+				f+=dx;
+				if(f>=dy) {
+					if(map.getCell(x0+sxC, y0+syC).isBlocked()) {
+						return false;
+					}
+					x0+=sx;
+					f-=dy;
+				}
+				if(f!=0 && map.getCell(x0+sxC, y0+syC).isBlocked()) {
+					return false;
+				}
+				if(dx==0) {
+					boolean blocked1 = false;
+					boolean blocked2 = false;
+					try {
+						blocked1 = map.getCell(x0, y0+syC).isBlocked();
+					} catch (ArrayIndexOutOfBoundsException e) {
+						blocked1 = true;
+					}
+					try {
+						blocked2 = map.getCell(x0-1, y0+syC).isBlocked();
+					} catch (ArrayIndexOutOfBoundsException e) {
+						blocked2 = true;
+					}
+					if(blocked1 && blocked2) {
+						return false;
+					}
+				}
+				y0+=sy;
+			}
+		}
+		return true;
+	}
+	
+	public static boolean isVisible_edge_finiteWidth(Node from, Node to, Map map) { return false; }
+	
+	public static boolean isVisible_centre_finiteWidth(Node from, Node to) { return false; }
+	
+	/*
+	 * implements a line of sight check based on Bresenham's line drawing algorithm
+	 * Instead of using the pure line-drawing algorithm as advised in the Theta* web implementation
+	 * I have made sure that each node on the line of sight is reachable (i.e. a neighbour) of the 
+	 * node before it in the line of sight. This ensures that the line of sight check produces
+	 * straight paths that are walkable for the character (i.e. not slipping between and around blocks
+	 * on paths that aren't possible according to the graph)
+	 */
+	
+	/*private static Node from;
 	private static Node to;
 	private static Node current;
 	private static Node temp;
@@ -15,16 +130,7 @@ public class LineOfSight {
 	private static int y1;
 	private static int x;
 	private static int y;
-
-
-	/*
-	 * implements a line of sight check based on Bresenham's line drawing algorithm
-	 * Instead of using the pure line-drawing algorithm as advised in the Theta* web implementation
-	 * I have made sure that each node on the line of sight is reachable (i.e. a neighbour) of the 
-	 * node before it in the line of sight. This ensures that the line of sight check produces
-	 * straight paths that are walkable for the character (i.e. not slipping between and around blocks
-	 * on paths that aren't possible according to the graph)
-	 */
+	
 	public static boolean isVisible_centre_finiteWidth(Node fromArg, Node toArg) {
 		if(fromArg == null || toArg == null) {
 			return false;
@@ -433,6 +539,7 @@ public class LineOfSight {
 			}
 		}
 	}
+
 	
 	//this function allows for rounding errors
 	private static double fp(double d) {
@@ -451,6 +558,6 @@ public class LineOfSight {
 		y1 = to.getY();
 		x = x0;
 		y = y0;
-	}
+	}*/
 
 }

@@ -2,36 +2,39 @@ package engine.graph.BlockAStar.LDDB;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import utility.Coordinate;
 import utility.Pair;
 
 public class LDDB implements java.io.Serializable {
 	
-	private final ArrayList<HashMap<PairOfCoords,Pair<Float,Integer>>> list;
+	private static final long serialVersionUID = 1L;
 	
-	public LDDB(ArrayList<HashMap<PairOfCoords,Pair<Float,Integer>>> list) {
+	private final ArrayList<HashMap<PairOfCoords,Pair<Double,Integer>>> list;
+	
+	public LDDB(ArrayList<HashMap<PairOfCoords,Pair<Double,Integer>>> list) {
 		this.list = list;
 	}
 	
 	public double getLength(int mapCode, PairOfCoords p) {
-		if(list.get(mapCode).get(p) == null) {
-			return Double.POSITIVE_INFINITY;
-		} else {
-			return list.get(mapCode).get(p).get0().doubleValue();
-		}
+			if(list.get(mapCode).get(p) == null) {
+				return Double.POSITIVE_INFINITY;
+			} else {
+				return list.get(mapCode).get(p).get0().doubleValue();
+			} 
 	}
 	
 	public ArrayList<Coordinate> getIntermediateNodes(int mapCode, PairOfCoords p) {
-		int listCode = list.get(mapCode).get(p).get1();
 		ArrayList<Coordinate> aL = new ArrayList<Coordinate>();
-		while(listCode !=0) {	//we will never have (0,0) as a coordinate in intermediate nodes so this is OK
-			int y = listCode & 7;
-			listCode = listCode >>> 3;
-			int x = listCode & 7;
-			aL.add(0, new Coordinate(x,y));
-			listCode = listCode >>> 3;
+		if(list.get(mapCode).get(p)	!= null) {
+			int listCode = list.get(mapCode).get(p).get1();
+			while(listCode !=0) {	//we will never have (0,0) as a coordinate in intermediate nodes so this is OK
+				int y = listCode & 7;
+				listCode = listCode >>> 3;
+				int x = listCode & 7;
+				aL.add(0, new Coordinate(x,y));
+				listCode = listCode >>> 3;
+			}
 		}
 		return aL;
 	}

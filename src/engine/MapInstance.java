@@ -11,9 +11,9 @@ import engine.graph.Node;
 import engine.map.Map;
 import engine.graph.GraphGenerator;
 import engine.graph.AStar.*;
-import engine.graph.BlockAStar.BlockAStar;
+import engine.graph.BlockAStar.*;
 import engine.graph.Dijkstra.Dijkstra;
-import engine.graph.ThetaStar.*;;
+import engine.graph.ThetaStar.*;
 
 /*
  * this class represents all of the data about a particular map
@@ -30,7 +30,7 @@ public class MapInstance implements java.io.Serializable{
 	
 	private AlgorithmData dijkstraData;
 	private AlgorithmData aStarData;
-	private AlgorithmData aStarVisData;
+	private AlgorithmData aStarVisibilityData;
 	private AlgorithmData aStarSmoothedData;
 	private AlgorithmData thetaStarData;
 	private AlgorithmData lazyThetaStarData;
@@ -68,59 +68,60 @@ public class MapInstance implements java.io.Serializable{
 	 * have requested to calculate is not A*, but A* will have been called without alerting the user in order
 	 * to find out if there is a possible route
 	 */
-	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType, Coordinate source, Coordinate goal) {
+	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType, Coordinate source, Coordinate goal, boolean isTesting) {
 		//FOR NOW I WILL RE-GENERATE A NEW GRAPH FROM THE MAP, but I need to implement a graph cloning algorithm cos this will take to long
 		//if I have loaded the graph it will have a null graph instance, so will need to consider this before cloning
 		AlgorithmStatistics algorithmStatistics;
 		if(algorithmType.equals(AlgorithmType.AStarVisibility)) {
 			Graph graph = GraphGenerator.generateGraph_visibility_edge_zeroWidth(map, new Node(source), new Node(goal));
-			if(aStarVisData == null) {
-				aStarVisData = new AStar();
-				aStarVisData.go(graph, map);
+			if(aStarVisibilityData == null) {
+				aStarVisibilityData = isTesting ? new AStarVisibility(map,source,goal) : new AStarVisibility();
+				aStarVisibilityData.go(graph, map);
 			}
-			algorithmStatistics = new AlgorithmStatistics(aStarVisData);
+			algorithmStatistics = new AlgorithmStatistics(aStarVisibilityData);
 			return algorithmStatistics;
 		} else {
 			Graph graph = GraphGenerator.generateGraph_edge_zeroWidth(map, new Node(source), new Node(goal));
 			switch (algorithmType) {
 			case Dijkstra:
 				if(dijkstraData == null) {
-					dijkstraData = new Dijkstra();
+					dijkstraData = isTesting ? new Dijkstra(map,source,goal): new Dijkstra();
 					dijkstraData.go(graph, map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(dijkstraData);
 				break;
 			case AStar:
 				if(aStarData == null) {
-					aStarData = new AStar();
+					aStarData = isTesting ? new AStar(map,source,goal) : new AStar();
 					aStarData.go(graph, map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(aStarData);
 				break;
 			case AStarSmoothed: 
 				if(aStarSmoothedData == null) {
-					aStarSmoothedData = new AStarSmoothed();
+					aStarSmoothedData = isTesting? new AStarSmoothed(map,source,goal) : new AStarSmoothed();
 					aStarSmoothedData.go(graph, map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(aStarSmoothedData);
 				break;
 			case ThetaStar:
 				if(thetaStarData == null) {
-					thetaStarData = new ThetaStar();
+					thetaStarData = isTesting ? new ThetaStar(map,source,goal) : new ThetaStar();
 					thetaStarData.go(graph,map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(thetaStarData);
 				break;
 			case LazyThetaStar:
 				if(lazyThetaStarData == null) {
-					lazyThetaStarData = new LazyThetaStar();
+					lazyThetaStarData = isTesting ? new LazyThetaStar(map,source,goal) : new LazyThetaStar();
 					lazyThetaStarData.go(graph,map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(lazyThetaStarData);
 				break;
 			case BlockAStar:
 				if(blockAStarData == null) {
-					blockAStarData = new BlockAStar();
+					BlockAStar_standard.loadDB("standard");
+					blockAStarData =  new BlockAStar_standard(map,source,goal);
 					blockAStarData.go(graph,map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(blockAStarData);
@@ -149,7 +150,7 @@ public class MapInstance implements java.io.Serializable{
 				path = aStarData.getPath();
 				break;
 			case AStarVisibility:
-				path = aStarVisData.getPath();
+				path = aStarVisibilityData.getPath();
 				break;
 			case AStarSmoothed:
 				path = aStarSmoothedData.getPath();
@@ -185,8 +186,12 @@ public class MapInstance implements java.io.Serializable{
                 return aStarSmoothedData;
         case ThetaStar:
                 return thetaStarData;
+        case LazyThetaStar:
+        		return lazyThetaStarData;
         case BlockAStar:
                 return blockAStarData;
+        case AStarVisibility:
+				return aStarVisibilityData;
         default:
                 return null;
         }

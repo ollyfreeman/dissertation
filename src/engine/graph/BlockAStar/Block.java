@@ -1,5 +1,6 @@
 package engine.graph.BlockAStar;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -14,11 +15,13 @@ public class Block implements Comparable<Block>{
 	private boolean[][] updatedGArray;
 	private double[][] hArray;
 	private BASNode[][] parentArray;
-	private LinkedList<Block> neighbours = new LinkedList<Block>();
+	private ArrayList<Block> neighbours = new ArrayList<Block>(8);
 	private int code;
+	private int size;
 	
 	public Block(int code, int size, Coordinate topLeft, Coordinate goal) {
 		this.code = code;
+		this.size=size;
 		this.topLeft = topLeft;
 		gArray = new double[size+1][size+1];
 		updatedGArray = new boolean[size+1][size+1];
@@ -29,7 +32,7 @@ public class Block implements Comparable<Block>{
 			for(int j=0;j<=size;j++) {
 				updatedGArray[i][j] = false;
 				parentArray[i][j] = new BASNode(new Coordinate(this.topLeft.getX()+i,this.topLeft.getY()+j),this);
-				setHValue(new Coordinate(i,j),(getDistance(topLeft.getX()+i,topLeft.getY()+j,goal)));
+				setHValue(new Coordinate(i,j),(getDistance(this.topLeft.getX()+i,this.topLeft.getY()+j,goal)));
 			}
 		}
 	}
@@ -42,7 +45,7 @@ public class Block implements Comparable<Block>{
 		this.neighbours.add(b);
 	}
 	
-	public LinkedList<Block> getNeighbours() {
+	public ArrayList<Block> getNeighbours() {
 		return this.neighbours;
 	}
 	

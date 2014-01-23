@@ -1,5 +1,6 @@
 package engine.graph.AStar;
 
+import utility.Coordinate;
 import engine.graph.LineOfSight;
 import engine.graph.Node;
 import engine.map.Map;
@@ -10,6 +11,10 @@ public class AStarSmoothed extends AStar {
 	
 	public AStarSmoothed() {
 		super();
+	}
+	
+	public AStarSmoothed (Map map, Coordinate source, Coordinate goal) {
+		super(map,source,goal);
 	}
 	
 	@Override
@@ -25,7 +30,7 @@ public class AStarSmoothed extends AStar {
 				target = null;
 			}
 			while(target != null) {
-				if(LineOfSight.isVisible_edge_zeroWidth(n,target,map)) {
+				if(LineOfSight.isVisible_edge_zeroWidth(n,target,map,false)) {
 					n.setParent(target);
 					target = target.getParent();
 					

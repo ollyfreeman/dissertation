@@ -54,7 +54,7 @@ public class SaveLoadPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				long time = System.currentTimeMillis();
 				JFileChooser fc = new JFileChooser();
-				fc.setSelectedFile(new File("/Users/olly_freeman/Dropbox/Part2Project/serialized/" + time + ".ser"));
+				fc.setSelectedFile(new File("/Users/olly_freeman/Dropbox/Part2Project/maps/" + time + ".ser"));
 				int returnVal = fc.showSaveDialog(coordinator.getWindow());
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
 	            	engine.saveMapInstance(fc.getSelectedFile().getName());
@@ -71,7 +71,7 @@ public class SaveLoadPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				long time = System.currentTimeMillis();
 				JFileChooser fc = new JFileChooser();
-				fc.setSelectedFile(new File("/Users/olly_freeman/Dropbox/Part2Project/serialized/" + time + "MAP.ser"));
+				fc.setSelectedFile(new File("/Users/olly_freeman/Dropbox/Part2Project/maps/" + time + "MAP.ser"));
 				int returnVal = fc.showSaveDialog(coordinator.getWindow());
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
 	            	engine.saveMapOnly(fc.getSelectedFile().getName());
@@ -89,7 +89,7 @@ public class SaveLoadPanel extends JPanel {
 				JFileChooser fc = new JFileChooser();
 				int returnVal = fc.showOpenDialog(coordinator.getWindow());
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            	engine.loadMapInstance(fc.getSelectedFile().getName());
+	            	engine.loadMapInstance("/Users/olly_freeman/Dropbox/Part2Project/maps/"+fc.getSelectedFile().getName());
 	            	enablePanel();
 	            }     
 			}

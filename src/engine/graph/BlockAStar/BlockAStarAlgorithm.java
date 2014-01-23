@@ -28,21 +28,21 @@ public class BlockAStarAlgorithm {
 	private static LDDB lddb = loadDB();
 	private static Map map;
 	private static Coordinate startInBlock,goalInBlock;
-	
+
 	public static Node getPath(Graph g, Map m) {
 		map = m;
 		openSet = new PriorityQueue<Block>();
 		Block[][] blockArray = initBlockArray(map);
 		Block startBlock = initStart(g.getSource().getCoordinate(),blockArray);
 		Block goalBlock = initGoal(g.getGoal().getCoordinate(),blockArray);
-		
+
 		if(startBlock == goalBlock) {
 			return startAndGoalInSameBlock(startBlock,goalBlock);
 		}
-		
+
 		double length = Double.POSITIVE_INFINITY;
 		openSet.add(startBlock);
-		
+
 		while(!openSet.isEmpty() && openSet.peek().getHeapValue() < length) {
 			Block currentBlock = openSet.remove();
 			currentBlock.setHeapValue(Double.POSITIVE_INFINITY);					//!!
@@ -66,14 +66,14 @@ public class BlockAStarAlgorithm {
 			return null;
 		}
 	}
-	
+
 	private static void expand(Block currentBlock, List<Coordinate> y) {
 		for(Block neighbourBlock : currentBlock.getNeighbours()) {
 			LinkedList<Coordinate> ListX = new LinkedList<Coordinate>();		//egress cells in currentBlock for this neighbourBlock
 			LinkedList<Coordinate> ListXPrime = new LinkedList<Coordinate>();	//corresponding ingress cell in the neighbourBlock
 			Coordinate neighbourTL = neighbourBlock.getTopLeft();				//i.e. the topLeft coordinate of the neighbour
 			Coordinate currentTL = currentBlock.getTopLeft();
-			
+
 			if(neighbourTL.getX() > currentTL.getX() && neighbourTL.getY() == currentTL.getY()) {
 				for(int i=0;i<=blockSize;i++) {
 					ListX.add(new Coordinate(blockSize,i));
@@ -97,7 +97,7 @@ public class BlockAStarAlgorithm {
 			} else {
 				System.out.println("Neighbour error!");
 			}
-			
+
 			//this next section should only run if we have FINITE WIDTH AGENTS - to avoid diagonal blockages
 			/*boolean TL,TR,BL,BR;
 			Iterator<Coordinate> listXIt = ListX.iterator();
@@ -133,7 +133,7 @@ public class BlockAStarAlgorithm {
 				}
 			}*/
 			//extra section for finite width ends here
-			
+
 			LinkedList<Coordinate> ListXPrimeUpdated = new LinkedList<Coordinate>();
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
@@ -153,7 +153,7 @@ public class BlockAStarAlgorithm {
 					ListXPrimeUpdated.add(xPrime);
 					//parent of xPrime is x
 					neighbourBlock.setParent(xPrime, currentBlock.getNode(x));
-					
+
 				}
 			}
 			double newHeapValue = Double.POSITIVE_INFINITY;
@@ -170,7 +170,7 @@ public class BlockAStarAlgorithm {
 			}
 		}
 	}
-	
+
 	private static Block[][] initBlockArray(Map map) {
 		int blockArrayWidth = (int) Math.ceil((map.getWidth()+0.0)/blockSize);
 		int blockArrayHeight = (int) Math.ceil((map.getHeight()+0.0)/blockSize);
@@ -181,7 +181,7 @@ public class BlockAStarAlgorithm {
 			}
 		}
 		Coordinate[] neighbourBlocks = {new Coordinate(0,-1),new Coordinate(1,0),new Coordinate(0,1),new Coordinate(-1,0),};//for FINITE WIDTH - I think
-		
+
 		for(int j=0; j<blockArrayHeight;j++) {
 			for(int i=0; i<blockArrayWidth;i++) {
 				for(Coordinate c : neighbourBlocks) {
@@ -193,14 +193,14 @@ public class BlockAStarAlgorithm {
 		}
 		return blockArray;
 	}
-	
+
 	private static Block initStart(Coordinate startCoord,Block[][] blockArray) {
 		Block startBlock = blockArray[startCoord.getX()/blockSize][startCoord.getY()/blockSize];
 		startInBlock = new Coordinate(startCoord.getX()%blockSize,startCoord.getY()%blockSize);
 		startBlock.setHeapValue(getDistance(startCoord,new Coordinate(map.getWidth(),map.getHeight())));        //doesn't actually matter what this is
 		Map m = new Map(map,startBlock.getTopLeft(),blockSize,blockSize);
-        for(int i=0; i<blockSize;i++) {
-        	Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
+		for(int i=0; i<blockSize;i++) {
+			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(startInBlock), new Node(c));
 				Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
@@ -219,7 +219,7 @@ public class BlockAStarAlgorithm {
 		}
 		return startBlock;
 	}
-	
+
 	private static Block initGoal(Coordinate goalCoord,Block[][] blockArray) {
 		Block goalBlock;
 		int x,y;
@@ -238,8 +238,8 @@ public class BlockAStarAlgorithm {
 		}
 		goalInBlock = new Coordinate(x,y);
 		Map m = new Map(map,goalBlock.getTopLeft(),blockSize,blockSize);
-        for(int i=0; i<blockSize;i++) {
-        	Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
+		for(int i=0; i<blockSize;i++) {
+			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(c),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
 				Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
@@ -258,23 +258,27 @@ public class BlockAStarAlgorithm {
 		}
 		return goalBlock;
 	}
-	
+
 	private static Node startAndGoalInSameBlock(Block startBlock, Block goalBlock) {
 		Map m = new Map(map,goalBlock.getTopLeft(),blockSize,blockSize);
 		Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(startInBlock),new Node(goalInBlock));
 		Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
-		ArrayList<Coordinate> intermediateNodes = lAIN.get1();
-		Node n = goalBlock.getNode(goalInBlock);
-		if(!startInBlock.equals(goalInBlock)) {
-			for(Coordinate c1 : intermediateNodes) {
-				n.setParent(goalBlock.getNode(c1));
-				n = goalBlock.getNode(c1);
+		if(lAIN.get0() != -1) {
+			ArrayList<Coordinate> intermediateNodes = lAIN.get1();
+			Node n = goalBlock.getNode(goalInBlock);
+			if(!startInBlock.equals(goalInBlock)) {
+				for(Coordinate c1 : intermediateNodes) {
+					n.setParent(goalBlock.getNode(c1));
+					n = goalBlock.getNode(c1);
+				}
+				n.setParent(goalBlock.getNode(startInBlock));
 			}
-			n.setParent(goalBlock.getNode(startInBlock));
+			return goalBlock.getNode(goalInBlock);
+		} else {
+			return null;
 		}
-		return goalBlock.getNode(goalInBlock);
 	}
-	
+
 	private static int getMapCode(Coordinate topLeft) {
 		int code = 0;
 		for(int j=0;j<blockSize;j++) {
@@ -291,27 +295,27 @@ public class BlockAStarAlgorithm {
 		}
 		return code;
 	}
-	
+
 	private static Node postProcessing(Block startBlock, Block goalBlock) {
 		BASNode goal = goalBlock.getNode(goalInBlock);
 		//post processing
 		//add in intermediate nodes
 		BASNode n = goal;
-		
+
 		//goalBlock
 		Map m = new Map(map,goalBlock.getTopLeft(),blockSize,blockSize);
 		Coordinate minGplusHCoordinate = new Coordinate(0,0);
 		double minGPlusH=Double.POSITIVE_INFINITY;//double minGPlusH = goalBlock.getNode(minGplusHCoordinate).getG()+goalBlock.getNode(minGplusHCoordinate).getF();
-        for(int i=0; i<blockSize;i++) {
-        	Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
+		for(int i=0; i<blockSize;i++) {
+			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				if(goalBlock.getNode(c).getF()+goalBlock.getNode(c).getG()<minGPlusH) {
 					minGplusHCoordinate = c;
 					minGPlusH = goalBlock.getNode(c).getF()+goalBlock.getNode(c).getG();
 				}
 			}
-        }
-        Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(minGplusHCoordinate),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
+		}
+		Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(minGplusHCoordinate),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
 		Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
 		ArrayList<Coordinate> intermediateNodes = lAIN.get1();
 		if(!minGplusHCoordinate.equals(goalInBlock)) {
@@ -355,15 +359,15 @@ public class BlockAStarAlgorithm {
 		}
 		return (Node) goal;
 	}
-	
+
 	private static LDDB loadDB() {
 		try {
 			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"zero.ser";
 			FileInputStream fileIn = new FileInputStream(filename);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			System.out.print("Loading DB...");
+			//System.out.print("Loading DB...");
 			LDDB lddb = (LDDB) in.readObject();
-			System.out.println("Done");
+			//System.out.println("Done");
 			in.close();
 			fileIn.close();
 			return lddb;

@@ -1,12 +1,14 @@
 package engine.graph.Dijkstra;
 
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.PriorityQueue;
 
+import utility.Coordinate;
 import utility.Pair;
 import engine.AlgorithmData;
 import engine.graph.Graph;
+import engine.graph.GraphGenerator;
 import engine.graph.Node;
 import engine.map.Map;
 
@@ -17,10 +19,19 @@ public class Dijkstra extends AlgorithmData {
 	public Dijkstra() {
 		super();
 	}
+	
+	public Dijkstra(Map map, Coordinate source, Coordinate goal) {
+		super();
+		double startTime = System.nanoTime();
+		this.graph =  GraphGenerator.generateGraph_edge_zeroWidth(map, new Node(source), new Node(goal));
+		double endTime = System.nanoTime();
+		this.graphCreationTime = (endTime - startTime)/1000000;
+		
+	}
 
 	@Override
 	public Pair<Node,Integer> getPath(Graph graph, Map map) {
-		List<Node> closedSet = new LinkedList<Node>();	
+		HashSet<Node> closedSet = new HashSet<Node>();	
 		PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 		Node start = graph.getSource();
 		initialise(start); 	
@@ -30,8 +41,8 @@ public class Dijkstra extends AlgorithmData {
 		
 		while(!openSet.isEmpty()) {
 			Node current = openSet.remove();		nodesExpanded++;
-			setNode(current,closedSet,map);								//for Lazy Theta Star
-			if(goalTest(current,goal,map)) {								//for A* and derivatives
+			setNode(current,closedSet,map);									//for Lazy Theta Star
+			if(goalTest(current,goal,map)) {
 				return new Pair<Node,Integer>(current,nodesExpanded);
 			}
 			closedSet.add(current);
@@ -69,7 +80,7 @@ public class Dijkstra extends AlgorithmData {
 		start.setF(0.0);
 	}
 
-	protected void setNode(Node current, List<Node> closedSet, Map map) {
+	protected void setNode(Node current, HashSet<Node> closedSet, Map map) {
 		//Do nothing
 	}
 	

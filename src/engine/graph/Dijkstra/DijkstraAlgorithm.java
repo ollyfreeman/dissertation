@@ -33,7 +33,6 @@ public class DijkstraAlgorithm {
 				}
 			}
 		}
-		System.out.println("nodes expanded: " + nodesExpanded);
 		if(goal.getParent() == null && (!goal.getCoordinate().equals(start.getCoordinate()))) {
 			return null;
 		} else {

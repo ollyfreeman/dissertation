@@ -7,7 +7,7 @@ import engine.graph.*;
 import engine.graph.AStar.AStarAlgorithm;
 import engine.graph.AStar.AStarSmoothedAlgorithm;
 import engine.graph.BlockAStar.BlockAStarAlgorithm;
-import engine.graph.BlockAStar.BlockAStarAlgorithmOLD;
+import engine.graph.BlockAStar.LDDB.raw.BlockAStarAlgorithm_raw;
 import engine.graph.Dijkstra.DijkstraAlgorithm;
 import engine.graph.ThetaStar.LazyThetaStarAlgorithm;
 import engine.graph.ThetaStar.ThetaStarAlgorithm;

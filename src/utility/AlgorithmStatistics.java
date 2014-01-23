@@ -18,7 +18,7 @@ public class AlgorithmStatistics {
 	public AlgorithmStatistics(AlgorithmData algorithmData) {
 		this.distance = algorithmData.getDistance();
 		this.angle = algorithmData.getAngle();
-		this.time = algorithmData.getTime();
+		this.time = algorithmData.getAlgorithmTime();
 		this.path = algorithmData.getPath();
 	}
 	

@@ -19,9 +19,10 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	protected transient Graph graph;		//when collecting data
 	private transient Node goalNode;
-	private Coordinate source;
-	private Coordinate goal;
+	protected Coordinate source;
+	protected Coordinate goal;
 	
 	/*
 	 * these 3 are all redundant (i.e. can be calculated from the Graph and Node),
@@ -29,7 +30,8 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	 */
 	private double distance;
 	private double angle;
-	private double time;
+	private double algorithmTime;
+	protected double graphCreationTime;
 	private int nodesExpanded;
 	private LinkedList<Coordinate> path;
 	
@@ -37,16 +39,18 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	}
 	
 	public void go(Graph graph, Map map) {
+		if (this.graph!=null) {				//for collecting data 
+			graph = this.graph;
+		}
 		this.source = graph.getSource().getCoordinate();
 		this.goal = graph.getGoal().getCoordinate();
 		Pair<Node,Integer> p0;
 		double startTime = System.nanoTime();
 		p0  = this.getPath(graph, map);
-		double endTime = System.nanoTime();	
+		double endTime = System.nanoTime();
+		this.algorithmTime = (endTime - startTime)/1000000;
 		this.goalNode = p0.get0();
 		this.nodesExpanded = p0.get1();
-		System.out.println("Node expanded: " + nodesExpanded);
-		this.time = (endTime - startTime)/1000000;
 		
 		Pair<Pair<Double,Double>,LinkedList<Coordinate>> p1 = calculateDistanceAnglePath();
 		this.distance = p1.get0().get0();
@@ -64,19 +68,23 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		double distanceAccumulator = 0.0;
 		double angleAccumulator = 0.0;
 		LinkedList<Coordinate> path = new LinkedList<Coordinate>();
-		while(n != null) {
-			try {
-				path.add(n.getCoordinate());
-				distanceAccumulator+=getDistance(n,n.getParent());
-			} catch (NullPointerException e) {
-				//when we get to the final (source) node
+		if(n!=null) {
+			while(n != null) {
+				try {
+					path.add(n.getCoordinate());
+					distanceAccumulator+=getDistance(n,n.getParent());
+				} catch (NullPointerException e) {
+					//when we get to the final (source) node
+				}
+				try {
+					angleAccumulator += getAngle(n);
+				}catch (NullPointerException e) {
+					//when we get to the penultimate node
+				}
+				n = n.getParent();
 			}
-			try {
-				angleAccumulator += getAngle(n);
-			}catch (NullPointerException e) {
-				//when we get to the penultimate node
-			}
-			n = n.getParent();
+		} else {
+			distanceAccumulator = Double.POSITIVE_INFINITY;
 		}
 		Pair<Double,Double> doubles = new Pair<Double,Double>(distanceAccumulator,angleAccumulator);
 		return new Pair<Pair<Double,Double>,LinkedList<Coordinate>>(doubles,path);
@@ -94,8 +102,8 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		return angle;
 	}
 
-	public double getTime() {
-		return time;
+	public double getAlgorithmTime() {
+		return algorithmTime;
 	}
 	
 	public LinkedList<Coordinate> getPath() {
@@ -131,6 +139,9 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	}
 	public Coordinate getGoal() {
 		return goal;
+	}
+	public double getGraphCreationTime() {
+		return this.graphCreationTime;
 	}
 
 

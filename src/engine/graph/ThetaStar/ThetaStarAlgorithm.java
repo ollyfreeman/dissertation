@@ -48,7 +48,7 @@ public class ThetaStarAlgorithm {
 	private static boolean updateCost(Node current, Node neighbour, Node goal, Map map) {
 		double prosposedNewGScore;
 		Node parentOfCurrent = current.getParent();
-		if(LineOfSight.isVisible_edge_zeroWidth(parentOfCurrent, neighbour, map)) {
+		if(LineOfSight.isVisible_edge_zeroWidth(parentOfCurrent, neighbour, map,false)) {
 			prosposedNewGScore = parentOfCurrent.getG() + getDistance(parentOfCurrent, neighbour);
 			if(prosposedNewGScore < neighbour.getG()) {
 				neighbour.setParent(parentOfCurrent);

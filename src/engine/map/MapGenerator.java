@@ -34,7 +34,7 @@ public class MapGenerator {
 			coverageCounter++;
 		}
 		
-		removeStartAndEnd(width, height);		// makes sure that the start and the end are unblocked
+		//removeStartAndEnd(width, height);		// makes sure that the start and the end are unblocked
 		
 		return new Map(map);
 	}

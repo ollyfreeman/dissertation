@@ -4,12 +4,12 @@ import utility.Coordinate;
 
 public class PairOfCoords implements java.io.Serializable{
 	
-	private final byte coordCode;
+	private final short coordCode;
 	private final int blockSize;
 	
 	public PairOfCoords(Coordinate c1, Coordinate c2, int blockSize) {
 		this.blockSize = blockSize;
-		this.coordCode = (byte) (c1.getX() + (blockSize+1)*c1.getY() + (blockSize+1)*(blockSize+1)*c2.getX() + (blockSize+1)*(blockSize+1)*(blockSize+1)*c2.getY());
+		this.coordCode = (short) (c1.getX() + (blockSize+2)*c1.getY() + (blockSize+2)*(blockSize+2)*c2.getX() + (blockSize+2)*(blockSize+2)*(blockSize+2)*c2.getY());
 	}
 	
 	public int hashCode() {
@@ -28,13 +28,13 @@ public class PairOfCoords implements java.io.Serializable{
 	@Override
 	public String toString() {
 		int cC = coordCode;
-		int x1 = cC%(blockSize+1);
-		cC/=(blockSize+1);
-		int y1 = cC%(blockSize+1);
-		cC/=(blockSize+1);
-		int x2 = cC%(blockSize+1);
-		cC/=(blockSize+1);
-		int y2 = cC%(blockSize+1);
+		int x1 = cC%(blockSize+2);
+		cC/=(blockSize+2);
+		int y1 = cC%(blockSize+2);
+		cC/=(blockSize+2);
+		int x2 = cC%(blockSize+2);
+		cC/=(blockSize+2);
+		int y2 = cC%(blockSize+2);
 		return "("+x1+","+y1+"),("+x2+","+y2+")";
 	}
 

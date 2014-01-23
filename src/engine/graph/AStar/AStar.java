@@ -1,5 +1,6 @@
 package engine.graph.AStar;
 
+import utility.Coordinate;
 import engine.graph.Node;
 import engine.graph.Dijkstra.Dijkstra;
 import engine.map.Map;
@@ -10,6 +11,10 @@ public class AStar extends Dijkstra {
 	
 	public AStar() {
 		super();
+	}
+	
+	public AStar (Map map, Coordinate source, Coordinate goal) {
+		super(map,source,goal);
 	}
 	
 	

@@ -1,7 +1,10 @@
 package engine.graph.ThetaStar;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
+import utility.Coordinate;
 import engine.graph.LineOfSight;
 import engine.graph.Node;
 import engine.graph.AStar.AStar;
@@ -13,6 +16,10 @@ public class LazyThetaStar extends AStar {
 
 	public LazyThetaStar() {
 		super();
+	}
+	
+	public LazyThetaStar (Map map, Coordinate source, Coordinate goal) {
+		super(map,source,goal);
 	}
 	
 	@Override
@@ -39,9 +46,9 @@ public class LazyThetaStar extends AStar {
 	}
 	
 	@Override
-	protected void setNode(Node current, List<Node> closedSet, Map map) {
+	protected void setNode(Node current, HashSet<Node> closedSet, Map map) {
 		if(current.getParent()!=null) {
-			if(!LineOfSight.isVisible_edge_zeroWidth(current.getParent(), current, map)) {
+			if(!LineOfSight.isVisible_edge_zeroWidth(current.getParent(), current, map, false)) {
 				Node bestNeighbour = null;
 				double lowestScore = Double.POSITIVE_INFINITY;
 				for(Node n : current.getNeighbours()) {
