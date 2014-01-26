@@ -11,10 +11,8 @@ public class Block implements Comparable<Block>{
 	
 	private double heapValue = Double.POSITIVE_INFINITY;
 	private Coordinate topLeft;
-	private double[][] gArray;
 	private boolean[][] updatedGArray;
-	private double[][] hArray;
-	private BASNode[][] parentArray;
+	private BASNode[][] nodeArray;
 	private ArrayList<Block> neighbours = new ArrayList<Block>(8);
 	private int code;
 	private int size;
@@ -23,15 +21,13 @@ public class Block implements Comparable<Block>{
 		this.code = code;
 		this.size=size;
 		this.topLeft = topLeft;
-		gArray = new double[size+1][size+1];
 		updatedGArray = new boolean[size+1][size+1];
-		hArray = new double[size+1][size+1];
-		parentArray = new BASNode[size+1][size+1];
+		nodeArray = new BASNode[size+1][size+1];
 		heapValue = Double.POSITIVE_INFINITY;
 		for(int i=0;i<=size;i++) {
 			for(int j=0;j<=size;j++) {
 				updatedGArray[i][j] = false;
-				parentArray[i][j] = new BASNode(new Coordinate(this.topLeft.getX()+i,this.topLeft.getY()+j),this);
+				nodeArray[i][j] = new BASNode(new Coordinate(this.topLeft.getX()+i,this.topLeft.getY()+j),this);
 				setHValue(new Coordinate(i,j),(getDistance(this.topLeft.getX()+i,this.topLeft.getY()+j,goal)));
 			}
 		}
@@ -63,8 +59,8 @@ public class Block implements Comparable<Block>{
 	
 	public List<Coordinate> getIngressNodes() {
 		LinkedList<Coordinate> result = new LinkedList<Coordinate>();
-		for(int j=0;j<gArray[0].length;j++) {
-			for(int i=0;i<gArray.length;i++) {
+		for(int j=0;j<updatedGArray[0].length;j++) {
+			for(int i=0;i<updatedGArray.length;i++) {
 				if(updatedGArray[i][j]) {
 					result.add(new Coordinate(i,j));
 					updatedGArray[i][j] = false;
@@ -75,30 +71,30 @@ public class Block implements Comparable<Block>{
 	}
 	
 	public void setGValue(Coordinate c, double value) {
-		parentArray[c.getX()][c.getY()].setG(value);
+		nodeArray[c.getX()][c.getY()].setG(value);
 		updatedGArray[c.getX()][c.getY()]  = true;
 	}
 	
 	public double getGValue(Coordinate c) {
-		return parentArray[c.getX()][c.getY()].getG();
+		return nodeArray[c.getX()][c.getY()].getG();
 	}
 	
 	//only to be used if goal block - I should subclass block to have goal block and put this method in there
 	public void setHValue(Coordinate c, double value) {
-		parentArray[c.getX()][c.getY()].setF(value);		//im using f for h
+		nodeArray[c.getX()][c.getY()].setF(value);		//im using f for h
 	}
 	
 	public double getHValue(Coordinate c) {
-		return parentArray[c.getX()][c.getY()].getF();
+		return nodeArray[c.getX()][c.getY()].getF();
 	}
 	
 	//sets the parent of the node (with Coordinate c) to Node n
 	public void setParent(Coordinate c, Node n) {
-		parentArray[c.getX()][c.getY()].setParent(n);
+		nodeArray[c.getX()][c.getY()].setParent(n);
 	}
 	
 	public BASNode getNode(Coordinate c) {
-		return parentArray[c.getX()][c.getY()];
+		return nodeArray[c.getX()][c.getY()];
 	}
 	
 	@Override

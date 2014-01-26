@@ -155,7 +155,24 @@ public class Engine {
 		/*
 		 * plot the path in the specified colour
 		 */
-		coordinator.drawPath(mapInstance.getMap(), path, color);
+		coordinator.drawPath(path, color);
+	}
+	
+	/*
+	 * draws the expanded nodes given the algorithm type and a colour
+	 */
+	public void plotNodes(AlgorithmType algorithmType, Color color) {
+		assert mapInstance.doesRouteExist().equals(DoesRouteExist.Yes) : "Should not be able to plot a route if either we don't know if a route exists or if a route doesn't exist";
+		/*
+		 * get the goal node for that algorithm
+		 */
+		List<Coordinate> path = mapInstance.getPath(algorithmType);
+		boolean[][] nea = mapInstance.getNodesExpandedArray(algorithmType);
+		assert path != null : "Should not be able to plot a route if that route hasn't been calculated";
+		/*
+		 * plot the path in the specified colour
+		 */
+		coordinator.drawNodes(nea, color);
 	}
 	
 	public void loadMapInstance(String filename) {

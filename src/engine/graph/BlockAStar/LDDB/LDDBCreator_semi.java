@@ -1,9 +1,7 @@
 package engine.graph.BlockAStar.LDDB;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,12 +9,9 @@ import java.util.LinkedList;
 
 import engine.map.Map;
 import engine.graph.Graph;
-import engine.graph.LineOfSight;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
-import engine.graph.Dijkstra.DijkstraAlgorithm;
 import engine.graph.AStar.AStar;
-import engine.graph.AStar.AStarAlgorithm;
 import engine.graph.BlockAStar.LDDB.PairOfCoords;
 import utility.Coordinate;
 import utility.Pair;
@@ -74,7 +69,7 @@ public class LDDBCreator_semi {
 		Double distanceAccumulator = 0.0;
 		ArrayList<Coordinate> intermediateCoordinates = new ArrayList<Coordinate>();
 		if(aStar.goalNodeExists()) {
-			distanceAccumulator = aStar.getDistance();
+			distanceAccumulator = (Double) aStar.getDistance();
 			LinkedList<Coordinate> list = aStar.getPath();
 			for(int i=1; i<list.size()-1; i++) {
 				intermediateCoordinates.add(list.get(i));
@@ -95,11 +90,7 @@ public class LDDBCreator_semi {
 				}
 				n = n.getParent();
 			}*/
-			if(mapCounter==375 && sourceCoord.equals(new Coordinate(1,0)) && goalCoord.equals(new Coordinate(3,3))) {
-				System.out.println(distanceAccumulator);
-			}
 			Pair<Double,Integer> pair = new Pair<Double,Integer>(distanceAccumulator,LDDB.getListCode(intermediateCoordinates));
-			//System.out.println("Putting " + sourceCoord + " to "+ goalCoord + " with dist " + distanceAccumulator);
 			hm.put(new PairOfCoords(sourceCoord,goalCoord,blockSize), pair);
 		}
 	}
@@ -116,30 +107,6 @@ public class LDDBCreator_semi {
 		} catch(IOException i) {
 			i.printStackTrace();
 		}
-	}
-
-	/*private static void loadDB() {
-		try {
-			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"zero_semi.ser";
-			FileInputStream fileIn = new FileInputStream(filename);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			LDDB lddb = (LDDB) in.readObject();
-			in.close();
-			fileIn.close();
-		} catch(IOException i) {
-			i.printStackTrace();
-			return;
-		} catch (ClassNotFoundException c) {
-			c.printStackTrace();
-			return;
-		}
-
-	}*/
-
-	private static double getDistance(Node n1, Node n2) {
-		double xDiff = n1.getX() - n2.getX();
-		double yDiff = n1.getY() - n2.getY();
-		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
 	}
 
 	public static void main(String[] args) {

@@ -29,7 +29,7 @@ public class AlgorithmPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private Engine engine;
-	private Component[][] componentArray = new Component[8][6];	
+	private Component[][] componentArray = new Component[8][7];	
 	private JTextField sourceCoordinateField;	private Coordinate sourceCoordinate;	private JRadioButton sourceButton;
 	private JTextField goalCoordinateField;		private Coordinate goalCoordinate;		private JRadioButton goalButton;
 	private boolean coordinatesEditable = false;
@@ -55,14 +55,15 @@ public class AlgorithmPanel extends JPanel {
 		componentArray[0][2] = new JLabel("Angle");
 		componentArray[0][3] = new JLabel("Time");
 		componentArray[0][4] = new JLabel("");
-		componentArray[0][5] = new JLabel("");
+		componentArray[0][5] = new JLabel("Path");
+		componentArray[0][6] = new JLabel("Expanded");
 
 		addAlgorithm("Dijkstra", AlgorithmType.Dijkstra, Color.GRAY, 1);
-		addAlgorithm("A*", AlgorithmType.AStar, Color.ORANGE, 2);
+		addAlgorithm("A*", AlgorithmType.AStar, new Color(0xFF8C00), 2);
 		addAlgorithm("A* - smoothed", AlgorithmType.AStarSmoothed, Color.RED, 3);
 		addAlgorithm("Basic Theta*", AlgorithmType.ThetaStar, Color.BLUE, 4);
-		addAlgorithm("Lazy Theta*", AlgorithmType.LazyThetaStar, Color.CYAN, 5);
-		addAlgorithm("Block A*", AlgorithmType.BlockAStar, Color.MAGENTA, 6);
+		addAlgorithm("Lazy Theta*", AlgorithmType.LazyThetaStar, new Color(0x00adad), 5);
+		addAlgorithm("Block A*", AlgorithmType.BlockAStar, new Color(0x8b008b), 6);
 		addAlgorithm("A* - visibility graph", AlgorithmType.AStarVisibility, Color.GREEN, 7);
 
 		for(int i=0; i<componentArray.length; i++) {
@@ -138,10 +139,32 @@ public class AlgorithmPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				drawAlgorithm(algType, c);
+				JButton b = (JButton) e.getSource();
+				if(b.getText().equals("Draw")) {
+					b.setText("Hide");
+				} else {
+					b.setText("Draw");
+				}
 			}
 		});
 		drawButton.setEnabled(false);
 		componentArray[index][5] = drawButton;
+		
+		JButton expandedButton = new JButton("Draw");
+		expandedButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				drawNodes(algType, c);
+				JButton b = (JButton) e.getSource();
+				if(b.getText().equals("Draw")) {
+					b.setText("Hide");
+				} else {
+					b.setText("Draw");
+				}
+			}
+		});
+		expandedButton.setEnabled(false);
+		componentArray[index][6] = expandedButton;
 	}
 
 	/*
@@ -157,6 +180,13 @@ public class AlgorithmPanel extends JPanel {
 	 */
 	private void drawAlgorithm(AlgorithmType algorithmType, Color color) {
 		engine.plotPath(algorithmType, color);
+	}
+	
+	/*
+	 * called by draw button
+	 */
+	private void drawNodes(AlgorithmType algorithmType, Color color) {
+		engine.plotNodes(algorithmType, color);
 	}
 
 	/*
@@ -193,6 +223,8 @@ public class AlgorithmPanel extends JPanel {
 			calculateButton.setEnabled(false);
 			JButton drawButton = (JButton) componentArray[index][5];
 			drawButton.setEnabled(true);
+			JButton expandedButton = (JButton) componentArray[index][6];
+			expandedButton.setEnabled(true);
 			//add source and goal coord, and nodes expanded and load time
 		}
 	}
@@ -211,7 +243,11 @@ public class AlgorithmPanel extends JPanel {
 			JButton calculateButton = (JButton) componentArray[i][4];
 			calculateButton.setEnabled(false);
 			JButton drawButton = (JButton) componentArray[i][5];
+			drawButton.setText("Draw");
 			drawButton.setEnabled(false);
+			JButton expandedButton = (JButton) componentArray[i][6];
+			expandedButton.setText("Draw");
+			expandedButton.setEnabled(false);
 
 			this.mapWidth=width;
 			this.mapHeight=height;
@@ -251,6 +287,8 @@ public class AlgorithmPanel extends JPanel {
 			calculateButton.setEnabled(false);
 			JButton drawButton = (JButton) componentArray[i][5];
 			drawButton.setEnabled(false);
+			JButton expandedButton = (JButton) componentArray[i][6];
+			expandedButton.setEnabled(false);
 		}
 	}
 

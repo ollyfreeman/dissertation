@@ -120,8 +120,8 @@ public class MapInstance implements java.io.Serializable{
 				break;
 			case BlockAStar:
 				if(blockAStarData == null) {
-					BlockAStar_standard.loadDB("semi");
-					blockAStarData =  new BlockAStar_semi(map,source,goal);
+					BlockAStar_full_halved_rotSymm.loadDB("fullSChalvedRot");
+					blockAStarData =  new BlockAStar_full_halved_rotSymm(map,source,goal);
 					blockAStarData.go(graph,map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(blockAStarData);
@@ -174,6 +174,43 @@ public class MapInstance implements java.io.Serializable{
 			System.out.println("MapInstance.getPath(): no path of that type");
 		}
 		return path;
+	}
+	
+	protected boolean[][] getNodesExpandedArray(AlgorithmType algorithmType) {
+		boolean[][] nea;
+		try {
+			switch (algorithmType) {
+			case Dijkstra :
+				nea = dijkstraData.getNodesExpandedArray();
+				break;
+			case AStar:
+				nea = aStarData.getNodesExpandedArray();
+				break;
+			case AStarVisibility:
+				nea = aStarVisibilityData.getNodesExpandedArray();
+				break;
+			case AStarSmoothed:
+				nea = aStarSmoothedData.getNodesExpandedArray();
+				break;
+			case ThetaStar:
+				nea = thetaStarData.getNodesExpandedArray();
+				break;
+			case LazyThetaStar:
+				nea = lazyThetaStarData.getNodesExpandedArray();
+				break;
+			case BlockAStar:
+				nea = blockAStarData.getNodesExpandedArray();
+				break;
+			default:
+				//TODO new algorithms	
+				nea = null;	
+				System.out.println("MapInstance.getPath(): alg type not found");
+			}
+		} catch (NullPointerException e) {
+			nea = null;	
+			System.out.println("MapInstance.getPath(): no path of that type");
+		}
+		return nea;
 	}
 	
 	protected AlgorithmData getAlgorithmData(AlgorithmType algorithmType) {

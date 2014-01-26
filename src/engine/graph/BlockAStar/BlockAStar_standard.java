@@ -3,7 +3,7 @@ package engine.graph.BlockAStar;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -15,8 +15,7 @@ import engine.graph.Graph;
 import engine.graph.GraphGenerator;
 import engine.graph.Node;
 import engine.graph.AStar.AStar;
-import engine.graph.AStar.AStarAlgorithm;
-import engine.graph.BlockAStar.LDDB.LDDB;
+import engine.graph.BlockAStar.LDDB.compressedAsLong.LDDB;
 import engine.graph.BlockAStar.LDDB.PairOfCoords;
 import engine.map.Map;
 
@@ -30,7 +29,10 @@ public class BlockAStar_standard extends AlgorithmData {
 	protected Coordinate startInBlock,goalInBlock;
 	
 	protected int nodesExpanded = 0;
+	protected int blockExpanded = 0;
 	protected Block[][] blockArray;
+	
+	private HashSet<Coordinate> expanded = new HashSet<Coordinate>();
 
 	public BlockAStar_standard(Map map, Coordinate start, Coordinate goal) {
 		super();
@@ -43,7 +45,7 @@ public class BlockAStar_standard extends AlgorithmData {
 	}
 
 	@Override
-	public Pair<Node, Integer> getPath(Graph graph, Map map) {
+	public Pair<Node, boolean[][]> getPath(Graph graph, Map map, boolean[][] nea) {
 		//double startTime = System.nanoTime();
 		PriorityQueue<Block> openSet = new PriorityQueue<Block>();
 
@@ -54,7 +56,7 @@ public class BlockAStar_standard extends AlgorithmData {
 		//double stopTime = System.nanoTime();
 		//System.out.println("Init time: = " + ((stopTime-startTime)/1000000));
 		if(startBlock == goalBlock) {
-			return new Pair<Node,Integer>(startAndGoalInSameBlock(startBlock,goalBlock,map),nodesExpanded);
+			return new Pair<Node,boolean[][]>(startAndGoalInSameBlock(startBlock,goalBlock,map),nea);
 		}
 		
 		//startTime = System.nanoTime();
@@ -63,17 +65,18 @@ public class BlockAStar_standard extends AlgorithmData {
 
 		while(!openSet.isEmpty() && openSet.peek().getHeapValue() < length) {
 			Block currentBlock = openSet.remove();
-			//System.out.println("POPPING "+ currentBlock.getTopLeft());
+			blockExpanded++;
 			currentBlock.setHeapValue(Double.POSITIVE_INFINITY);					//!!
 			List<Coordinate> ingressNodes = currentBlock.getIngressNodes();
 			nodesExpanded+=ingressNodes.size();
+			for(int i=0;i<ingressNodes.size();i++) {
+				//expanded.add(new Coordinate(currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX(), currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()));
+				nea[currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX()][currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()] = true;
+			}
 			if(currentBlock == goalBlock) {
 				for(Coordinate c : ingressNodes) {
 					if(goalBlock.getGValue(c)+goalBlock.getHValue(c) < length) {
 						length = goalBlock.getGValue(c)+goalBlock.getHValue(c);
-						//System.out.println("AT GOAL BLOCK: from " + c + ": " + goalBlock.getGValue(c) + " plus " + goalBlock.getHValue(c) + " = " +(goalBlock.getGValue(c) + goalBlock.getHValue(c)) );
-						//parent of goal is c
-						//goalBlock.setParent(goalInBlock, goalBlock.getNode(c));
 					}
 				}
 			}
@@ -82,16 +85,15 @@ public class BlockAStar_standard extends AlgorithmData {
 		if(length!=Double.POSITIVE_INFINITY) {
 			//stopTime = System.nanoTime();
 			//System.out.println("Main time: = " +((stopTime-startTime)/1000000));
-			//System.out.println(nodesExpanded);
-			return new Pair<Node,Integer>(postProcessing(startBlock,goalBlock,map),nodesExpanded);
+			//System.out.println("Node expansions: " + nodesExpanded + ", nodes expanded:" +  expanded.size() + ", block expansions: " + blockExpanded);
+			return new Pair<Node,boolean[][]>(postProcessing(startBlock,goalBlock,map),nea);
 		} else {
-			return new Pair<Node,Integer>(null,nodesExpanded);
+			return new Pair<Node,boolean[][]>(null,nea);
 		}
 	}
 
 	protected void expand(Block currentBlock, List<Coordinate> y, PriorityQueue<Block> openSet) {
 		for(Block neighbourBlock : currentBlock.getNeighbours()) {
-			//System.out.println("new neigh");
 			LinkedList<Coordinate> ListX = new LinkedList<Coordinate>();		//egress cells in currentBlock for this neighbourBlock
 			LinkedList<Coordinate> ListXPrime = new LinkedList<Coordinate>();	//corresponding ingress cell in the neighbourBlock
 			Coordinate neighbourTL = neighbourBlock.getTopLeft();				//i.e. the topLeft coordinate of the neighbour
@@ -173,12 +175,9 @@ public class BlockAStar_standard extends AlgorithmData {
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
 				for(Coordinate c : y) {
-					//System.out.println("Expanding: (" + (currentBlock.getTopLeft().getX()+c.getX()) +","+ (currentBlock.getTopLeft().getY()+c.getY()) + ") to (" + (currentBlock.getTopLeft().getX()+x.getX()) +","+ (currentBlock.getTopLeft().getY()+x.getY()) +")");
 					double length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(c,x,blockSize));
-					//System.out.println("Code check:"+currentBlock.getCode());
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
-						//System.out.println(c + " to " + x + " in " + currentBlock.getTopLeft() + " --> " + currentBlock.getGValue(c) + " + " + length + "=" + (currentBlock.getGValue(c) + length));
 						//parent of x is c
 						currentBlock.setParent(x, currentBlock.getNode(c));
 					}
@@ -287,7 +286,7 @@ public class BlockAStar_standard extends AlgorithmData {
 			for(Coordinate c : outArray) {
 				Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(c), new Node(goalInBlock));
 				AStar aStar = new AStar();	aStar.go(g,map);
-				double length = aStar.getDistance();//aStar.goalNodeExists() ? aStar.getDistance() : Double.POSITIVE_INFINITY;
+				double length = aStar.getDistance();
 				LinkedList<Coordinate> intermediateNodes = aStar.getPath();
 				try {
 					intermediateNodes.remove(0); intermediateNodes.remove(intermediateNodes.size()-1);
@@ -373,8 +372,7 @@ public class BlockAStar_standard extends AlgorithmData {
 			}
 		}
 		Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(minGplusHCoordinate),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
-		Pair<Double,ArrayList<Coordinate>> lAIN = AStarAlgorithm.getLengthAndIntermediateNodes(g,map);
-		ArrayList<Coordinate> intermediateNodes = lAIN.get1();
+		List<Coordinate> intermediateNodes = getGoalIntermediateNodes(g,map,goalBlock.getTopLeft());
 		if(!minGplusHCoordinate.equals(goalInBlock)) {
 			for(Coordinate c1 : intermediateNodes) {
 				n.setParent(goalBlock.getNode(c1));
@@ -387,7 +385,9 @@ public class BlockAStar_standard extends AlgorithmData {
 		while(n != null && n.getParent() != null) {
 			BASNode parent = (BASNode) n.getParent();
 			if(n.getBlock() == parent.getBlock() && !n.getBlock().equals(startBlock)) {
-				intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords(new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY()),new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY()),blockSize)));
+				Coordinate from = new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY());
+				Coordinate to = new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY());
+				intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords(from,to,blockSize)));
 				for(int i=(intermediateNodes.size()-1);i>=0;i--) {
 					Coordinate c = intermediateNodes.get(i);
 					nNew = new BASNode(new Coordinate(c.getX()+n.getBlock().getTopLeft().getX(),c.getY()+n.getBlock().getTopLeft().getY()),n.getBlock());
@@ -417,6 +417,16 @@ public class BlockAStar_standard extends AlgorithmData {
 		//double stopTime = System.nanoTime();
 		//System.out.println("Post: "+ ((stopTime-startTime)/1000000));
 		return (Node) goal;
+	}
+	
+	protected List<Coordinate> getGoalIntermediateNodes(Graph graph, Map map, Coordinate goalBlockCoord) {
+		AStar aStar = new AStar();	aStar.go(graph,map);
+		List<Coordinate> list = aStar.getPath();
+		try{
+			list.remove(0);
+			list.remove(list.size()-1);
+		} catch (IndexOutOfBoundsException e) {}
+		return list;
 	}
 
 	public static void loadDB(String dbType) {

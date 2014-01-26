@@ -20,8 +20,8 @@ public class AnalysisTest {
 	private static final String filePath = "/Users/olly_freeman/Dropbox/Part2Project/maps/";
 
 	public static void main(String[] args) {
-		//generateMaps(100,30,50,100);
-		exportResults(200,10,0,10);
+		generateMaps(200,10,0,100);
+		exportResults(200,10,0,100);
 	}
 	
 	public static void generateMaps(int size, int coverage, int clustering, int numberOfMaps) {

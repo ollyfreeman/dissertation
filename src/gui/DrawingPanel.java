@@ -1,8 +1,10 @@
 package gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.LinkedList;
@@ -30,6 +32,8 @@ public class DrawingPanel extends JPanel {
 	private int resolution;
 	private List<List<Coordinate>> paths;
 	private List<Color> pathColours;
+	private List<boolean[][]> nodesExpanded;
+	private List<Color> nodeColours;
 	
 	//these are for creating a new map
 	private boolean creationMode;
@@ -45,6 +49,8 @@ public class DrawingPanel extends JPanel {
 		this.height = height;
 		this.paths = new LinkedList<List<Coordinate>>();
 		this.pathColours = new LinkedList<Color>();
+		this.nodesExpanded =  new LinkedList<boolean[][]>();
+		this.nodeColours = new LinkedList<Color>();
 		this.creationMode = false;
 		this.coordinator = coordinator;
 	}
@@ -61,17 +67,30 @@ public class DrawingPanel extends JPanel {
 		this.resolution = data.MapResolutions.getResolutionFromMapHeight(map.getHeight());
 		this.map = map;
 		this.paths = new LinkedList<List<Coordinate>>();		//i.e. reset this for the new map
-		pathColours = new LinkedList<Color>();	//i.e. reset this for the new map
+		this.pathColours = new LinkedList<Color>();	//i.e. reset this for the new map
+		this.nodesExpanded =  new LinkedList<boolean[][]>();
+		this.nodeColours = new LinkedList<Color>();
 		window.repaint();					//need this because calling repaint on just this panel seems glitchy
 	}
 
-	public void drawPath(Map map, List<Coordinate> path, Color color) {
+	public void drawPath(List<Coordinate> path, Color color) {
 		if(!pathColours.contains(color)) {
 			paths.add(path);
 			pathColours.add(color);
 		} else {
 			paths.remove(path);
 			pathColours.remove(color);
+		}
+		window.repaint();
+	}
+	
+	public void drawNodes(boolean[][] nea, Color color) {
+		if(!nodeColours.contains(color)) {
+			nodeColours.add(color);
+			nodesExpanded.add(nea);
+		} else {
+			nodeColours.remove(color);
+			nodesExpanded.remove(nea);
 		}
 		window.repaint();
 	}
@@ -159,6 +178,8 @@ public class DrawingPanel extends JPanel {
 						while(j+1 < path.size()) {
 							Coordinate from = path.get(j);
 							Coordinate to = path.get(j+1);
+							Graphics2D g2 = (Graphics2D) g;
+			                g2.setStroke(new BasicStroke(2));
 							g.drawLine((from.getX()*resolution), (from.getY()*resolution), (to.getX()*resolution), (to.getY()*resolution));
 							
 							//when drawing in middle of cell: 
@@ -166,6 +187,19 @@ public class DrawingPanel extends JPanel {
 							j++;
 						}
 					}
+				}
+				for(int i=0; i<nodesExpanded.size(); i++) {
+					//if(nodesExpanded!=null) {
+						boolean[][] nea = nodesExpanded.get(i);
+						g.setColor(nodeColours.get(i));
+						for(int a=0;a<nea[0].length;a++) {
+							for(int b=0;b<nea.length;b++) {
+								if(nea[a][b]) {
+									g.fillRect(a*resolution-1, b*resolution-1, 2, 2);
+								}
+							}
+						}
+					//}
 				}
 			}
 		}

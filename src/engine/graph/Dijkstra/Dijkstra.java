@@ -30,7 +30,7 @@ public class Dijkstra extends AlgorithmData {
 	}
 
 	@Override
-	public Pair<Node,Integer> getPath(Graph graph, Map map) {
+	public Pair<Node,boolean[][]> getPath(Graph graph, Map map, boolean[][] nea) {
 		HashSet<Node> closedSet = new HashSet<Node>();	
 		PriorityQueue<Node> openSet = new PriorityQueue<Node>();
 		Node start = graph.getSource();
@@ -40,11 +40,13 @@ public class Dijkstra extends AlgorithmData {
 		int nodesExpanded = 0;
 		
 		while(!openSet.isEmpty()) {
-			Node current = openSet.remove();		nodesExpanded++;
+			Node current = openSet.remove();		nodesExpanded++;	nea[current.getX()][current.getY()] = true;
+			//System.out.println(current.coordinateAsString());
+			
 			setNode(current,closedSet,map);									//for Lazy Theta Star
 			if(goalTest(current,goal,map)) {
-				//System.out.println(nodesExpanded);
-				return new Pair<Node,Integer>(current,nodesExpanded);
+				//System.out.println("Nodes expanded : " + nodesExpanded);
+				return new Pair<Node,boolean[][]>(current,nea);
 			}
 			closedSet.add(current);
 			for(Node neighbour : current.getNeighbours()) {
@@ -59,10 +61,10 @@ public class Dijkstra extends AlgorithmData {
 			}
 		}
 		if(goal.getParent() == null && (!goal.getCoordinate().equals(start.getCoordinate()))) {
-			return new Pair<Node,Integer>(null,nodesExpanded);
+			return new Pair<Node,boolean[][]>(null,nea);
 		} else {
-			//System.out.println(nodesExpanded);
-			return new Pair<Node,Integer>(goal,nodesExpanded);
+			//System.out.println("Nodes expanded : " + nodesExpanded);
+			return new Pair<Node,boolean[][]>(goal,nea);
 		}
 	}
 
@@ -87,7 +89,7 @@ public class Dijkstra extends AlgorithmData {
 	}
 	
 	protected boolean goalTest(Node current, Node goal, Map map) {
-		return false;
+		return (current.getCoordinate().equals(goal.getCoordinate()));
 	}
 
 }

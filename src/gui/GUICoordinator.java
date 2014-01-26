@@ -60,8 +60,12 @@ public class GUICoordinator {
 		drawingPanel.drawMap(map);
 	}
 	
-	public void drawPath(Map map, List<Coordinate> path, Color color) {
-		drawingPanel.drawPath(map, path, color);
+	public void drawPath(List<Coordinate> path, Color color) {
+		drawingPanel.drawPath(path, color);
+	}
+	
+	public void drawNodes(boolean[][] nea, Color color) {
+		drawingPanel.drawNodes(nea, color);
 	}
 	
 	public void setAlgorithmStatistics(AlgorithmStatistics algorithmStatistics, AlgorithmType algorithmType) {

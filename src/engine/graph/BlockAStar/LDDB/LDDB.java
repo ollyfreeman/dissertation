@@ -18,9 +18,9 @@ public class LDDB implements java.io.Serializable {
 	
 	public double getLength(int mapCode, PairOfCoords p) {
 			if(list.get(mapCode).get(p) == null) {
-				return Double.POSITIVE_INFINITY;
+				return Float.POSITIVE_INFINITY;
 			} else {
-				return list.get(mapCode).get(p).get0().doubleValue();
+				return list.get(mapCode).get(p).get0();
 			} 
 	}
 	

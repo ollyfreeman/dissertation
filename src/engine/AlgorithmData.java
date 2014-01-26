@@ -33,6 +33,7 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	private double algorithmTime;
 	protected double graphCreationTime;
 	private int nodesExpanded;
+	private boolean[][] nodesExpandedArray;
 	private LinkedList<Coordinate> path;
 	
 	public AlgorithmData() {
@@ -44,13 +45,22 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		}
 		this.source = graph.getSource().getCoordinate();
 		this.goal = graph.getGoal().getCoordinate();
-		Pair<Node,Integer> p0;
+		Pair<Node,boolean[][]> p0;
+		nodesExpandedArray = new boolean[map.getWidth()+1][map.getHeight()+1];
 		double startTime = System.nanoTime();
-		p0  = this.getPath(graph, map);
+		p0  = this.getPath(graph, map, nodesExpandedArray);
 		double endTime = System.nanoTime();
 		this.algorithmTime = (endTime - startTime)/1000000;
 		this.goalNode = p0.get0();
-		this.nodesExpanded = p0.get1();
+		this.nodesExpandedArray = p0.get1();
+		this.nodesExpanded = 0;
+		for(int i=0; i<this.nodesExpandedArray.length;i++) {
+			for(int j=0; j<this.nodesExpandedArray[0].length;j++) {
+				if(this.nodesExpandedArray[i][j]) {
+					this.nodesExpanded++;
+				}
+			}
+		}
 		
 		Pair<Pair<Double,Double>,LinkedList<Coordinate>> p1 = calculateDistanceAnglePath();
 		this.distance = p1.get0().get0();
@@ -61,7 +71,7 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	/*
 	 * returns the number of nodes expanded during execution
 	 */
-	protected abstract Pair<Node,Integer> getPath(Graph graph, Map map);
+	protected abstract Pair<Node,boolean[][]> getPath(Graph graph, Map map, boolean[][] nodesExpandedArray);
 
 	private Pair<Pair<Double,Double>,LinkedList<Coordinate>> calculateDistanceAnglePath() {
 		Node n = goalNode;
@@ -110,6 +120,10 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		return path;
 	}
 	
+	public boolean[][] getNodesExpandedArray() {
+		return this.nodesExpandedArray;
+	}
+	
 	public int getNodesExpanded() {
 		return nodesExpanded;
 	}
@@ -117,10 +131,10 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	/*
 	 * helper method - gets Euclidean distance between 2 nodes
 	 */
-	protected double getDistance(Node n1, Node n2) {
+	protected float getDistance(Node n1, Node n2) {
 		double xDiff = n1.getX() - n2.getX();
 		double yDiff = n1.getY() - n2.getY();
-		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+		return (float) Math.sqrt(xDiff*xDiff + yDiff*yDiff);
 	}
 	
 	/*

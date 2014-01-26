@@ -1,8 +1,10 @@
 package engine.graph.BlockAStar;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import utility.Coordinate;
+import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.BlockAStar.LDDB.PairOfCoords;
 import engine.map.Map;
@@ -20,15 +22,11 @@ public class BlockAStar_semi extends BlockAStar_standard {
 		Block startBlock = blockArray[this.source.getX()/blockSize][this.source.getY()/blockSize];
 		startInBlock = new Coordinate(this.source.getX()%blockSize,this.source.getY()%blockSize);
 		startBlock.setHeapValue(0);        //doesn't actually matter what this is
-		//System.out.println(startBlock.getCode());
-		//Map m = new Map(map,startBlock.getTopLeft(),blockSize,blockSize); don't need
 		for(int i=0; i<blockSize;i++) {
 			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				double length = lddb.getLength(startBlock.getCode(),new PairOfCoords(startInBlock,c,blockSize));
-				//System.out.println("to " + c + " is " + length);
 				ArrayList<Coordinate> intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords(startInBlock,c,blockSize)));
-				//nodesExpanded+=aStar.getNodesExpanded(); don't need
 				startBlock.setGValue(c, length);
 				if(!c.equals(startInBlock)) {
 					Node n = startBlock.getNode(c);
@@ -61,25 +59,28 @@ public class BlockAStar_semi extends BlockAStar_standard {
 			y = this.goal.getY()%blockSize;
 		}
 		goalInBlock = new Coordinate(x,y);
-		//Map m = new Map(map,goalBlock.getTopLeft(),blockSize,blockSize); don't need
 		for(int i=0; i<blockSize;i++) {
 			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				double length = lddb.getLength(goalBlock.getCode(),new PairOfCoords(goalInBlock,c,blockSize));
 				ArrayList<Coordinate> intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(goalInBlock,c,blockSize)));
-				//nodesExpanded+=aStar.getNodesExpanded(); don't need
 				goalBlock.setHValue(c, length);
 				if(!c.equals(goalInBlock)) {
 					Node n = goalBlock.getNode(goalInBlock);
-					for(int j=intermediateNodes.size()-1;j>=0;j--) {//for(Coordinate c1 : intermediateNodes) {
+					for(int j=intermediateNodes.size()-1;j>=0;j--) {
 						Coordinate c1 = intermediateNodes.get(j);
 						n.setParent(goalBlock.getNode(c1));
 						n = goalBlock.getNode(c1);
 					}
-					n.setParent(goalBlock.getNode(c));//HAD ---> before but surely wrong?! goalBlock.getNode(c).setParent(n);
+					n.setParent(goalBlock.getNode(c));
 				}
 			}
 		}
 		return goalBlock;
+	}
+	
+	@Override
+	protected List<Coordinate> getGoalIntermediateNodes(Graph graph, Map map, Coordinate goalBlockCoord) {
+		return lddb.getIntermediateNodes(getMapCode(goalBlockCoord,map),(new PairOfCoords(graph.getSource().getCoordinate(),graph.getGoal().getCoordinate(),blockSize)));
 	}
 }

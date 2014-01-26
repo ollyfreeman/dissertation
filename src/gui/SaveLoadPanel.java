@@ -57,7 +57,7 @@ public class SaveLoadPanel extends JPanel {
 				fc.setSelectedFile(new File("/Users/olly_freeman/Dropbox/Part2Project/maps/" + time + ".ser"));
 				int returnVal = fc.showSaveDialog(coordinator.getWindow());
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            	engine.saveMapInstance(fc.getSelectedFile().getName());
+	            	engine.saveMapInstance("/Users/olly_freeman/Dropbox/Part2Project/maps/" + fc.getSelectedFile().getName());
 	            }
 			}
 		});
@@ -74,7 +74,7 @@ public class SaveLoadPanel extends JPanel {
 				fc.setSelectedFile(new File("/Users/olly_freeman/Dropbox/Part2Project/maps/" + time + "MAP.ser"));
 				int returnVal = fc.showSaveDialog(coordinator.getWindow());
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            	engine.saveMapOnly(fc.getSelectedFile().getName());
+	            	engine.saveMapOnly("/Users/olly_freeman/Dropbox/Part2Project/maps/"+ fc.getSelectedFile().getName());
 	            }
 			}
 		});
