@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.LinkedList;
 
 import engine.graph.Node;
+import engine.map.Map;
 import utility.Coordinate;
 
 public class Block implements Comparable<Block>{
@@ -14,13 +15,13 @@ public class Block implements Comparable<Block>{
 	private boolean[][] updatedGArray;
 	private BASNode[][] nodeArray;
 	private ArrayList<Block> neighbours = new ArrayList<Block>(8);
-	private int code;
-	private int size;
+	protected int code;
+	protected int size;
 	
-	public Block(int code, int size, Coordinate topLeft, Coordinate goal) {
-		this.code = code;
-		this.size=size;
+	public Block(Map map, int size, Coordinate topLeft, Coordinate goal) {
 		this.topLeft = topLeft;
+		this.size = size;
+		this.code = getCodeFromMap(map);
 		updatedGArray = new boolean[size+1][size+1];
 		nodeArray = new BASNode[size+1][size+1];
 		heapValue = Double.POSITIVE_INFINITY;
@@ -95,6 +96,23 @@ public class Block implements Comparable<Block>{
 	
 	public BASNode getNode(Coordinate c) {
 		return nodeArray[c.getX()][c.getY()];
+	}
+	
+	protected int getCodeFromMap(Map map) {
+		int code = 0;
+		for(int j=topLeft.getY();j<topLeft.getY()+size;j++) {
+			for(int i=topLeft.getX();i<topLeft.getX()+size;i++) {
+				code = code<<1;
+				try{
+					if(!(map.getCell(i, j).isBlocked())) {
+						code++;
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+					//skip if part of this block is out of bounds, because we call those cells blocked!
+				}
+			}
+		}
+		return code;
 	}
 	
 	@Override

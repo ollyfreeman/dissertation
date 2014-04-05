@@ -3,7 +3,7 @@ package engine.graph.BlockAStar.LDDB.compressedAsLong.rotSymm;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import engine.graph.BlockAStar.LDDB.PairOfCoords;
+import engine.graph.BlockAStar.LDDB.LDDB.old.PairOfCoords;
 import utility.Coordinate;
 
 public class LDDB implements java.io.Serializable {

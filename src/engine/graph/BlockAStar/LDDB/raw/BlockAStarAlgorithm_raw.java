@@ -19,7 +19,7 @@ import engine.graph.Node;
 import engine.graph.AStar.AStarAlgorithm;
 import engine.graph.BlockAStar.BASNode;
 import engine.graph.BlockAStar.Block;
-import engine.graph.BlockAStar.LDDB.PairOfCoords;
+import engine.graph.BlockAStar.LDDB.LDDB.old.PairOfCoords;
 
 public class BlockAStarAlgorithm_raw {
 

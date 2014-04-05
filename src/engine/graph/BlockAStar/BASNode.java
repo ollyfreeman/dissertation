@@ -8,7 +8,7 @@ import utility.Coordinate;
  * when inserting intermediate nodes during traceback
  */
 
-public class BASNode extends engine.graph.Node{
+public class BASNode extends Node{
 	
 	private static final long serialVersionUID = 1L;
 	

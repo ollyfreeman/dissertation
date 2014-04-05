@@ -17,7 +17,7 @@ public class Block implements Comparable<Block>{
 	private ArrayList<Block> neighbours = new ArrayList<Block>(8);
 	private int code;
 	private int rotation;
-	private int size;
+	protected int size;
 	private ArrayList<LinkedList<Coordinate>> rotatedEgress;
 	
 	public Block(Map map, Coordinate topLeft, int size, Coordinate goal) {

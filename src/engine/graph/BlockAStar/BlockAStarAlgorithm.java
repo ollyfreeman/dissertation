@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -18,8 +17,8 @@ import engine.graph.Node;
 import engine.graph.AStar.AStarAlgorithm;
 import engine.graph.BlockAStar.BASNode;
 import engine.graph.BlockAStar.Block;
-import engine.graph.BlockAStar.LDDB.LDDB;
-import engine.graph.BlockAStar.LDDB.PairOfCoords;
+import engine.graph.BlockAStar.LDDB.old.LDDB;
+import engine.graph.BlockAStar.LDDB.old.PairOfCoords;
 
 public class BlockAStarAlgorithm {
 

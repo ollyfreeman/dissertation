@@ -12,7 +12,7 @@ import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
 import engine.graph.AStar.AStar;
-import engine.graph.BlockAStar.LDDB.PairOfCoords;
+import engine.graph.BlockAStar.LDDB.LDDB.old.PairOfCoords;
 import utility.Coordinate;
 
 public class LDDBCreator_semi {

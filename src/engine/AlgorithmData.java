@@ -58,9 +58,7 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		this.nodesExpanded = 0;
 		for(int i=0; i<this.nodesExpandedArray.length;i++) {
 			for(int j=0; j<this.nodesExpandedArray[0].length;j++) {
-				//if(this.nodesExpandedArray[i][j]) {
-					this.nodesExpanded+=this.nodesExpandedArray[i][j];
-				//}
+				this.nodesExpanded+=this.nodesExpandedArray[i][j];
 			}
 		}
 		Pair<Pair<Double,Double>,LinkedList<Coordinate>> p1 = calculateDistanceAnglePath();

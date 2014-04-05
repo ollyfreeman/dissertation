@@ -3,11 +3,12 @@ package engine.graph.BlockAStar;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import data.CompressionType;
 import utility.Coordinate;
 import utility.Pair;
 import engine.AlgorithmData;
@@ -15,31 +16,33 @@ import engine.graph.Graph;
 import engine.graph.GraphGenerator;
 import engine.graph.Node;
 import engine.graph.AStar.AStar;
-import engine.graph.BlockAStar.LDDB.compressedAsLong.LDDB;
-import engine.graph.BlockAStar.LDDB.PairOfCoords;
+import engine.graph.BlockAStar.LDDB.LDDB;
+import engine.graph.BlockAStar.LDDB.bitwise.PairOfCoords_bitwise;
+import engine.graph.BlockAStar.LDDB.geometric.Block_geometric;
+import engine.graph.BlockAStar.LDDB.uncompressed.PairOfCoords_uncompressed;
 import engine.map.Map;
 
 public class BlockAStar_standard extends AlgorithmData {
 
 	protected static final long serialVersionUID = 1L;
 
-	protected static final int blockSize = 3;
+	protected static final int blockSize = 2;
 	protected static LDDB lddb;
+	protected static String filename = "/Users/olly_freeman/Dropbox/Part2Project/";
+	protected static CompressionType compressionType = CompressionType.geometric;
 
 	protected Coordinate startInBlock,goalInBlock;
 	
 	protected Block[][] blockArray;
-	
-	private HashSet<Coordinate> expanded = new HashSet<Coordinate>();
 
 	public BlockAStar_standard(Map map, Coordinate start, Coordinate goal) {
 		super();
-			this.source = start;
-			this.goal = goal;
-			double startTime = System.nanoTime();
-			blockArray = initBlockArray(map);
-			double endTime = System.nanoTime();
-			this.graphCreationTime = (endTime - startTime)/1000000;
+		this.source = start;
+		this.goal = goal;
+		double startTime = System.nanoTime();
+		blockArray = initBlockArray(map);
+		double endTime = System.nanoTime();
+		this.graphCreationTime = (endTime - startTime)/1000000;
 	}
 
 	@Override
@@ -135,7 +138,18 @@ public class BlockAStar_standard extends AlgorithmData {
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
 				for(Coordinate c : y) {
-					double length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(c,x,blockSize));
+					double length;
+					switch(compressionType) {
+						case uncompressed: 	length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_uncompressed(c,x));
+											break;
+						case bitwise: 		length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_bitwise(c,x));
+											break;
+						case geometric:		Block_geometric currBlock = (Block_geometric) currentBlock;
+											length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_uncompressed(currBlock.toRotated(c),currBlock.toRotated(x)));
+											//System.out.println(currentBlock.getCode() + " from " + currBlock.toRotated(c) + " to " + currBlock.toRotated(x) + " length is "+ length);
+											break;
+						default:			length=0.0;
+					}
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
 						//parent of x is c
@@ -175,7 +189,11 @@ public class BlockAStar_standard extends AlgorithmData {
 		Block[][] blockArray = new Block[blockArrayWidth][blockArrayHeight];
 		for(int j=0; j<blockArrayHeight;j++) {
 			for(int i=0; i<blockArrayWidth;i++) {
-				blockArray[i][j] = new Block(getMapCode(new Coordinate(i*blockSize,j*blockSize),map),blockSize,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
+				if(compressionType == CompressionType.geometric) {
+					blockArray[i][j] = new Block_geometric(map,blockSize,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
+				} else {
+					blockArray[i][j] = new Block(map,blockSize,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
+				}
 			}
 		}
 		Coordinate[] neighbourBlocks = {new Coordinate(-1,-1),new Coordinate(0,-1),new Coordinate(1,-1),new Coordinate(1,0),new Coordinate(1,1),new Coordinate(0,1),new Coordinate(-1,1),new Coordinate(-1,0)};
@@ -287,7 +305,7 @@ public class BlockAStar_standard extends AlgorithmData {
 		}
 	}
 
-	protected int getMapCode(Coordinate topLeft, Map map) {
+	/*protected int getMapCode(Coordinate topLeft, Map map) {
 		int code = 0;
 		for(int j=0;j<blockSize;j++) {
 			for(int i=0;i<blockSize;i++) {
@@ -302,7 +320,7 @@ public class BlockAStar_standard extends AlgorithmData {
 			}
 		}
 		return code;
-	}
+	}*/
 
 	protected Node postProcessing(Block startBlock, Block goalBlock, Map map) {
 		//double startTime = System.nanoTime();
@@ -325,7 +343,7 @@ public class BlockAStar_standard extends AlgorithmData {
 			}
 		}
 		Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(minGplusHCoordinate),new Node(goalInBlock)); //generateGraph_visibility_edge_zeroWidth & generateBlockAStarGraph_visibility_edge_zeroWidth are equiv now - so I think I can delete generateBlockAStarGraph...
-		List<Coordinate> intermediateNodes = getGoalIntermediateNodes(g,map,goalBlock.getTopLeft());
+		List<Coordinate> intermediateNodes = getGoalIntermediateNodes(g,map,goalBlock);
 		if(!minGplusHCoordinate.equals(goalInBlock)) {
 			for(Coordinate c1 : intermediateNodes) {
 				n.setParent(goalBlock.getNode(c1));
@@ -340,7 +358,21 @@ public class BlockAStar_standard extends AlgorithmData {
 			if(n.getBlock() == parent.getBlock() && !n.getBlock().equals(startBlock)) {
 				Coordinate from = new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY());
 				Coordinate to = new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY());
-				intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords(from,to,blockSize)));
+				switch(compressionType) {
+					case uncompressed: 	intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords_uncompressed(from,to)));
+										break;
+					case bitwise: 		intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords_bitwise(from,to)));
+										break;
+					case geometric:		Block_geometric currBlock = (Block_geometric) n.getBlock();
+										intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(from),currBlock.toRotated(to))));
+										ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
+										for(Coordinate c : intermediateNodes) {
+											newIntermediateNodes.add(currBlock.toRotated(c));
+										}
+										intermediateNodes = newIntermediateNodes;
+										break;
+					default:			intermediateNodes = null;
+				}
 				for(int i=(intermediateNodes.size()-1);i>=0;i--) {
 					Coordinate c = intermediateNodes.get(i);
 					nNew = new BASNode(new Coordinate(c.getX()+n.getBlock().getTopLeft().getX(),c.getY()+n.getBlock().getTopLeft().getY()),n.getBlock());
@@ -372,7 +404,7 @@ public class BlockAStar_standard extends AlgorithmData {
 		return (Node) goal;
 	}
 	
-	protected List<Coordinate> getGoalIntermediateNodes(Graph graph, Map map, Coordinate goalBlockCoord) {
+	protected List<Coordinate> getGoalIntermediateNodes(Graph graph, Map map, Block goalBlock) {
 		AStar aStar = new AStar();	aStar.go(graph,map);
 		List<Coordinate> list = aStar.getPath();
 		try{
@@ -382,11 +414,10 @@ public class BlockAStar_standard extends AlgorithmData {
 		return list;
 	}
 
-	public static void loadDB(String dbType) {
+	public static void loadDB(String s) {
 		try {
 			if(lddb == null) {
-				String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"zero_"+dbType+".ser";
-				FileInputStream fileIn = new FileInputStream(filename);
+				FileInputStream fileIn = new FileInputStream(filename+s+"_"+blockSize+"_"+compressionType+".ser");
 				ObjectInputStream in = new ObjectInputStream(fileIn);
 				LDDB db = (LDDB) in.readObject();
 				in.close();

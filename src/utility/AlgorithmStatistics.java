@@ -2,8 +2,8 @@ package utility;
 
 import java.util.List;
 
-import engine.AlgorithmData_Static;
 import engine.AlgorithmData;
+import engine.AlgorithmData_Static;
 
 /*
  * object to wrap up algorithm statistics when passing between the front end and back end
