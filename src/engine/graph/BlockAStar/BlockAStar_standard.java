@@ -23,13 +23,11 @@ public class BlockAStar_standard extends AlgorithmData {
 
 	protected static final long serialVersionUID = 1L;
 
-	protected static final int blockSize = 4;
+	protected static final int blockSize = 3;
 	protected static LDDB lddb;
 
 	protected Coordinate startInBlock,goalInBlock;
 	
-	protected int nodesExpanded = 0;
-	protected int blockExpanded = 0;
 	protected Block[][] blockArray;
 	
 	private HashSet<Coordinate> expanded = new HashSet<Coordinate>();
@@ -45,33 +43,31 @@ public class BlockAStar_standard extends AlgorithmData {
 	}
 
 	@Override
-	public Pair<Node, boolean[][]> getPath(Graph graph, Map map, boolean[][] nea) {
+	public Pair<Node, int[][]> getPath(Graph graph, Map map, int[][] nea) {
 		//double startTime = System.nanoTime();
 		PriorityQueue<Block> openSet = new PriorityQueue<Block>();
 
 		//initialise
-		
 		Block startBlock = initStart(blockArray,map);
 		Block goalBlock = initGoal(blockArray,map);
 		//double stopTime = System.nanoTime();
 		//System.out.println("Init time: = " + ((stopTime-startTime)/1000000));
 		if(startBlock == goalBlock) {
-			return new Pair<Node,boolean[][]>(startAndGoalInSameBlock(startBlock,goalBlock,map),nea);
+			return new Pair<Node,int[][]>(startAndGoalInSameBlock(startBlock,goalBlock,map),nea);
 		}
 		
 		//startTime = System.nanoTime();
 		double length = Double.POSITIVE_INFINITY;
 		openSet.add(startBlock);
-
+		
 		while(!openSet.isEmpty() && openSet.peek().getHeapValue() < length) {
 			Block currentBlock = openSet.remove();
-			blockExpanded++;
+			//nea[currentBlock.getTopLeft().getX()][currentBlock.getTopLeft().getY()]++;	//uncomment when want the blocks expanded not nodes expanded
 			currentBlock.setHeapValue(Double.POSITIVE_INFINITY);					//!!
 			List<Coordinate> ingressNodes = currentBlock.getIngressNodes();
-			nodesExpanded+=ingressNodes.size();
 			for(int i=0;i<ingressNodes.size();i++) {
 				//expanded.add(new Coordinate(currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX(), currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()));
-				nea[currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX()][currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()] = true;
+				nea[currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX()][currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()]++;
 			}
 			if(currentBlock == goalBlock) {
 				for(Coordinate c : ingressNodes) {
@@ -86,9 +82,9 @@ public class BlockAStar_standard extends AlgorithmData {
 			//stopTime = System.nanoTime();
 			//System.out.println("Main time: = " +((stopTime-startTime)/1000000));
 			//System.out.println("Node expansions: " + nodesExpanded + ", nodes expanded:" +  expanded.size() + ", block expansions: " + blockExpanded);
-			return new Pair<Node,boolean[][]>(postProcessing(startBlock,goalBlock,map),nea);
+			return new Pair<Node,int[][]>(postProcessing(startBlock,goalBlock,map),nea);
 		} else {
-			return new Pair<Node,boolean[][]>(null,nea);
+			return new Pair<Node,int[][]>(null,nea);
 		}
 	}
 
@@ -134,43 +130,7 @@ public class BlockAStar_standard extends AlgorithmData {
 			}else {
 				System.out.println("Neighbour error!");
 			}
-
-			//this next section should only run if we have FINITE WIDTH AGENTS - to avoid diagonal blockages
-			/*boolean TL,TR,BL,BR;
-			Iterator<Coordinate> listXIt = ListX.iterator();
-			Iterator<Coordinate> listXPrimeIt = ListXPrime.iterator();
-			while(listXIt.hasNext()){
-				Coordinate c = listXIt.next();
-				listXPrimeIt.next();
-				int cX = c.getX();
-				int cY = c.getY();
-				try {
-					TL = map.getCell(new Coordinate(cX-1+currentBlock.getTopLeft().getX(),cY-1+currentBlock.getTopLeft().getY())).isBlocked();
-				} catch (ArrayIndexOutOfBoundsException e) {
-					TL = false;
-				}
-				try {
-					TR = map.getCell(new Coordinate(cX+currentBlock.getTopLeft().getX(),cY-1+currentBlock.getTopLeft().getY())).isBlocked();
-				} catch (ArrayIndexOutOfBoundsException e) {
-					TR = false;
-				}
-				try {
-					BL = map.getCell(new Coordinate(cX-1+currentBlock.getTopLeft().getX(),cY+currentBlock.getTopLeft().getY())).isBlocked();
-				} catch (ArrayIndexOutOfBoundsException e) {
-					BL = false;
-				}
-				try {
-					BR = map.getCell(new Coordinate(cX+currentBlock.getTopLeft().getX(),cY+currentBlock.getTopLeft().getY())).isBlocked();
-				} catch (ArrayIndexOutOfBoundsException e) {
-					BR = false;
-				}
-				if((TL && BR) || (TR && BL)) {
-					listXIt.remove();
-					listXPrimeIt.remove();
-				}
-			}*/
-			//extra section for finite width ends here
-
+			
 			LinkedList<Coordinate> ListXPrimeUpdated = new LinkedList<Coordinate>();
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
@@ -182,7 +142,6 @@ public class BlockAStar_standard extends AlgorithmData {
 						currentBlock.setParent(x, currentBlock.getNode(c));
 					}
 				}
-				//System.out.println();
 				Coordinate xPrime = ListXPrime.get(i);
 				double xPrimeG = neighbourBlock.getGValue(xPrime);
 				double xG = currentBlock.getGValue(x);
@@ -243,12 +202,11 @@ public class BlockAStar_standard extends AlgorithmData {
 			for(Coordinate c : outArray) {
 				Graph g = GraphGenerator.generateGraph_visibility_edge_zeroWidth(m, new Node(startInBlock), new Node(c));
 				AStar aStar = new AStar();	aStar.go(g,map);
-				double length = aStar.getDistance();//aStar.goalNodeExists()  ? aStar.getDistance() : Double.POSITIVE_INFINITY;
+				double length = aStar.getDistance();
 				LinkedList<Coordinate> intermediateNodes = aStar.getPath();
 				try {
 					intermediateNodes.remove(0); intermediateNodes.remove(intermediateNodes.size()-1);
 				} catch (IndexOutOfBoundsException e) {}
-				nodesExpanded+=aStar.getNodesExpanded();
 				startBlock.setGValue(c, length);
 				if(!c.equals(startInBlock)) {
 					Node n = startBlock.getNode(c);
@@ -291,7 +249,6 @@ public class BlockAStar_standard extends AlgorithmData {
 				try {
 					intermediateNodes.remove(0); intermediateNodes.remove(intermediateNodes.size()-1);
 				} catch (IndexOutOfBoundsException e) {}
-				nodesExpanded+=aStar.getNodesExpanded();
 				goalBlock.setHValue(c, length);
 				if(!c.equals(goalInBlock)) {
 					Node n = goalBlock.getNode(goalInBlock);
@@ -299,7 +256,7 @@ public class BlockAStar_standard extends AlgorithmData {
 						n.setParent(goalBlock.getNode(c1));
 						n = goalBlock.getNode(c1);
 					}
-					n.setParent(goalBlock.getNode(c));//HAD ---> before but surely wrong?! goalBlock.getNode(c).setParent(n);
+					n.setParent(goalBlock.getNode(c));
 				}
 			}
 		}
@@ -316,7 +273,6 @@ public class BlockAStar_standard extends AlgorithmData {
 			try {
 				intermediateNodes.remove(0); intermediateNodes.remove(intermediateNodes.size()-1);
 			} catch (IndexOutOfBoundsException e) {}
-			nodesExpanded+=aStar.getNodesExpanded();
 			Node n = goalBlock.getNode(goalInBlock);
 			if(!startInBlock.equals(goalInBlock)) {
 				for(Coordinate c1 : intermediateNodes) {
@@ -339,9 +295,6 @@ public class BlockAStar_standard extends AlgorithmData {
 				try{
 					if(!map.getCell(i+topLeft.getX(),j+topLeft.getY()).isBlocked()) {
 						code++;
-						//System.out.println(i + "," + j + " is free");
-					} else {
-						//System.out.println(i + "," + j + " is blocked");
 					}
 				} catch (ArrayIndexOutOfBoundsException e) {
 					//skip if part of this block is out of bounds, because we call those cells blocked!
@@ -435,9 +388,7 @@ public class BlockAStar_standard extends AlgorithmData {
 				String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"zero_"+dbType+".ser";
 				FileInputStream fileIn = new FileInputStream(filename);
 				ObjectInputStream in = new ObjectInputStream(fileIn);
-				//System.out.print("Loading DB...");
 				LDDB db = (LDDB) in.readObject();
-				//System.out.println("Done");
 				in.close();
 				fileIn.close();
 				lddb = db;

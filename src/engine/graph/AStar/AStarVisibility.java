@@ -43,7 +43,7 @@ public class AStarVisibility extends AStar {
 	}
 	
 	@Override
-	protected boolean goalTest(Node current, Node goal, Map map) {
+	protected boolean goalTest(Node current, Node goal, Map map,int[][] nea) {
 		return current.getCoordinate().equals(goal.getCoordinate());
 	}
 	

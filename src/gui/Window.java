@@ -33,17 +33,17 @@ public class Window extends JFrame implements MouseMotionListener, MouseListener
 	    c.gridx = 0;
 	    c.gridy = 0;
 	   
-	    mapGeneratorPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+	    mapGeneratorPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
 	    this.add(mapGeneratorPanel, c);
 	    c.gridy = 1;
-	    mapCreatorPanel.setBorder(BorderFactory.createLineBorder(Color.blue));
+	    mapCreatorPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
 	    this.add(mapCreatorPanel, c);
 	    c.gridy = 2;
-	    saveLoadPanel.setBorder(BorderFactory.createLineBorder(Color.blue));
+	    saveLoadPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
 	    this.add(saveLoadPanel, c);
 	    c.gridy = 3;
 	    this.algorithmPanel = algorithmPanel;
-	    algorithmPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+	    algorithmPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
 	    this.add(algorithmPanel,c);
 	    
 		
@@ -51,7 +51,7 @@ public class Window extends JFrame implements MouseMotionListener, MouseListener
 		c.gridx = 1;
 		c.gridheight = 4;
 		this.drawingPanel = drawingPanel;
-		drawingPanel.setBorder(BorderFactory.createLineBorder(Color.red));
+		drawingPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		this.add(drawingPanel, c);
 		drawingPanel.addMouseListener(this);
 	}

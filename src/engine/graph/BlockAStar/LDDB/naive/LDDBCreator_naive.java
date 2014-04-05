@@ -92,14 +92,6 @@ public class LDDBCreator_naive {
 			}
 			hm.put(new PairOfCoords_naive(sourceCoord,goalCoord,blockSize),new Pair<Double,ArrayList<Coordinate>>(distanceAccumulator,intermediateCoordinates));
 		}
-
-		if(mapCounter==8) {
-			String c1 = "("+sourceCoord.getX() + "," + sourceCoord.getY() +") ";
-			String c2 = "("+goalCoord.getX() + "," + goalCoord.getY() +") ";
-			System.out.println("Making: "+c1 + c2 + distanceAccumulator);
-			
-			
-		}
 	}
 	
 	private static void saveDB(ArrayList<HashMap<PairOfCoords_naive,Pair<Double,ArrayList<Coordinate>>>> db) {
@@ -114,28 +106,6 @@ public class LDDBCreator_naive {
 			i.printStackTrace();
 		}
 	}
-	
-	
-	/*private static void loadDB() {
-		try {
-			String filename = "/Users/olly_freeman/Dropbox/Part2Project/"+blockSize+"x"+blockSize+"zerofulldb.ser";
-			FileInputStream fileIn = new FileInputStream(filename);
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			ArrayList<HashMap<OldPairOfCoords,LengthAndIntermediateNodes>> db = (ArrayList<HashMap<OldPairOfCoords,LengthAndIntermediateNodes>>) in.readObject();
-			in.close();
-			fileIn.close();
-			for(Entry<OldPairOfCoords, LengthAndIntermediateNodes> e : db.get(11).entrySet()) {
-				System.out.println("Loading: " + e.getKey().toString() + ", " + e.getValue().getLength() +" with code " + e.getValue().getIntermediateNodes());
-			}
-		} catch(IOException i) {
-			i.printStackTrace();
-			return;
-		} catch (ClassNotFoundException c) {
-			c.printStackTrace();
-			return;
-		}
-
-	}*/
 
 	private static double getDistance(Node n1, Node n2) {
 		double xDiff = n1.getX() - n2.getX();

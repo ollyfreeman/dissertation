@@ -167,7 +167,7 @@ public class Engine {
 		 * get the goal node for that algorithm
 		 */
 		List<Coordinate> path = mapInstance.getPath(algorithmType);
-		boolean[][] nea = mapInstance.getNodesExpandedArray(algorithmType);
+		int[][] nea = mapInstance.getNodesExpandedArray(algorithmType);
 		assert path != null : "Should not be able to plot a route if that route hasn't been calculated";
 		/*
 		 * plot the path in the specified colour

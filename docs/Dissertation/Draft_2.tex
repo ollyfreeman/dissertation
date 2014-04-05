@@ -1,4 +1,5 @@
 \documentclass[12pt,notitlepage]{report}
+\usepackage{cite}					%bibliography
 \usepackage{mathptmx}				%Times New Roman
 \usepackage{geometry}				% Margins
  \geometry{
@@ -54,7 +55,7 @@ numbersep=5mm, numbers=left,numberstyle=\footnotesize,keywordstyle=\color{blue}\
 \vspace*{60mm}
 \begin{center}
 \Huge
-{\bf A Comparison of Any-Angle Pathfinding Algorithms for Virtual Agents} \\
+{\bf A comparison of \\Any-Angle Pathfinding Algorithms \\for Virtual Agents} \\
 \vspace*{5mm}
 Computer Science: Part II \\
 \vspace*{5mm}
@@ -78,14 +79,16 @@ Clare College \\
 \begin{tabular}{ll}
 Name:               & \bf Oliver Freeman                      \\
 College:            & \bf Clare College                    \\
-Project Title:      & \bf A Comparison of Any-Angle Pathfinding\\ 
+Project Title:      & \bf A comparison of Any-Angle Pathfinding\\ 
                     & \bf Algorithms for Virtual Agents \\
 Examination:        & \bf Computer Science Tripos: Part II, May 2014        \\
-Word Count:         & \bf ????\footnote{This word count was computed by ...}  \\
+Word Count:         & \bf ????\footnotemark[1]\\
 Project Originator: & \bf Oliver Freeman                   \\
 Supervisor:         & \bf Dr R. J. Gibbens                   \\ 
 \end{tabular}
 }
+
+\footnotetext[1]{This word count was computed by {\tt detex diss.tex | wc -w}.} 
 
 
 \section*{Original Aims of the Project}
@@ -121,6 +124,8 @@ extent for a comparable purpose.
 
 \listoffigures
 
+\listofalgorithms
+
 \newpage
 \section*{Acknowledgements}
 
@@ -140,10 +145,10 @@ extent for a comparable purpose.
 
 \section{Motivation}
 
-Finding short and realistic-looking paths through maps with arbitrarily placed obstacles is one of the central problems in artificial intelligence for games and robotics. Figure 1.1 (a) shows a grid-based map, consisting of free cells and blocked cells. Figure 1.1 (c) shows the shortest path through the map between the $start$ and the $goal$.\\
+Finding short and realistic-looking paths through maps with arbitrarily placed obstacles is one of the central problems in artificial intelligence for games and robotics. Figure 1.1 (a) shows a grid-based map, consisting of free cells and blocked cells. Figure 1.1 (b) shows the shortest path through this map between the $start$ and the $goal$.\\
 
 \noindent
-However, path-finding algorithms operate on graphs. A graph representation of the map is shown in figure 1.1 (b) --- where each node in the graph represents a coordinate on the map and a character can travel directly between any two nodes connected by an edge. Figure 1.1 (d) shows the optimum path through the graph --- however, this is clearly longer than the optimum path through the map.\\
+However, path-finding algorithms operate on graphs. A graph representation of this map is shown in figure 1.1 (c) --- each node in the graph represents a coordinate on the map, and an agent can travel directly between any two nodes connected by an edge. Figure 1.1 (d) shows the optimum path through the graph --- however, this is clearly longer than the optimum path through the map.\\
 
 \begin{figure}[h]
 \centering
@@ -161,20 +166,22 @@ However, path-finding algorithms operate on graphs. A graph representation of th
       \node[right] at (3,6.5) {blocked cell};
       \draw[->] (3.5,6.2) -- (1.5,5.5);
 
-      \node[below right] at (3,3) {$goal$};
-      \node[below left] at (0,0) {$start$};
-
       \filldraw[color=black!60,fill=black!40] (1,1) rectangle (2,3); 
       \draw[color=black!60] (0,0) grid (3,3);
       \draw[blue, ultra thick] (0,0) -- (2,1) -- (3,3); 
-      %\fill (0,0) circle (2pt);
-      %\fill (3,3) circle (2pt);
       
       \draw[black] (0,0) -- (3,0);
       \draw[black] (0,0) -- (0,3);
       \draw[black] (3,3) -- (3,0);
       \draw[black] (3,3) -- (0,3);
+      
+      \node[right] at (3,3) {$goal$};
+      \fill[blue] (3,3) circle (3pt);
+      \node[below left] at (0,0) {$start$};
+      \fill[blue] (0,0) circle (3pt);
      
+      \fill[blue] (9,3) circle (3pt);
+      \fill[blue] (6,0) circle (3pt);
      \draw[orange] (6,4) grid (9,7);
      
      \foreach \x in {6,7,8} {
@@ -234,7 +241,7 @@ However, path-finding algorithms operate on graphs. A graph representation of th
         }
       }
 
-      \node[below right] at (9,3) {$goal$};
+      \node[right] at (9,3) {$goal$};
       \node[below left] at (6,0) {$start$};
 
       \draw[blue, ultra thick] (6,0) -- (7,0) -- (9,2) -- (9,3);
@@ -249,25 +256,39 @@ However, path-finding algorithms operate on graphs. A graph representation of th
         }
       }
       
-      \node[below] at (1.5,0) {(c)};
+      \node[below] at (1.5,0) {(b)};
       \node[below] at (1.5,4) {(a)};
       \node[below] at (7.5,0) {(d)};
-      \node[below] at (7.5,4) {(b)};
+      \node[below] at (7.5,4) {(c)};
     \end{tikzpicture}
   \caption[Shortest paths through maps and graphs]{Shortest path through a map vs. shortest path through the graph representing the map}
  \label{fig:fart}
 \end{figure}
 
 \noindent
-If the graph representation were changed then a more realistic path could be achieved, but in general such a graph would require many more nodes and edges which would cause exponentially increasing memory requirements. This dissertation will investigate various algorithms that aim to find optimal paths through maps while using the space-efficient grid-based graphs show in figure 1.1(b).\\
+The structure of this graph is based on the grid structure of the map. If a different graph representation was chosen then a shorter path could have been achieved, but in general such a graph would require many more nodes and edges which would cause exponentially increasing memory requirements and search space size. This dissertation will investigate various algorithms that aim to find a near-optimal path through a map while using space-efficient grid-based graph like that shown in figure 1.1(c).\\
 
 \section{Related work}
 
-\todo{Related work \ldots}
+Applying a post-processing step to smoothe paths returned by {\em A*} has been a technique that has been used since the earliest video games\cite{Thorpe84}, but most of the research into more advanced any-angle pathfinding algorithms have taken place in the last half decade. \\
+
+\noindent
+Ferguson and Stentz's paper on {\em Field D*}\cite{FergusonStentz06} in 2006 was followed by a significant contribution to the field by Nash and Koenig et al., who published papers on {\em Theta*}\cite{Daniel10} and {\em Lazy Theta*}\cite{Nash10} in 2010. In 2011, Yap's paper on {\em Block A*}\cite{Yap11} introduced the concept of pre-calculating solutions to sub-maps to speed up execution.\\
+
+\noindent
+Studies such as Nash and Koneig's article in {\em Artificial Intelligence Magazine}\cite{Nash11} have been conducted that compare a selection of these any-angle pathfinding algorithms, though the only established authority that utilises empirical data on {\em Block A*} is Yap's own work\cite{Yap11}, which compares only {\em A*}, {\em Theta*} and {\em Block A*}.
 
 \section {Project goals}
 
-\todo{Project goals \ldots}
+\todo{Therefore, in this project I am aiming to reconcile the gaps in the literature by...?}
+
+\noindent
+The goals of this project are to:
+
+\begin{itemize}
+\item create an algorithm simulation environment that enables intuitive and informative comparison of the performance of the most prominent any-angle path-finding algorithms;
+\item use statistical analysis to present conclusions on the suitability of these algorithms to different path-finding situations.
+\end {itemize}
 
 \cleardoublepage
 
@@ -276,258 +297,97 @@ If the graph representation were changed then a more realistic path could be ach
 
 \section{Introduction to any-angle pathfinding}
 
-In this section I will introduce some key terms, define the any-angle pathfinding problem, and describe some decisions and methods to solve the problem.
+This section formally introduces the concept of maps and describes how graphs are created from maps. It then defines the any-angle path-finding problem.
 
-\subsection{Definitions}
 
-\begin{description}
-\item[Agent] \hfill \\
-  An entity that can move from one location in the environment to another. The agent cannot move to or through a location that is blocked by an obstacle.
-  \item[Map] \hfill \\
-  A representation of an environment as a two dimensional plane {$\mathbb{R}^{2}$}. For simplicity, this dissertation will focus on grid-based maps, where a map is divided into {$N^{2}$} cells of equal size. 
-    \item[Cell] \hfill \\
-  The logical unit of a map. Each cell may either be free or blocked. A blocked cell represents an obstacle that completely fills the cell.
-  \item[Line of Sight] \hfill \\
-  Exists between two coordinates on a map if a straight line between those two coordinates does not intersect any blocked cells.
-   \item[Path] \hfill \\
-  An ordered list of coordinates ({$c_{start}$}, {$c_{1}$}, ..., {$c_{goal}$}). For the path to be valid, a line of sight must exist between {$c_{start}$} and {$c_{1}$}, {$c_{1}$} and {$c_{2}$}, ... {$c_{n-1}$} and {$c_{goal}$}.
-  \item[Graph] \hfill \\
-  A finite mathematical construct, consisting of nodes and undirected edges. A graph is a discrete representation of the {$\mathbb{R}^{2}$} space of the map.
-  \item[Node] \hfill \\
-  Represents a single $coordinate$ on the map.
-  \item[Edge] \hfill \\
-  An unordered pair of nodes. The existence of edge ({$n_{1}$},{$n_{2}$}) denotes that an agent can travel in a straight line between the coordinates represented by {$n_{1}$} and {$n_{2}$}. Each edge has an associated $weight$, which represents the Euclidean distance between the coordinates represented by the two nodes.
-    \item[Neighbour] \hfill \\
-    A node {$n'$} is the neighbour of a node {$n$} if there exists an edge ({$n$},{$n'$}).
-  
-\end{description}
+\subsection{Map}
 
-\subsection{The any-angle pathfinding problem}
-
-The problem is to compute optimal or near-optimal paths, if they exist, through maps. The optimality is based on the total Euclidean distance and cumulative angle turned by an agent following the path. \\
+A map $M$ of size $N^{2}$ is a square region in two-dimensional space $[0,N]^{2} \subseteq \mathbb{R}^{2}$, where $N \in\mathbb{Z}$ and $N > 0$. A location on the map can be specified with a coordinate $(x,y) \in \mathbb{R}^{2}$, where $0 \leq x,y \leq N$.\\
 
 \noindent
-The problem is split into two sub-problems:
-\begin{itemize}
-\item {\em Discretization} - a graph is created that represents that map in some way
-\item {\em Pathfinding} - an algorithm is run on the graph to produce a path
-\end{itemize}
+The map is logically divided into a grid of $N^{2}$ cells of size $1 \times 1$, where the cell identified by the coordinate $(i,j) \in M$ includes all locations $(x,y) \in \mathbb{R}^{2}$ where $i \leq x \leq i+1$ and $j \leq y \leq j+1$, and each cell is either `free' or `blocked'.\\
 
-These two sub-problems will now be introduced:
-
-\subsection{Discretization}
-
-We must choose how to represent a continuous space, grid-based map with a graph consisting of a finite number of nodes and edges.\\
-
-\noindent
-{\bfseries Grid-based graph}\\
-
-\noindent
-A common representation is to use a grid-based graph: there is one node per cell, and there are edges between nodes that represent locations that can be reached in a {$1$} unit step at {$0^{o}$}, {$90^{o}$}, {$180^{o}$} or {$270^{o}$} bearing, or a {$\sqrt{2}$} step at {$45^{o}$}, {$135^{o}$}, {$225^{o}$} or {$315^{o}$} bearing. If the location represented by one node cannot be reached from the location represented by another node (because there is a blocked cell in between), then there will be no edge between the two nodes. We are now presented with a choice as to where to place the nodes:
+\noindent A map $M$ can be represented by a square boolean array $A_{M}$, where element $A_{M}[i][j]$ represents the cell in $M$ with coordinate $(i,j)$ --- $A_{M}[i][j] = 0$ denotes that $(i,j)$ is a free cell, whereas $A_{M}[i][j] = 1$ denotes that $(i,j)$ is a blocked cell
 
 \begin{figure}[h]
   \begin{subfigure}{.5\textwidth}
     \centering
-    \begin{tikzpicture}[scale=1.2,line width=0.75pt]
-      \draw[black] (0,0) grid (3,3);
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
       
-      \fill[black] (0.5,0.5) circle (1.5pt);
-      \fill[black] (0.5,1.5) circle (1.5pt);
-      \fill[black] (0.5,2.5) circle (1.5pt);
-      \fill[black] (1.5,0.5) circle (1.5pt);
-      \fill[black] (1.5,1.5) circle (1.5pt);
-      \fill[black] (1.5,2.5) circle (1.5pt);
-      \fill[black] (2.5,0.5) circle (1.5pt);
-      \fill[black] (2.5,1.5) circle (1.5pt);
-      \fill[black] (2.5,2.5) circle (1.5pt);
+      \filldraw[color=black!60,fill=black!40] (1,1) rectangle (2,2); 
+      \filldraw[color=black!60,fill=black!40] (1,3) rectangle (2,4); 
+      \filldraw[color=black!60,fill=black!40] (3,1) rectangle (4,3); 
+      %\draw[color=black!60] (0,0) grid (4,4);
       
-      \draw[black] (1.5,1.5) -- (0.5,0.5);
-      \draw[black] (1.5,1.5) -- (0.5,1.5);
-      \draw[black] (1.5,1.5) -- (0.5,2.5);
-      \draw[black] (1.5,1.5) -- (1.5,0.5);
-      \draw[black] (1.5,1.5) -- (1.5,2.5);
-      \draw[black] (1.5,1.5) -- (2.5,0.5);
-      \draw[black] (1.5,1.5) -- (2.5,1.5);
-      \draw[black] (1.5,1.5) -- (2.5,2.5);
+      \draw[black] (0,0) -- (4,0);
+      \draw[black] (0,0) -- (0,4);
+      \draw[black] (4,4) -- (4,0);
+      \draw[black] (4,4) -- (0,4);
      
     \end{tikzpicture}
-    \caption{Nodes in the centres of cells}
+    \caption[Map]{Map $M$}
     %\label{fig:sfig1}
   \end{subfigure}
   %
   \begin{subfigure}{.5\textwidth}
     \centering
-    \begin{tikzpicture}[scale=1.2,line width=0.75pt]
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
       
-      \draw[black] (0,0) grid (3,3);
+      \draw[color=black!60] (0,0) grid (4,4);
       
-      \fill[black] (0,3) circle (1.5pt);
-      \fill[black] (1,3) circle (1.5pt);
-      \fill[black] (2,3) circle (1.5pt);
-      \fill[black] (0,2) circle (1.5pt);
-      \fill[black] (1,2) circle (1.5pt);
-      \fill[black] (2,2) circle (1.5pt);
-      \fill[black] (0,1) circle (1.5pt);
-      \fill[black] (1,1) circle (1.5pt);
-      \fill[black] (2,1) circle (1.5pt);
+      \draw[black] (0,0) -- (4,0);
+      \draw[black] (0,0) -- (0,4);
+      \draw[black] (4,4) -- (4,0);
+      \draw[black] (4,4) -- (0,4);
       
-      \draw[black] (1,2) -- (0,3);
-      \draw[black] (1,2) -- (1,3);
-      \draw[black] (1,2) -- (2,3);
-      \draw[black] (1,2) -- (0,2);
-      \draw[black] (1,2) -- (2,2);
-      \draw[black] (1,2) -- (0,1);
-      \draw[black] (1,2) -- (1,1);
-      \draw[black] (1,2) -- (2,1);
-      
+      \node at (0.5,3.5){0}; \node at (1.5,3.5){1}; \node at (2.5,3.5){0};\node at (3.5,3.5){0};
+      \node at (0.5,2.5){0}; \node at (1.5,2.5){0}; \node at (2.5,2.5){0}; \node at (3.5,2.5){1};
+      \node at (0.5,1.5){0}; \node at (1.5,1.5){1}; \node at (2.5,1.5){0};\node at (3.5,1.5){1};
+      \node at (0.5,0.5){0}; \node at (1.5,0.5){0}; \node at (2.5,0.5){0}; \node at (3.5,0.5){0};
+
     \end{tikzpicture}
-    \caption{Nodes on the corners of cells}
+    \caption{Array $A_{M}$ of map $M$}
     %\label{fig:sfi2}
   \end{subfigure}
-  \caption{A node and its eight neighbours}
+  \caption{A map of size $4^{2}$}
   %\label{fig:fig}
 \end{figure}
 
-\noindent
-The choice is essentially a stylistic one for most of the algorithms, but placing nodes in the middle of cells places stringent restrictions on the paths produced by Block A*, so I will place my nodes on the corners of cells. \\
+\begin{description}
+\item{\bfseries Valid location}\\
+The agent is modelled as a dimensionless point, as is the convention\cite{Daniel10} \todo{is this the correct way to reference it?} in any-angle pathfinding research.\footnote{It is possible to ensure that such paths are never taken by adding extra checks in the graph creation and line of sight algorithms, but this would distract from the core investigation and be an unnecessary deviation from the accepted standard.} Therefore, a valid location is defined as any location $(x,y) \in M$ that lies in or on the boundary of a free cell.
+\end{description}
+
+\begin{description}
+\item{\bfseries Line of sight}\\
+A line of sight exists between two locations $(x_{0},y_{0})$ and $(x_{1},y_{1})$ on a map if all locations that lie on the straight line drawn between $(x_{0},y_{0})$ and $(x_{1},y_{1})$ are valid --- that is to say, for all $t \in \mathbb{R}$ where $0 \leq t \leq 1$: $(x_{0} + t(x_{1}-x_{0}),y_{0} + t(y_{1}-y_{0}))$ is a valid location.
+\end{description}
+
+\begin{description}
+\item{\bfseries Path through a map}\\
+A path  $P_{M} = ((x_{0},y_{0}), (x_{1},y_{1}), \ldots, (x_{n},y_{n}))$ through map $M$ is an ordered list of coordinates $(x,y) \in \mathbb{R}^{2}$ where $0 \leq x,y \leq N$, $x_{0}=(x_{start},y_{start})$ and $x_{n}=(x_{goal},y_{goal})$. A path is valid if there exists a line of sight between every pair of coordinates $(x_{i},y_{i})$ and $(x_{i+1},y_{i+1})$.\\
 
 \noindent
-{\bfseries Visibility graph}\\
+It should be noted that since the agent is modelled as a dimensionless point, the path through the map shown in Figure 2.2, which features a `diagonal blockage', is a valid path.\\
 
-\noindent
-This is an alternative graph representation. Nodes exist at the start and end coordinates, and otherwise only on the corner of cells for which exactly three of the four surrounding cells are free. An edge exists between any two nodes that have a line of sight.\\
+\end{description}
 
 \begin{figure}[h]
-\begin{subfigure}{.3\textwidth}
     \centering
-    \begin{tikzpicture}[scale=0.75,line width=0.5pt]
-
-      \node[below left] at (0,0) {$n_{start}$};
-      \fill (0,0) circle (1.5pt);
-      \node[above left] at (0,5) {$n_{goal}$};
-      \fill (0,5) circle (1.5pt);
-      
-      \filldraw[color=black,fill=black!20] (0,3) rectangle (1,4);
-      \filldraw[color=black,fill=black!20] (2,3) rectangle (3,4);
-      \filldraw[color=black!20,fill=black!20] (1,1) rectangle (2,2);
-      \filldraw[color=black!20,fill=black!20] (2,0) rectangle (3,2);
-      \draw (1,1) -- (1,2);
-      \draw (1,1) -- (2,1);
-      \draw (1,2) -- (3,2);
-      \draw (2,1) -- (2,0);
-      \draw[black] (0,0) -- (3,0);
-      \draw[black] (0,0) -- (0,5);
-      \draw[black] (3,5) -- (3,0);
-      \draw[black] (3,5) -- (0,5);
-      
-    \end{tikzpicture}
-    \caption{Map}
-    %\label{fig:sfig1}
-  \end{subfigure}
-  \begin{subfigure}{.3\textwidth}
-    \centering
-    \begin{tikzpicture}[scale=0.75,line width=0.5pt]
-      \draw[black] (0,0) grid (3,5);
-      
-      \node[below left] at (0,0) {$n_{start}$};
-      \fill (0,0) circle (1.5pt);
-      \node[above left] at (0,5) {$n_{goal}$};
-      \fill (0,5) circle (1.5pt);
-      
-      
-       \foreach \x in {0,1,2} {
-        \foreach \y in {0,1,2,3,4} {
-          \pgfmathparse{int(\x + 1)};
-          \let\xa\pgfmathresult;
-          \pgfmathparse{int(\y + 1)};
-          \let\ya\pgfmathresult;
-          \draw[black] (\x,\y) -- (\xa,\ya);
-        }
-      }
-  
-      \foreach \x in {0,1,2} {
-        \foreach \y in {1,2,3,4,5} {
-          \pgfmathparse{int(\x + 1)};
-          \let\xa\pgfmathresult;
-          \pgfmathparse{int(\y - 1)};
-          \let\ya\pgfmathresult;
-          \draw[black] (\x,\y) -- (\xa,\ya);
-        }
-      }
-      
-      \filldraw[color=black,fill=white] (1,1) rectangle (2,2);
-      \filldraw[color=black,fill=white] (2,0) rectangle (3,2);
-      \filldraw[color=black,fill=white] (0,3) rectangle (1,4);
-      \filldraw[color=black,fill=white] (2,3) rectangle (3,4);
-      \draw[white,ultra thick] (2,0) -- (3,0);
-      \draw[white,ultra thick] (3,0) -- (3,2);
-      \draw[white,ultra thick] (3,3) -- (3,4);
-      \draw[white,ultra thick] (2,1) -- (2,2);
-      \draw[white,ultra thick] (0,3) -- (0,4);
-      
-      \foreach \x in {0,1,2} {
-        \foreach \y in {0,1,2,3,4,5} {
-          \fill (\x,\y) circle (1.5pt);
-        }
-      }
-      \foreach \y in {2,3,4,5} {
-        \fill (3,\y) circle (1.5pt);
-      }
-      
-    \end{tikzpicture}
-    \caption{Grid-based graph}
-    %\label{fig:sfig1}
-  \end{subfigure}
-  %
-  \begin{subfigure}{.3\textwidth}
-    \centering
-    \begin{tikzpicture}[scale=0.75,line width=0.5pt]
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
     
-      \node[below left] at (0,0) {$n_{start}$};
-      \fill (0,0) circle (1.5pt);
-      \node[above left] at (0,5) {$n_{goal}$};
-      \fill (0,5) circle (1.5pt);
-      
-      \fill (1,1) circle (1.5pt);
-      \fill (1,2) circle (1.5pt);
-      \fill (1,3) circle (1.5pt);
-      \fill (1,4) circle (1.5pt);
-      \draw[black] (0,0) -- (1,1);
-      \draw[black] (0,0) -- (2,4);
-      \draw[black] (0,0) -- (1,3);
-      \draw[black] (1,1) -- (1,4);
-      \draw[black] (1,2) -- (2,3);
-      \draw[black] (1,3) -- (2,3);
-      \draw[black] (1,3) -- (2,4);
-      \draw[black] (1,4) -- (2,3);
-      \draw[black] (1,4) -- (2,4);
-      \draw[black] (1,4) -- (0,5);
-      \draw[black] (2,4) -- (0,5);
-      \draw[black] (2,4) -- (2,3);
-          
-    \end{tikzpicture}
-    \caption{Visibility graph}
-    %\label{fig:sfi2}
-  \end{subfigure}
-  \caption{Different graph representations for a given map}
-  %\label{fig:fig}
-\end{figure}
-
-\noindent
-The optimal path through a visibility graph will correspond to the optimal path through a map, whereas the optimal path through a grid-based graph may not. However, grid-based graphs are generally accepted as preferable since, for a map of {$N^{2}$} cells, a grid-based graph will have {$O(N^{2})$} edges, whereas a visibility graph has {$O(N^{4})$} edges, which can be unfeasible for large or high resolution maps. Therefore, this investigation will focus predominantly on grid-based graphs.\\
-
-\begin{figure}
-    \centering
-    \begin{tikzpicture}[scale=2,line width=1pt]
-    
-      \draw (0,0) grid (2,2);
-      \filldraw[color=black,fill=black!20] (0,1) rectangle (1,2); 
-      \filldraw[color=black,fill=black!20] (1,0) rectangle (2,1); 
-      \filldraw (0,0) circle (1pt);
-      \filldraw (2,2) circle (1pt);
-      \node[below left] at (0,0) {$n_{start}$};
-      \node[above right] at (2,2) {$n_{goal}$};
-      \draw[blue] (0,0) -- (2,2);
+      \draw[black!60] (0,0) grid (2,2);
+      \filldraw[color=black!60,fill=black!40] (0,1) rectangle (1,2); 
+      \filldraw[color=black!60,fill=black!40] (1,0) rectangle (2,1); 
+      \draw (0,0) -- (2,0);
+      \draw (0,0) -- (0,2);
+      \draw (2,2) -- (2,0);
+      \draw (2,2) -- (0,2);
+      \node[below left] at (0,0) {$(x_{start},y_{start})$};
+      \node[above right] at (2,2) {$(x_{goal},y_{goal})$};
+      \filldraw[blue] (0,0) circle (3pt);
+      \filldraw[blue] (2,2) circle (3pt);
+      \draw[blue, ultra thick] (0,0) -- (2,2);
       
           
     \end{tikzpicture}
@@ -536,38 +396,299 @@ The optimal path through a visibility graph will correspond to the optimal path 
 \end{figure}
 
 
-\noindent
-{\bfseries Agent size}\\
+\subsection{Lattice}
+
+A lattice $L_{N}$ is a graph of $N^{2}$ nodes, where $N \in\mathbb{Z}$ and $N > 0$. 
+
+\begin{description}
+\item{\bfseries Octile lattice $L_{N,O}$}\\The nodes are arranged in a square grid, and each node is connected with an edge to the closest node, if any exists, at a bearing of any integer multiple of $\frac{\pi}{4}$ radians.
+
+\item{\bfseries Full lattice $L_{N,F}$}\\The nodes are arranged in a square grid, and each node is connected with an edge to every other node in the lattice.
+\end{description}
+
+\begin{figure}[h]
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
+      
+      \draw[orange] (0,0) grid (4,4);
+  
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {0,1,2,3} {
+          \pgfmathparse{int(\x + 1)};
+          \let\xa\pgfmathresult;
+          \pgfmathparse{int(\y + 1)};
+          \let\ya\pgfmathresult;
+          \draw[orange] (\x,\y) -- (\xa,\ya);
+        }
+      }
+  
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {1,2,3,4} {
+          \pgfmathparse{int(\x + 1)};
+          \let\xa\pgfmathresult;
+          \pgfmathparse{int(\y - 1)};
+          \let\ya\pgfmathresult;
+          \draw[orange] (\x,\y) -- (\xa,\ya);
+        }
+      }
+      
+      \foreach \x in {0,1,2,3,4} {
+        \foreach \y in {0,1,2,3,4} {
+          \fill[red] (\x,\y) circle (2pt);
+        }
+      }
+     
+    \end{tikzpicture}
+    \caption[Map]{Octile lattice $L_{N,O}$}
+    %\label{fig:sfig1}
+  \end{subfigure}
+  %
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
+      
+      \draw[orange] (0,0) grid (4,4);
+      
+       \foreach \x in {0,1,2,3,4} {
+        \foreach \y in {0,1,2,3,4} {
+          \foreach \a in {0,1,2,3,4} {
+            \foreach \b in {0,1,2,3,4} {
+              \draw[orange] (\x,\y) -- (\a,\b);
+            }
+          }
+        }
+      }
+      
+            \foreach \x in {0,1,2,3,4} {
+        \foreach \y in {0,1,2,3,4} {
+          \fill[red] (\x,\y) circle (2pt);
+        }
+      }
+
+    \end{tikzpicture}
+    \caption{Full lattice $L_{N,F}$}
+    %\label{fig:sfi2}
+  \end{subfigure}
+  \caption{Octile lattice and full lattice of size $4^{2}$}
+  %\label{fig:fig}
+\end{figure}
+
+\subsection{Graph}
+
+A graph $G_{M}=(V,E)$ is a discrete representation of a map $M$. Each node $n \in V$ represents a valid location $(a,b) \in M$, where $0 \leq a,b \leq N$. An agent can travel directly between the locations represented by two nodes $n$ and $n'$ if they are connected by an edge $e=(n,n') \in E$, and are thus called `neighbours'. The weight $(n,n').weight$ is the Euclidean distance an agent would traverse by travelling between the locations represented by the nodes $n$ and $n'$.\\
+\begin{description}
+\item{\bfseries Path through a graph}\\
+A path $P_{G} = (n_{0}, n_{1}, \ldots, n_{n-1}, n_{n})$ through graph $G_{M}=(V,E)$ is a list of nodes $n \in V$, where $n_{0}=n_{start}$ and $n_{n}=n_{goal}$. A path is valid if for each pair of nodes $n_{i}$ and $n_{i+1}$ there exists an edge $(n_{i},n_{i+1}) \in E$.
+\end{description}
 
 \noindent
-I will adopt the standard practice in any-angle pathfinding research by modelling the agent as a dimensionless point. Therefore, the path shown in Figure 2.3, which features a 'diagonal blockage', is a valid path. It is possible to ensure that such paths are never taken by adding extra checks in the graph creation and line of sight algorithms, but this would distract from the core investigation and be an unnecessary deviation from the accepted standard.
+{\bfseries Discretisation}\\
+\noindent
+Discretisation is the process of creating a graph $G_{M}=(V,E)$ that represents a map $M$. The processes can be visualised as refining a lattice by removing edges and nodes from the lattice until the desired graph remains --- a node $n$ is removed if the map indicates that $n$ represents an invalid location, and an edge $(n,n')$ is removed if there is no line of sight on the map between the locations represented by $n$ and $n'$. If a grid-based graph is desired, an octile lattice is used, whereas if a visibility graph is desired, a full lattice is used.\\ 
 
+\noindent
+A more formal description of this process is now provided:
+
+\begin{description}
+\item{\bfseries Grid-based graph: $f_{G}(L_{O},M) \rightarrow G_{M,G}$}\\
+An octile lattice $L_{N,O}$ is laid over $M$ such that each node in $L_{N,O}$ lies directly on top of a coordinate $(x,y)$ in $M$, where $(x,y) \in \mathbb{Z}^{2}$. If none of the (up to) four cells surrounding a node\footnote{In a map $M$ of size $N^{2}$, the four cells surrounding a node that represents coordinate $(a,b) \in M$ are the cells $(a,b)$, $(a,b-1)$, $(a-1,b-1)$ and $(a-1,b)$ if they exist, where $0 \leq a,b \leq N$.} are free then that node is removed, along with all edges that are connected to it. Additionally, if a cell is blocked, diagonal edges that cross that cell are removed, along with any horizontal or vertical edges that lie beneath the blocked cell and are also on the boundary of the lattice.
+
+\item{\bfseries Visibility graph: $f_{V}(L_{O},M) \rightarrow G_{M,V}$}\\
+A full lattice $L_{N,O}$ is laid over $M$ such that each node in $L_{N,O}$ lies directly on top of a coordinate $(x,y)$ in $M$, where $x,y \in \mathbb{Z}^{2}$. Unless {\em either} exactly three of the (up to) four cells surrounding a node are free {\em or} the node is $n_{start}$ or $n_{goal}$ then that node is removed, along with all edges that are connected to it. In addition each edge $(n,n') \in E$ is removed if there is no line of sight between the locations that $n$ and $n'$ represent.
+
+\end{description}
+
+\begin{figure}[h]
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
+      
+      \draw[orange] (0,0) grid (4,4);
+  
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {0,1,2,3} {
+          \pgfmathparse{int(\x + 1)};
+          \let\xa\pgfmathresult;
+          \pgfmathparse{int(\y + 1)};
+          \let\ya\pgfmathresult;
+          \draw[orange] (\x,\y) -- (\xa,\ya);
+        }
+      }
+  
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {1,2,3,4} {
+          \pgfmathparse{int(\x + 1)};
+          \let\xa\pgfmathresult;
+          \pgfmathparse{int(\y - 1)};
+          \let\ya\pgfmathresult;
+          \draw[orange] (\x,\y) -- (\xa,\ya);
+        }
+      }
+      
+      \filldraw[color=orange,fill=white] (1,1) rectangle (2,2);
+      \filldraw[color=orange,fill=white] (1,3) rectangle (2,4);
+      \draw[white, ultra thick] (1,4) -- (2,4);
+      \filldraw[color=orange,fill=white] (3,1) rectangle (4,3);
+      \draw[white, ultra thick] (4,1) -- (4,3);
+      
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {0,1,2,3,4} {
+          \fill[red] (\x,\y) circle (2pt);
+        }
+      }
+      \fill[red] (4,0) circle (2pt);
+      \fill[red] (4,1) circle (2pt);
+      \fill[red] (4,3) circle (2pt);
+      \fill[red] (4,4) circle (2pt);
+     
+    \end{tikzpicture}
+    \caption[Map]{Grid-based graph $G_{M,G}$}
+    %\label{fig:sfig1}
+  \end{subfigure}
+  %
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
+
+     \draw[orange] (0,0) -- (1,1);
+     \draw[orange] (0,0) -- (1,2);
+     \draw[orange] (0,0) -- (1,3);
+     \draw[orange] (0,0) -- (2,1);
+     \draw[orange] (0,0) -- (3,1);
+     
+     \draw[orange] (1,1) -- (1,3);
+     \draw[orange] (1,1) -- (3,1);
+     
+     \draw[orange] (1,2) -- (2,2);
+     \draw[orange] (1,2) -- (2,3);
+     \draw[orange] (1,2) -- (3,3);
+     \draw[orange] (1,2) -- (4,4);
+     
+     \draw[orange] (1,3) -- (3,3);
+     \draw[orange] (1,3) -- (3,1);
+     
+     \draw[orange] (2,1) -- (2,3);
+     \draw[orange] (2,1) -- (3,3);
+     
+     \draw[orange] (2,2) -- (4,4);
+     
+     \draw[orange] (3,1) -- (3,3);
+     \draw[orange] (3,1) -- (2,3);
+     
+     \draw[orange] (2,3) -- (4,4);
+     
+     \fill[red] (0,0) circle (2pt);
+     \fill[red] (1,1) circle (2pt);
+     \fill[red] (1,2) circle (2pt);
+     \fill[red] (1,3) circle (2pt);
+     \fill[red] (2,1) circle (2pt);
+     \fill[red] (2,2) circle (2pt);
+     \fill[red] (2,3) circle (2pt);
+     \fill[red] (3,1) circle (2pt);
+     \fill[red] (3,3) circle (2pt);
+     \fill[red] (4,4) circle (2pt);
+     
+
+    \end{tikzpicture}
+    \caption{Visibility graph $G_{M,V}$}
+    %\label{fig:sfi2}
+  \end{subfigure}
+  \caption[Graph representations of map $M$]{Graph representations of map $M$, where $n_{start} = (0,0)$ and $n_{goal} = (4,4)$}
+  %\label{fig:fig}
+\end{figure}
+
+\newpage
+\subsection{The any-angle pathfinding problem}
+
+The problem is to compute optimal or near-optimal paths, if they exist, through maps.\\
+
+\noindent
+\todo{Need to sort out wording here}
+An optimal path $P^{*}_{M}$ through map $M$ is a path $P_{M}$ has a path length that is no longer than the path length of any other paths through $M$. If there exists more than one path with this shortest path length, the optimal paths are the paths with the shortest path length and the smallest path angle-sum, where:
+
+\begin{description}
+\item{\bfseries Path length}\\
+The length of path $P_{M}$ is the sum of the Euclidean distances between each pair of coordinates $(x_{i},y_{i})$ and $(x_{i+1},y_{i+1})$ in $P_{M}$.
+\item{\bfseries Path angle-sum}\\
+The angle-sum of path $P_{M}$ is the sum of the smallest angle between each pair of path segments $(x_{i},y_{i})$ to $(x_{i+1},y_{i+1})$ and $(x_{i+1},y_{i+1})$ to $(x_{i+2},y_{i+2})$ in $P_{M}$.
+\end{description}
+
+\subsection{Solving the any-angle pathfinding problem}
+
+\noindent
+An optimal or near-optimal path through map $M$ is obtained by applying a pathfinding algorithm\footnote{{\em Block A*} operates in a different way, and will be dealt with separately.} to a graph $G_{M}$. The path $P_{G} = (n_{0},n_{1},...,n_{n})$  returned by the pathfinding algorithm corresponds to the path $P_{M} = (x_{0},x_{1},...,x_{n})$, where $x_{i}$ is the location represented by $n_{i}$.
+
+\begin{description}
+\item{\bfseries Classic pathfinding algorithm}\\ 
+A classic pathfinding algorithm will return the optimal\footnote{The optimal path $P^{*}_{G}$ through graph $G$ is defined analogously to the optimal path $P^{*}_{M}$ through map $M$.} path $P^{*}_{G}$ through $G_{M}$.
+\item{\bfseries Any-angle pathfinding algorithm}\\
+An any-angle pathfinding algorithm will return the optimal path $P^{*}_{G'}$ through $G'_{M}$, where the augmented graph $G'_{M}$ may have extra edges to $G_{M}$.
+\end{description}
+
+\noindent
+The optimal path $P^{*}_{G}$ through a visibility graph $G_{M,V}$ directly corresponds to the optimal path $P^{*}_{M}$ through map $M$, whereas the optimal path through a grid-based graph $G_{M,G}$ or an augmented graph $G_{M,G'}$ may not. However, grid-based graphs are generally accepted as the preferable form of map representation for pathfinding since, for a map $M$ of size $N^{2}$, $G_{M,G}$ has {$O(N^{2})$} edges, whereas $G_{M,V}$ has {$O(N^{4})$} edges, which may be unfeasible for large or high resolution maps. Therefore, this investigation will focus predominantly on pathfinding algorithms applied to grid-based graphs.\\
+
+\newpage
 \section{Any-angle pathfinding algorithms}
 
-In this section, I will introduce the four any-angle pathfinding algorithms that I will be investigating: A* with post smoothing, Theta*, Lazy Theta* and Block A*. Firstly, I will introduce an additional two comparatively basic algorithms to aid in the explanation of the more complex algorithms.
+\noindent
+This section starts with an introduction of pathfinding over graphs. It then describes two classic pathfinding algorithms: {\em Dijktra's shortest paths}\cite{Dij59} and {\em A*}\cite{Hart68}, followed by the four any-angle pathfinding algorithms that form the core investigation in this dissertation: {\em A* with post smoothing}, {\em Theta*}, {\em Lazy Theta*} and {\em Block A*}.
+
+\subsection{Pathfinding over graphs}
+
+\noindent
+Section 2.1.3 introduced the concept of a graph $G_{M}$ that is a representation of a map $M$. In addition to an associated coordinate, each node $n$ in $G_{M}$ has a set of parameters of which the values will change during the execution of the pathfinding algorithm. These parameters include:
+\begin{itemize}
+\item {\em g-value} --- the path length of the shortest path found so far from $n_{start}$ to $n$;
+\item {\em parent} --- a pointer to the previous node in the shortest path found so far from $n_{start}$ to $n$.
+\end{itemize}
+
+\noindent
+When the algorithm is initialised, $n.g = \infty$ and $n.parent = \bot$\footnote{Where $\bot$ denotes that the parameter value is undefined.} for all nodes.\\
+
+\noindent
+When the algorithm terminates, $n_{goal}.g$ is the path length of the shortest path, if one exists, found by the algorithm from $n_{start}$ to $n_{goal}$, and the shortest path, if one exists, can be found by recursively following the $parent$ pointers from $n_{goal}$ to $n_{start}$\footnote{The pathfinding algorithm guarantees $n_{start}.parent = \bot$.}.
 
 \subsection {Dijkstra's shortest paths}
 
-Most of the algorithms that I will study will be derivatives of the well known A* graph traversal algorithm, which itself is a derivative of Dijkstra's famous shortest-path algorithm.\\
+Most of the algorithms in this dissertation are derivatives of the {\em A*} graph traversal algorithm, which itself is a derivative of {\em Dijkstra}'s famous shortest-path algorithm.\\
 
 \noindent
-Dijkstra finds the shortest path from a given node {$n_{start}$} to all other nodes in a graph - though it can be prematurely terminated when the goal is reached. Each node {$n$} has a:
-\begin{itemize}
-\item {\em g-value} - represents the length of the shortest path found so far from {$n_{start}$} to {$n$}. Initialised to $\infty$.
-\item {\em parent} - the previous node in the shortest path found so far from {$n_{start}$} to {$n$}
-\end{itemize}
-The algorithm processes each node once only, selecting it from $openSet$, a priority queue that prioritises low g-values. When a node is selected, it's g-value is the length of the shortest path to it from {$n_{start}$}. A closed set is used to ensure that no node is expanded twice, as this would incur unnecessary work. When {$n_{goal}$} is processed, the algorithm terminates. Dijkstra's shortest-path algorithm is optimal and complete.\\
+{\bf Explanation}\\
+\noindent
+Starting with $n_{start}$, {\em Dijkstra} processes (or `expands') nodes from $G_{M}$ until it processes $n_{goal}$, at which point it terminates. Each node is expanded at most once, since it is a provable\cite{CormenDijkstra} invariant of the algorithm that when a node $n$ is selected to be processed, $n.g$ is the length of the shortest path in the graph to $n$ from $n_{start}$ --- a set $closedSet$\footnote{The set and priority queue methods $add()$, $pop()$ and  $contains()$ are defined in the usual way.} ensures that no node is expanded twice, as this would incur unnecessary work.\\
 
-\begin{algorithm}[htp]
+\noindent
+{\bf Iteration}\\
+\noindent
+On each iteration, {\em Dijkstra} selects a node $n$ to expand from $openSet$, a priority queue that stores nodes in increasing order of their {\em g-values}. For each $n_{neigh}$ of the neighbours of $n$, {\em Dijkstra} attempts to `relax' $n_{neigh}$ --- that is to say: {\em Dijkstra} tests whether the shortest path to $n_{neigh}$ that has been found so far is longer than the path to $n_{neigh}$ that goes via $n$:
+\begin{equation}
+n.g + (n,n_{neigh}).weight < n_{neigh}.g
+\end{equation}
+\noindent
+and if (2.1) is true, {\em Dijkstra} updates $n_{neigh}$ so that the shortest path to it is via $n$, by: 
+\begin{itemize}
+\item updating the {\em g-value} of $n_{neigh}$ to $n.g + (n,n_{neigh}).weight$  
+\item updating the $parent$ of $n_{neigh}$ to $n$;
+\item adding $n_{neigh}$ to $openSet$ if it is not already in it.
+\end{itemize}
+
+\noindent
+{\bf Termination}\\
+\noindent
+This process continues until $openSet$ is empty or $n_{goal}$ has been processed, at which point the algorithm terminates. If a valid path exists, {\em Dijkstra} returns $P^{*}_{G}$. Otherwise it returns $\bot$.\
+
+\begin{algorithm}
   \SetAlgoLined\DontPrintSemicolon
   \SetKwFunction{dijkstra}{Dijkstra}\SetKwFunction{update}{Update}
   \SetKwProg{myDef}{def}{}{}
   \myDef{\dijkstra{G, $n_{start}$, $n_{goal}$}}{
-  \nl $openSet \gets \emptyset$\;
-  \nl $closedSet \gets \emptyset$\;
+  \nl $openSet \gets \bot$\;
+  \nl $closedSet \gets \bot$\;
   \nl $n_{start}.g \gets 0$\;
   \nl $openSet.add(n_{start})$\;
-  \nl \While{$openSet \neq \emptyset$} {
+  \nl \While{$openSet \neq \bot$} {
     \nl $n_{curr} \gets openSet.pop()$\;
     \nl $closedSet.add(n_{curr})$\;
     \nl \If{$n_{curr} = n_{goal}$} {
@@ -583,44 +704,48 @@ The algorithm processes each node once only, selecting it from $openSet$, a prio
       }
     }
   }
-  \nl \KwRet{$\emptyset$}\;
+  \nl \KwRet{$\bot$}\;
 }{}
   \setcounter{AlgoLine}{0}
   \myDef{\update{$n_{neigh}$}}{
-    \nl \uIf{$n_{curr}.g + euclidean(n_{curr},n_{neigh}) < n_{neigh}.g$} {
-      \nl $n_{neigh}.g = n_{curr}.g + euclidean(n_{curr},n_{neigh})$\;
+    \nl \uIf{$n_{curr}.g + (n_{curr},n_{neigh}).weight < n_{neigh}.g$} {
+      \nl $n_{neigh}.g = n_{curr}.g + (n_{curr},n_{neigh}).weight$\;
       \nl $n_{neigh}.parent = n_{curr}$\;
       \nl \KwRet{$true$}\;
     } \nl \Else {
       \nl \KwRet{$false$}\;
     } 
   }
-  \caption{{\sc DIJKSTRA}}
+  \caption{{\sc Dijkstra}}
 \end{algorithm} 
-
-\noindent
-If a path exists, the algorithm returns $n_{goal}$. The shortest path from {$n_{start}$} to {$n_{goal}$} can be then be traced: \\({$n_{goal}$}, {$n_{goal}.parent$}, {$n_{goal}.parent.parent$}, ..., {$n_{start})$}
 
 \subsection {A*}
 
-A* is based on Dijkstra's shortest-path algorithm, but uses a heuristic {$h$} to reduce the number of nodes expanded, and hence often finds the optimal route to {$n_{goal}$} in less time. Where Dijkstra preferentially expands nodes with low g-values, A* preferentially expands nodes with low f-values, where {$f(n) = g(n) + h(n)$}: 
-\begin{itemize}
-\item {\em {$g(n)$}} - calculated in the same way as in Dijkstra's algorithm
-\item {\em {$h(n)$}} - Euclidean distance between {$n$} and {$n_{goal}$}  - a cheaply computable monotonic estimate of the actual distance that will need to be traversed.
-\end{itemize}
-The monotonicity of Euclidean distance as a heuristic ensures that A* is optimal and complete. \\
+{\em A*} is based on {\em Dijkstra's shortest-paths} algorithm, but uses a heuristic $h$ to reduce the number of nodes expanded.\\
 
 \noindent
-The pseudocode for A* differs only from Dijkstra in the {\tt update} subroutine, where the h-score must also be initialised.
+In addition to a {\em g-value} and a {\em parent}, each node also has a\todo{Arbitrary choice between node having h-value or f-value?}:
+\begin{itemize}
+\item {\em h-value} --- Euclidean distance between {$n$} and {$n_{goal}$}: a cheaply computable monotonic estimate\footnote{The monotonicity of Euclidean distance as a heuristic ensures that {\em A*}, like {\em Dijkstra}, is complete (if a path exists, it finds it) and optimal (if a path is found, it is a shortest distance path)} of the actual shortest path length between $n$ and $n_{goal}$.
+\end{itemize}
 
-\begin{algorithm}[htp]
+\noindent
+While {\em Dijkstra} preferentially expands nodes with low {\em g-value}s, {\em A*} preferentially expands nodes with low {\em f-score}s, where a node $n$'s {\em f-score} is the algorithms current estimate of the shortest path from $n_{start}$ to $n_{goal}$ that goes via $n$ --- that is to say:
+\begin{equation}
+n.f = n.g + n.h
+\end{equation}
+
+\noindent
+The pseudocode for {\em A*} differs only from {\em Dijkstra} in the {\tt update} subroutine, where the {\em h-score} must also be set.
+
+\begin{algorithm}
   \SetAlgoLined\DontPrintSemicolon
   \SetKwFunction{update}{Update}
   \SetKwProg{myDef}{def}{}{}
   \myDef{\update{$n_{neigh}$}}{
-    \nl \uIf{$n_{curr}.g + euclidean(n_{curr},n_{neigh}) < n_{neigh}.g$} {
+    \nl \uIf{$n_{curr}.g + (n_{curr},n_{neigh}).weight < n_{neigh}.g$} {
       \nl $n_{neigh}.g \gets n_{curr}.g + euclidean(n_{curr},n_{neigh})$\;
-      \nl $n_{neigh}.f \gets euclidean(n_{neigh},n_{goal})$\;
+      \nl $n_{neigh}.h \gets euclidean(n_{neigh},n_{goal})$\;
       \nl $n_{neigh}.parent = n_{curr}$\;
       \nl \KwRet{$true$}\;
     } \nl \Else {
@@ -632,30 +757,41 @@ The pseudocode for A* differs only from Dijkstra in the {\tt update} subroutine,
 
 \subsection {A* with post-smoothing}
 
-A post processing step is run on the path returned by A*, where any unnecessary deviations are cut out by changing the parents of nodes of the path:
+A post-processing step is run on the path $P_{G} = (n_{start}, n_{1}, \ldots, n_{n-1}, n_{goal})$ returned by {\em A*}, which attempts to reduce the path distance by changing the {\em parent} pointer of some of the elements of $P_{G}$ --- this has the effect of adding new edges to the graph $G$ to create a new graph $G'$.\\
 
 \noindent
-The algorithm starts with the node returned by A*: {$ n = n_{goal}$}. The algorithm performs a line of sight test from {$n$} to {$n$}'s parent's parent. If the test passes, {$n$} will have its parent set to be its parent's parent. This test and parent resetting is repeated until the line of sight test fails. Once the test has failed, we choose a new {$n$}, which will be the old {$n$}'s parent's parent - i.e. the node on which the line of sight test failed. We repeat this process until we reach the start node, at which point the algorithm terminates.\\
+{\bf Iteration}\\
+\noindent
+On each iteration, the algorithm considers a node $n_{curr}$. Starting with $n_{curr} = n_{goal}$ a line of sight test is performed from the coordinate associated with $n_{curr}$ to the coordinate associated with $n_{curr}.parent.parent$. If a line of sight exists, $n_{curr}.parent$ is set to $n_{curr}.parent.parent$ --- this has the effect of adding an edge $(n_{curr},n_{curr}.parent.parent)$ to $G$. This process is repeated on $n_{curr}$ until a line of sight test fails, at which point $n_{curr}$ is set to $n_{curr}.parent.parent$\footnote{Note: $n_{curr}.parent.parent$ is the node on which the line of sight test failed.}, and the next iteration commences. \\
+
+\noindent
+{\bf Termination}\\
+\noindent
+When $n = n_{start}$, the algorithm terminates.\\
 
 \begin{figure}[h]
   \begin{subfigure}{.3\textwidth}
     \centering
-    \begin{tikzpicture}[scale=0.75,line width=0.5pt, >=latex]
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
     
-      \draw (0,0) grid (3,4);
+      \draw[color=black!60] (0,0) grid (3,4);
     
       \node[below right] at (0,0) {$n_{start}$};
-      \node[above left] at (3,4) {$n_{goal}$};
+      \node[above right] at (3,4) {$n_{goal}$};
 
-      \filldraw[color=black,fill=black!20] (1,1) rectangle (2,2); 
+      \filldraw[color=black!60,fill=black!40] (1,1) rectangle (2,2); 
+      \draw (0,0) -- (0,4);
+      \draw (0,0) -- (3,0);
+      \draw (3,4) -- (0,4);
+      \draw (3,4) -- (3,0);
     
-      \draw[blue, thick] (0,0) -- (1,0) -- (3,2) -- (3,4);
-      \fill[blue,thick] (0,0) circle (2pt);
-      \fill[blue,thick] (1,0) circle (2pt);
-      \fill[blue,thick] (2,1) circle (2pt);
-      \fill[blue,thick] (3,2) circle (2pt);
-      \fill[blue,thick] (3,3) circle (2pt);
-      \fill[blue,thick] (3,4) circle (2pt);
+      \draw[orange, ultra thick] (0,0) -- (1,0) -- (3,2) -- (3,4);
+      \fill[red] (0,0) circle (2pt);
+      \fill[red] (1,0) circle (2pt);
+      \fill[red] (2,1) circle (2pt);
+      \fill[red] (3,2) circle (2pt);
+      \fill[red] (3,3) circle (2pt);
+      \fill[red] (3,4) circle (2pt);
 
     \end{tikzpicture}
     \caption{Original path}
@@ -663,26 +799,35 @@ The algorithm starts with the node returned by A*: {$ n = n_{goal}$}. The algori
   \end{subfigure}
   \begin{subfigure}{.3\textwidth}
     \centering
-    \begin{tikzpicture}[scale=0.75,line width=0.5pt, >=latex]
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
     
-      \draw (0,0) grid (3,4);
+      \draw[color=black!60] (0,0) grid (3,4);
     
       \node[below right] at (0,0) {$n_{start}$};
-      \node[above left] at (3,4) {$n_{goal}$};
+      \node[above right] at (3,4) {$n_{goal}$};
 
-      \filldraw[color=black,fill=black!20] (1,1) rectangle (2,2); 
-    
-      \draw[blue] (0,0) -- (1,0) -- (3,2) -- (3,4);
-      \draw[green, thick,->] (3,4) -- (3,2);
-      \draw[green,thick,->] (3,4) -- (2,1);
-      \draw[red,thick] (3,4) -- (2,2);
-      \draw[red!20,thick,->] (2,2) -- (1,0);
-      \draw[red,thick] (1.9,2.1) -- (2.1,1.9);
-      \draw[red,thick] (1.9,1.9) -- (2.1,2.1);
-      \draw[green,thick, ->] (2,1) -- (0,0);
-    
-      \fill[green] (3,4) circle (2pt);
-      \fill[green] (2,1) circle (2pt);
+      \filldraw[color=black!60,fill=black!40] (1,1) rectangle (2,2); 
+      \draw (0,0) -- (0,4);
+      \draw (0,0) -- (3,0);
+      \draw (3,4) -- (0,4);
+      \draw (3,4) -- (3,0);
+      
+      \draw[orange, ultra thick] (0,0) -- (1,0) -- (3,2) -- (3,4);
+      \fill[red] (0,0) circle (2pt);
+      \fill[red] (1,0) circle (2pt);
+      \fill[red] (2,1) circle (2pt);
+      \fill[red] (3,2) circle (2pt);
+      \fill[red] (3,3) circle (2pt);
+      \fill[red] (3,4) circle (2pt);
+      
+      \draw[green!50!black, ultra thick,->] (3,4) -- (3,2);
+      \draw[green!50!black, ultra thick,->] (3,4) -- (2,1);
+      \draw[green!50!black, ultra thick] (3,4) -- (2,2);
+      %\draw[red!20,thick,->] (2,2) -- (1,0);
+      \draw[green!50!black,ultra thick] (1.9,2.1) -- (2.1,1.9);
+      \draw[green!50!black,ultra thick] (1.9,1.9) -- (2.1,2.1);
+      \draw[green!50!black, ultra thick, ->] (2,1) -- (0,0);
+
 
     \end{tikzpicture}
     \caption{Line of sight tests} \label{fig:astarsmoothed}
@@ -690,19 +835,23 @@ The algorithm starts with the node returned by A*: {$ n = n_{goal}$}. The algori
   %
   \begin{subfigure}{.3\textwidth}
     \centering
-    \begin{tikzpicture}[scale=0.75,line width=0.5pt, >=latex]
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
     
-      \draw (0,0) grid (3,4);
+      \draw[color=black!60] (0,0) grid (3,4);
     
       \node[below right] at (0,0) {$n_{start}$};
-      \node[above left] at (4,4) {$n_{goal}$};
+      \node[above right] at (3,4) {$n_{goal}$};
 
-      \filldraw[color=black,fill=black!20] (1,1) rectangle (2,2); 
+      \filldraw[color=black!60,fill=black!40] (1,1) rectangle (2,2); 
+      \draw (0,0) -- (0,4);
+      \draw (0,0) -- (3,0);
+      \draw (3,4) -- (0,4);
+      \draw (3,4) -- (3,0);
     
-      \draw[blue, thick] (0,0) -- (2,1) -- (3,4);
-      \fill[blue,thick] (0,0) circle (2pt);
-      \fill[blue,thick] (2,1) circle (2pt);
-      \fill[blue,thick] (3,4) circle (2pt);
+      \draw[orange, ultra thick] (0,0) -- (2,1) -- (3,4);
+      \fill[red] (0,0) circle (2pt);
+      \fill[red] (2,1) circle (2pt);
+      \fill[red] (3,4) circle (2pt);
 
     \end{tikzpicture}
     \caption{Improved path}
@@ -713,14 +862,14 @@ The algorithm starts with the node returned by A*: {$ n = n_{goal}$}. The algori
 \end{figure}
 
 
-\begin{algorithm}[htp]
+\begin{algorithm}
   \SetAlgoLined\DontPrintSemicolon
   \SetKwFunction{ps}{PostSmoothing}\SetKwFunction{los}{LineOfSight}
   \SetKwProg{myDef}{def}{}{}
   \myDef{\ps{$n_{start}, n_{goal}$}}{
     \nl $n_{curr} \gets n_{goal} $\;
     \nl $n_{next} \gets n_{goal}.parent.parent $\;
-    \nl \uIf {$n_{next}  = \emptyset$} {
+    \nl \uIf {$n_{next}  = \bot$} {
       \nl \KwRet{} \;
     }
     \nl \While{$true$} {
@@ -741,18 +890,21 @@ The algorithm starts with the node returned by A*: {$ n = n_{goal}$}. The algori
   \caption{{\tt PostSmoothing} from {\sc A* with post-smoothing}}
 \end{algorithm} 
 
-\subsection {Basic {$\theta^{*}$}}
+\subsection {Theta*}
 
-Where A* with post-smoothing does an explicit smoothing step after finding the basic path, Basic {$\theta^{*}$} interleaves smoothing with exploration by attempting to re-parent each node that is expanded with the parent of its parent. This reparenting occurs if there exists a line of sight between the node being expanded and the parent of its parent.\\
+Where {\em A* with post-smoothing} performs an explicit smoothing step after finding the basic path with {\em A*}, {\em Theta*} interleaves smoothing with exploration by attempting to re-parent each of $n_{curr}$'s neighbours $n_{neigh}$ with $n_{curr}.parent$ at the time when $n_{curr}$ is expanded\footnote{As with {\em A* with post-smoothing}, re-parenting in {\em Theta*} occurs if a line of sight exists between the coordinates represented by the two nodes in question.}.\\
 
-\begin{algorithm}[htp]
+\noindent
+The pseudocode for {\em Theta*} differs only from {\em A*} in the {\tt update} subroutine. If a line of sight exists between the coordinates represented by $n_{neigh}$ and $n_{curr}.parent$, {\em Theta*} (notionally) creates an edge $e = (n_{neigh}, n_{curr}.parent)  \in G$ and attempts to relax $e$. If the line of sight does not exist, $e$ is removed from $G$ and {\em Theta*} mimics {\em A*} by attempting to relax the edge $(n_{neigh},n_{curr})$\footnote{As per the {\tt update} subroutine of {\em A*}.}.
+
+\begin{algorithm}
   \SetAlgoLined\DontPrintSemicolon
   \SetKwFunction{update}{Update}\SetKwFunction{los}{LineOfSight}
   \SetKwProg{myDef}{def}{}{}
   \myDef{\update{$n_{neigh}$}}{
     \nl \uIf{$\los(n_{neigh}, n_{curr}.parent) = true$} {
-      \nl \uIf{$n_{curr}.parent.g + euclidean(n_{curr}.parent,n_{neigh}) < n_{neigh}.g$} {
-        \nl $n_{neigh}.g \gets n_{neigh}.parent.g + euclidean(n_{curr}.parent,n_{neigh})$\;
+      \nl \uIf{$n_{curr}.parent.g + (n_{curr}.parent,n_{neigh}).weight < n_{neigh}.g$} {
+        \nl $n_{neigh}.g \gets n_{neigh}.parent.g + (n_{curr}.parent,n_{neigh}).weight$\;
         \nl $n_{neigh}.f \gets euclidean(n_{neigh},n_{goal})$\;
         \nl $n_{neigh}.parent \gets n_{curr}.parent$\;
         \nl \KwRet{$true$}\;
@@ -760,8 +912,8 @@ Where A* with post-smoothing does an explicit smoothing step after finding the b
         \nl \KwRet{$false$}\;
       } 
     } \nl \Else {
-      \nl \uIf{$n_{curr}.g + euclidean(n_{curr},n_{neigh}) < n_{neigh}.g$} {
-        \nl $n_{neigh}.g \gets n_{curr}.g + euclidean(n_{curr},n_{neigh})$\;
+      \nl \uIf{$n_{curr}.g + (n_{curr},n_{neigh}).weight < n_{neigh}.g$} {
+        \nl $n_{neigh}.g \gets n_{curr}.g + (n_{curr},n_{neigh}).weight$\;
         \nl $n_{neigh}.f \gets euclidean(n_{neigh},n_{goal})$\;
         \nl $n_{neigh}.parent \gets n_{curr}$\;
         \nl \KwRet{$true$}\;
@@ -770,31 +922,33 @@ Where A* with post-smoothing does an explicit smoothing step after finding the b
       } 
     }
   }
-  \caption{{\tt Update} from {\sc $\theta^{*}$}}
+  \caption{{\tt Update} from {\sc Theta*}}
 \end{algorithm} 
 
-\subsection {Lazy {$\theta^{*}$}}
+\subsection {Lazy Theta*}
 
-Lazy {$\theta^{*}$} reduces the number of line of sight tests performed by Basic {$\theta^{*}$}. Basic {$\theta^{*}$} will do a line of sight on every node that is visited (i.e. every neighbour of every expanded node) - however, if the node is visited but not expanded then this line of sight test will have been unnecessary.\\
+{\em Lazy Theta*} attempts to refine {\em Theta*} by finding similar paths despite performing fewer line of sight tests. Where {\em Theta*} performs a line of sight for every neighbour $n_{neigh}$ of every node $n_{curr}$ that is expanded, {\em Lazy Theta*} avoids unnecessary line of sight tests by only performing them for every node $n_{curr}$ that is expanded. \\
 
 \noindent
-Instead, when visiting a node $n$, Lazy {$\theta^{*}$} assumes that there is a line of sight between each neighbour $n'$ and $n.parent$, and updates the g-value and parent of each $n'$ accordingly. The algorithm only checks to see if that line of sight actually exists if the $n'$ is ever expanded, by calling {\tt Initialise} on $n'$ when it is popped off $openSet$. If the line of sight doesn't pass, {\tt Initialise} alters the g-value of $n'$ to reflect this by taking as its new parent the expanded neighbour $n''$ or $n'$ which minimises {$g(n') + distance(n',n'')$}.
+{\bf Iteration}\\
+\noindent
+For each $n_{curr}$ that is expanded, {\em Lazy Theta*} assumes that a line of sight exists between $n_{curr}.parent$ and each neighbour $n_{neigh}$ of $n_{curr}$, and updates the {\em g-value} and $parent$ of each $n_{neigh}$ accordingly\footnote{{\em Lazy Theta*} performs the update part of relaxation without first performing the test in equation (2.1)}. {\em Lazy Theta*} only actually performs that line of sight test if the $n_{neigh}$ itself is ever expanded (henceforth referred to as $n_{curr}'$, for clarity), by calling {\tt Initialise} when $n_{curr}'$ is popped off $openSet$. If the line of sight doesn't in fact exist, {\tt Initialise} alters $n_{curr}'$ accordingly\footnote{See {\bfseries Algorithm 5} lines 2-4}.
 
-\begin{algorithm}[htp]
+\begin{algorithm}
   \SetAlgoLined\DontPrintSemicolon
   \SetKwFunction{update}{Update}\SetKwFunction{los}{LineOfSight}\SetKwFunction{init}{Initialise}
   \SetKwProg{myDef}{def}{}{}
   \myDef{\init{$n_{curr}$}}{
       \nl \uIf{$\los(n_{curr}, n_{curr}.parent) = false$} {
-        \nl $newParent \gets \argmin\limits_{n' \in expandedNeigh(n_{curr})} (n'.g + distance(n',n_{curr}))$\;
+        \nl $newParent \gets \argmin\limits_{n' \in expandedNeigh(n_{curr})} (n'.g + (n',n_{curr}).weight)$\;
         \nl $n_{curr}.parent \gets n'$\;
-        \nl $n_{curr}.g \gets n'.g + distance(n',n_{curr})$\;
+        \nl $n_{curr}.g \gets n'.g + (n',n_{curr}).weight$\;
        } 
   }
   \myDef{\update{$n_{neigh}$}}{
         \tcp{assume line of sight test passes}
-      \nl \uIf{$n_{curr}.parent.g + euclidean(n_{curr}.parent,n_{neigh}) < n_{neigh}.g$} {
-        \nl $n_{neigh}.g \gets n_{neigh}.parent.g + euclidean(n_{curr}.parent,n_{neigh})$\;
+      \nl \uIf{$n_{curr}.parent.g + (n_{curr}.parent,n_{neigh}).weight < n_{neigh}.g$} {
+        \nl $n_{neigh}.g \gets n_{neigh}.parent.g + (n_{curr}.parent,n_{neigh}).weight$\;
         \nl $n_{neigh}.f \gets euclidean(n_{neigh},n_{goal})$\;
         \nl $n_{neigh}.parent \gets n_{curr}.parent$\;
         \nl \KwRet{$true$}\;
@@ -802,126 +956,686 @@ Instead, when visiting a node $n$, Lazy {$\theta^{*}$} assumes that there is a l
         \nl \KwRet{$false$}\;
       } 
   }
-  \caption{{\tt Initialise} and {\tt Update} from {\sc Lazy $\theta^{*}$}}
+  \caption{{\tt Initialise} and {\tt Update} from {\sc Lazy Theta*}}
 \end{algorithm} 
 
-\newpage
+\noindent
+It should be noted that when run on a given map, {\em Lazy Theta*} does not necessarily return the same path as {\em Theta*}.
+
 \subsection {Block A*}
 
-Block A* is by far the most complicated algorithm that I will investigate. It was published in 2011, and is at the very cutting edge of any-angle path-finding algorithmic research.\\
+\noindent
+{\em Block A*} is the most complex algorithm in this dissertation. It was published in 2011, and is at the very cutting edge of any-angle path-finding algorithmic research. This dissertation attempts a novel explanation of {\em Block A*} that draws closer parallels with the graph-based explanations provided in the previous sections for {\em Dijkstra} and {\em A*}.\\
 
 \noindent
-Block A* is a variant of A* that uses the concept of an LDDB (`Local Distance Database') - a database that holds the distances and inflection points of the optimum routes through small {$n$} by {$n$} submaps, known as blocks. The size of the blocks in the LDDB is optional - the size chosen will affect the size of the database, the lookup time of the database, the speed of the algorithm and the optimality of the algorithm. \\
+{\bfseries Overview}\\
+\noindent
+{\em Block A*} divides a map $M$ into logical blocks and then finds an optimal or near-optimal path by proceeding through $M$ in a block by block fashion, as opposed to node by node like the other algorithms studied in this dissertation. This gives {\em Block A*} the potential for fast evaluation. {\em Block A*} uses the concept of a {\em Local Distance Database} to provide information about shortest paths {\em through} blocks without having to explicitly calculate them.\\
 
 \noindent
-Block A* deals with blocks in a similar way to that in which A* deals with nodes: blocks have neighbours and priority-values (called `heap-values', like A*'s f-values), and can be expanded, put in a priority queue and popped off the priority queue. However, note that blocks can be re-expanded if a better route is found - this does not occur in A*.\footnote{This subtlety caused me such confusion that I eventually emailed Peter Yapp, the author of the Block A* paper, for clarification. He explained the difference, and told me that he had included an explanation of this specific point when he gave a presentation [citation] on Block A* as the confusion is not uncommon.} The majority of the work of Block A* is performed by only considering nodes on the boundaries of blocks - since the LDDB can be used to quickly give costs for traversing the inside of the nodes. Therefore, Block A* can quickly skip across the map, block by block. The blocks that contain {$n_{start}$} and {$n_{goal}$} are special cases, as there is no guarantee that these nodes lie on the boundary of their respective blocks - and they may even lie in the same block. Therefore, the LDDB cannot be used for these blocks.\\
+{\bfseries Blocks}\\
+\noindent
+Where all of the previously introduced algorithms operate on a simple graph structure, {\em Block A*} operates on a structure based on blocks. A block $B_{i,j}$ of size $N_{B}^{2}$, identified by the coordinate $(i,j) \in \mathbb{Z}^{2}$, is a graph that represents the subsection of a map $M$ containing all locations $(x,y) \in \mathbb{R}^{2}$, where $i \leq x \leq i+N_{B}$ and $j \leq y \leq j+N_{B}$.\\
 
 \noindent
-A block's heap-value is the lowest f-value of a boundary node that has been updated since the block was last expanded, and is reset to {$\infty$} when the block is removed from the {$openSet$}. In a similar way to A*, the basic cycle to Block A* is that the block with the lowest heap-value will be removed from the {$openSet$} and expanded. To expand the block:
+For each block $B_{i,j} = (V_{i,j},E_{i,j})$, $n \in V_{i,j}$ represents a location $(a,b) \in \mathbb{Z}^{2}$ in $M$ where $(a,b)$ lies on the boundary of the $B_{i,j}$ --- that is to say, where $a=i$ or $a=i+N_{B}$, and $b=j$ or $b=j+N_{B}$. In addition to an associated coordinate, each node $n \in B_{i,j}$ has the parameters:
 \begin{itemize}
-\item a list Y is made of all boundary nodes of the block that have been updated since the block was last expanded. 
-\item For each side of the block that isn't on the edge of the map (see Figure 2.4):
-  \begin{itemize}
-  \item a list {$listX$} is made of each node on that side
-  \item a corresponding list {$listX'$} is made which contains, for each {$x_{i}$} in {$listX$}, an {$x'_{i}$} which is the corresponding node to {$x_{i}$} in the neighbour block to that side.
-  \item the g-value of {$x_{i}$} is updated if there is a {$g(y) + LDDB(y,x_{i})$} that is smaller that {$g(x_{i})$}. We call $y$ the $ingress$ coordinate and $x_{i}$ the $egress$ coordinate, as $y$ is the point of entry to the block and $x_{i}$ is the proposed point of exit from the block. 
-  \item if {$x_{i}$} is updated, so is {$x'_{i}$} - to {$g(x'_{i})+ distance(x_{i},x'_{i})$} - which is 0 if we use nodes on corners or 1 if we use nodes in centre of cells.
-  \item if the smallest f-value of an updated {$x'$} is smaller than the neighbour block's current heap-value, we update it and insert the neighbour block into the {$openSet$} if it is not already there.
-  \end{itemize}
-\end{itemize}
-\noindent
-Special cases - where, in the general case, the LDDB is not sufficient:
-\begin{itemize} 
-\item {\em $block_{start}$}: the call to {\tt init(start)} creates and initialises $block_{start}$. The optimum path from {$n_{start}$} to each boundary node {$x$} is computed, and the length of this path is used to set {$x$}'s g-value.
-\item {\em $block_{goal}$}: the call to {\tt init(goal)} creates and initialises {$block_{goal}$}. The optimum path from $n_{goal}$ to each boundary node {$x$} is computed, and the length of this path is used to set {$x$}'s h-value.\footnote{h-value, not g-value. The difference between the treatment of $block_{start}$ and $block_{goal}$ is important}
-\item{\em $block_{start} = block_{goal}$}: the optimum path from {$n_{start}$} to {$n_{goal}$} is calculated directly, and returned.
+\item {\em g-value} --- the path length of the shortest path found so far from $start$\footnote{In {\em Block A*} there is no explicit node $n_{start}$ or $n_{goal}$ --- $start$ and $goal$ are coordinates $(x,y) \in \mathbb{R}^{2}$ in $M$.} to $n$;
+\item {\em h-value} --- Euclidean distance between $n$ and $goal$\footnote{Except when the block is $B_{goal}$, when the {\em h-value} is the length of the shortest path between $n$ and $goal$ --- this is discussed in the `Initialisation' step.}. 
+\item {\em parent} --- the previous node in the shortest path found so far from $start$ to $n$
 \end{itemize}
 
 \noindent
-When $block_{goal}$ is evaluated, its h-value has already been calculated by finding the actual shortest path from each boundary node to $n_{goal}$ (see Special cases above), as opposed to using an estimate. Therefore, if the heap-value of $block_{goal}$ is less that any other blocks in $openSet$ then there are no possible shorter paths to $goal_{block}$, so the algorithm terminates.\\
+Each $block$ $B_{i,j}$ maintains an unordered $openSet_{i,j} \subseteq V_{i,j}$, and a $heapValue_{i,j}$. $heapValue_{i,j}$ is the smallest {\em f-score} of the nodes in $openSet_{i,j}$\footnote{If $openSet_{i,j} = \bot$, $B_{i,j}.heapValue = \infty$.}, and is used to order blocks in $openSet_{blocks}$, a priority queue that stores blocks in increasing order of their $heapValue$s.\\
 
 \noindent
-The pseudocode for Block A* can be found in Appendix ?\\
-	
-\begin{figure}[h]
-  \begin{center}
-  \begin{tikzpicture}[scale=0.75,line width=0.5pt]
-    
-    \filldraw[black!20] (0,1) rectangle (2,3);
-    \filldraw[black!20] (2,4) rectangle (4,6);
-    \filldraw[black!20] (0,8) rectangle (4,9);
-    \filldraw[black!20] (3,1) rectangle (4,2);
-    \filldraw[black!20] (0,5) rectangle (1,8);
-    \filldraw[black!20] (6,0) rectangle (7,5);
-    \filldraw[black!20] (7,2) rectangle (9,4);
-    \filldraw[black!20] (5,7) rectangle (7,8);
-    
-   \draw[black] (0,0) grid (9,9);
+If the locations represented by $B_{i,j}$ contain the location $start$ or $goal$ then $B_{i,j}$ is called $B_{start}$ or $B_{goal}$ respectively, and $B_{i,j}$ has an extra node $n_{start}$ or $n_{goal}$ with an edge from that node to every other node in the block. For all other blocks, called 'regular' blocks, there is an edge between every pair of nodes in $B_{i,j}$. See figure 2.7. For all edges $(n,n') \in B$, {\em $(n,n').weight$ is the length of the shortest path in map $M$ between the two locations represented by $n$ and $n'$, and $0 \leq $(n,n').weight$ \leq \infty$}. This important distinction bears clarificiation: in grid-based graphs and visibility graphs, an edge denotes that an agent can travel in a straight line between the two nodes that the edge connects, whereas an edge in a block merely denotes that an agent can travel between those two nodes {\em on some path within that block}, where the length of that path is the edge weight which may range from $0$ to $\infty$. See figure 2.7\\
 
-    \node[below left] at (0,0) {0};
-    \node[below] at (1,0) {1};
-    \node[below] at (2,0) {2};
-    \node[below] at (3,0) {3};
-    \node[below] at (4,0) {4};
-    \node[below] at (5,0) {5};
-    \node[below] at (6,0) {6};
-    \node[below] at (7,0) {7};
-    \node[below] at (8,0) {8};
-    \node[below] at (9,0) {9};
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[scale=1.1,line width=0.5pt]
+  
+      \foreach \i in {0,3,6} {
+      \foreach \j in {0,3,6} {
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {0,3} {
+          \foreach \a in {0,1,2,3} {
+            \foreach \b in {0,3} {
+             \pgfmathparse{int(\x + \i)};
+             \let\xn\pgfmathresult;
+             \pgfmathparse{int(\a + \i)};
+             \let\an\pgfmathresult;
+             \pgfmathparse{int(\y + \j)};
+             \let\yn\pgfmathresult;
+             \pgfmathparse{int(\b + \j)};
+             \let\bn\pgfmathresult;
+              \draw[orange] (\xn,\yn) -- (\an,\bn);
+              \draw[orange] (\yn,\xn) -- (\bn,\an);
+            }
+          }
+        }
+      }
+      }}
+      
+      \foreach \i in {0,3,6} {
+      \foreach \j in {0,3,6} {
+      \foreach \x in {1,2} {
+        \foreach \y in {0,3} {
+          \foreach \a in {1,2} {
+            \foreach \b in {0,3} {
+             \pgfmathparse{int(\x+\i)};
+             \let\xn\pgfmathresult;
+             \pgfmathparse{int(\a+\j)};
+             \let\an\pgfmathresult;
+             \pgfmathparse{int(\y+\j)};
+             \let\yn\pgfmathresult;
+             \pgfmathparse{int(\b+\i)};
+             \let\bn\pgfmathresult;
+              \draw[orange] (\xn,\yn) -- (\bn,\an);
+              \draw[orange] (\yn,\xn) -- (\an,\bn);
+            }
+          }
+        }
+      }
+      }}
+      
+      \filldraw[color=orange, fill=white] (0,3) rectangle (3,6);
+      \filldraw[color=orange, fill=white] (6,0) rectangle (9,3);
+      
+      \draw[orange] (1,4) -- (0,3);
+      \draw[orange] (1,4) -- (0,4);
+      \draw[orange] (1,4) -- (0,5);
+      \draw[orange] (1,4) -- (0,6);
+      \draw[orange] (1,4) -- (3,3);
+      \draw[orange] (1,4) -- (3,4);
+      \draw[orange] (1,4) -- (3,5);
+      \draw[orange] (1,4) -- (3,6);
+      \draw[orange] (1,4) -- (1,3);
+      \draw[orange] (1,4) -- (2,3);
+      \draw[orange] (1,4) -- (1,6);
+      \draw[orange] (1,4) -- (2,6);
+      \fill[red] (1,4) circle (2pt);
+      \draw[orange] (8,2) -- (6,0);
+      \draw[orange] (8,2) -- (6,1);
+      \draw[orange] (8,2) -- (6,2);
+      \draw[orange] (8,2) -- (6,3);
+      \draw[orange] (8,2) -- (9,0);
+      \draw[orange] (8,2) -- (9,1);
+      \draw[orange] (8,2) -- (9,2);
+      \draw[orange] (8,2) -- (9,3);
+      \draw[orange] (8,2) -- (7,0);
+      \draw[orange] (8,2) -- (8,0);
+      \draw[orange] (8,2) -- (7,3);
+      \draw[orange] (8,2) -- (8,3);
+      \fill[red] (8,2) circle (2pt);
+      
+      \foreach \x in {0,1,2,2.95,3.05,4,5,5.95,6.05,7,8,9} {
+        \foreach \y in {0,9} {
+              \fill[red] (\x,\y) circle (2pt);
+              \fill[red] (\y,\x) circle (2pt);
+        }
+      }
+      
+      \foreach \x in {1,2,4,5,7,8} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\y + 0.05)};
+           \let\ya\pgfmathresult;
+            \pgfmathparse{(\y - 0.05)};
+           \let\yb\pgfmathresult;
+              \fill[red] (\x,\ya) circle (2pt);
+              \fill[red] (\x,\yb) circle (2pt);
+              \fill[red] (\ya,\x) circle (2pt);
+              \fill[red] (\yb,\x) circle (2pt);
+        }
+      }
+      
+       \foreach \x in {3,6} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\x + 0.05)};
+           \let\xa\pgfmathresult;
+            \pgfmathparse{(\x - 0.05)};
+           \let\xb\pgfmathresult;
+           \pgfmathparse{(\y + 0.05)};
+           \let\ya\pgfmathresult;
+              \fill[red] (\xa,\ya) circle (2pt);
+              \fill[red] (\xb,\ya) circle (2pt);
+              \fill[red] (\ya,\xa) circle (2pt);
+              \fill[red] (\ya,\xb) circle (2pt);
+        }
+      }
+      
+             \foreach \x in {3,6} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\x + 0.05)};
+           \let\xa\pgfmathresult;
+            \pgfmathparse{(\x - 0.05)};
+           \let\xb\pgfmathresult;
+           \pgfmathparse{(\y - 0.05)};
+           \let\ya\pgfmathresult;
+              \fill[red] (\xa,\ya) circle (2pt);
+              \fill[red] (\xb,\ya) circle (2pt);
+              \fill[red] (\ya,\xa) circle (2pt);
+              \fill[red] (\ya,\xb) circle (2pt);
+        }
+      }
+      
+      \node[left] at (-1,5.5) {$B_{start}$};
+      \draw[->] (-1,5.5) -- (0.5,5.5);
+      
+      \node[left] at (-1,4.5) {$n_{start}$};
+      \draw[->] (-1,4.5) -- (1,4);
+      
+      \node[right] at (10,1.5) {$n_{goal}$};
+      \draw[->] (10,1.5) -- (8,2);
+      
+      \node[right] at (10,0.5) {$B_{goal}$};
+      \draw[->] (10,0.5) -- (8.5,0.5);
+      
+      \node[right] at (10,7) {a node in $B_{6,6}$};
+      \draw[->] (10,7) -- (9,7);
+      
+      \node[left,align=center] at (-1,7) {collocational nodes \\in $B_{0,3}$ and $B_{0,6}$};
+      \draw[->] (-1,7) -- (0,6);
+      
+     
+    \end{tikzpicture}
+    \caption[Set of blocks]{Logical view of a map of size $9^{2}$ as a set of 9 blocks of size $3^{2}$}
+  %\label{fig:fig}
+\end{figure}
 
-    \node[left] at (0,1) {1};
-    \node[left] at (0,2) {2};
-    \node[left] at (0,3) {3};
-    \node[left] at (0,4) {4};
-    \node[left] at (0,5) {5};
-    \node[left] at (0,6) {6};
-    \node[left] at (0,7) {7};
-    \node[left] at (0,8) {8};
-    \node[left] at (0,9) {9};
-    
-    \draw[ultra thick] (0,0) -- (9,0);
-    \draw[ultra thick] (0,3) -- (9,3);
-    \draw[ultra thick] (0,6) -- (9,6);
-    \draw[ultra thick] (0,9) -- (9,9);
-    \draw[ultra thick] (0,0) -- (0,9);
-    \draw[ultra thick] (3,0) -- (3,9);
-    \draw[ultra thick] (6,0) -- (6,9);
-    \draw[ultra thick] (9,0) -- (9,9);
-    
-    \node at (1.5,1.5) {$block_{0}$};
-    \node at (4.5,1.5) {$block_{1}$};
-    \node at (7.5,1.5) {$block_{2}$};
-    \node at (1.5,4.5) {$block_{start}$};
-    \node at (4.5,4.5) {$block_{3}$};
-    \node at (7.5,4.5) {$block_{4}$};
-    \node at (1.5,7.5) {$block_{5}$};
-    \node at (4.5,7.5) {$block_{6}$};
-    \node at (7.5,7.5) {$block_{goal}$};
-    
-    \fill (2,4) circle (3pt);
-    \node[below right] at (2,4) {$n_{start}$};
-    \fill (9,7) circle (3pt);
-    \node[below right] at (9,7) {$n_{goal}$};
 
-  \end{tikzpicture}
-  \end{center}
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[scale=2,line width=0.5pt]
+    
+      \filldraw[color=black!60,fill=black!40] (1,1) rectangle (2,3); 
+      \filldraw[color=black!60,fill=black!40] (1,2) rectangle (3,3); 
+  
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {0} {
+          \foreach \a in {0,1,2,3} {
+            \foreach \b in {3} {
+              \draw[orange] (\x,\y) -- (\a,\b);
+              \draw[orange] (\y,\x) -- (\b,\a);
+            }
+          }
+        }
+      }
+      
+      \foreach \x in {1,2} {
+        \foreach \y in {0,3} {
+          \foreach \a in {0,3} {
+            \foreach \b in {1,2} {
+              \draw[orange] (\x,\y) -- (\a,\b);
+              \draw[orange] (\y,\x) -- (\b,\a);
+            }
+          }
+        }
+      }
+      
+      \draw[orange, line width = 3pt] (0,0) -- (1,0);
+      \draw[orange, line width = 3pt](0,1) -- (3,2);
+      \draw[orange, line width = 3pt] (0,2) -- (2,3);
+      
+      \node[left] at (-0.5,0.5) {weight = $1$};
+      \draw[->] (-0.5,0.5) -- (0.5,0);
+      \node[left] at (-0.5,1.5) {weight = $2 + \sqrt 2$};
+      \draw[->] (-0.5,1.5) -- (0.5,1.17);
+      \node[left] at (-0.5,2.5) {weight = $\infty$};
+      \draw[->] (-0.5,2.5) -- (0.5,2.25);
+      
+      \fill[red] (0,0) circle (2pt);
+      \fill[red] (0,1) circle (2pt);
+      \fill[red] (0,2) circle (2pt);
+      \fill[red] (0,3) circle (2pt);
+      \fill[red] (3,0) circle (2pt);
+      \fill[red] (3,1) circle (2pt);
+      \fill[red] (3,2) circle (2pt);
+      \fill[red] (3,3) circle (2pt);
+      \fill[red] (1,0) circle (2pt);
+      \fill[red] (2,0) circle (2pt);
+      \fill[red] (1,3) circle (2pt);
+      \fill[red] (2,3) circle (2pt);
+      
+     
+    \end{tikzpicture}
+    \caption[Anatomy of a block]{A block of size $3^{2}$ laid over the area of map it represents, with certain highlighted edge weights labeled.}
+  %\label{fig:fig}
+\end{figure}
+
+\noindent
+The edge weights for regular blocks are discovered by querying the {\em Local Distance Database (LDDB)}, which is introduced in the next subsection. Since the {\em LDDB} only contains data for regular blocks, the weights of edges in $B_{start}$ and $B_{goal}$ are calculated separately --- this is discussed in the Implementation chapter of this dissertation.\\
+
+\noindent
+Each block $B_{i,j}$ contains nodes that are collocational with nodes from up to six neighbouring blocks. {\em Block A*} maintains the invariant for two collocational nodes $n$ and $n'$ that $n.g = n'.g$ and $n.h = n'.h$.\\
+
+\noindent
+{\bfseries Local Distance Database --- $LDDB$}\\
+\noindent
+An $LDDB_{N}$ is a pre-computed database that holds the path length and inflection points of the optimum paths between all pairs of locations $(a,b)$ and $(c,d)$ for all map configurations $M$ of size $N^{2}$, where $a,b,c,d \in \mathbb{Z}^{2}$ and $(a,b)$ and $(c,d)$ lie on the boundary of $M$.\\
+
+\noindent
+{\bfseries Initialisation}\\
+\noindent
+For all $n \in B_{start}$, $n.g$ is set to $(n_{start},n).weight$. For all $n \in B_{goal}$, $n.h$ is set to $(n,n_{goal}).weight$. $B_{start}$ and $B_{goal}$ are treated as special cases as there is no guarantee that $start$ and $goal$ lie on the boundary of a block. The exceptional case that $B_{start} = B_{goal}$ must also be checked for.\\
+
+\noindent
+Having initialised $B_{start}$ and $B_{goal}$, $B_{start}$ is added to $openSet$.\\
+
+\noindent
+{\bfseries Iteration}\\
+\noindent
+The iteration stage of {\em Block A*} proceeds similarly to {\em A*}, though {\em Block A*} expands blocks chosen from $openSet_{blocks}$ whereas {\em A*} expands nodes. However, note that a block can be expanded multiple times, whereas in {\em A*} a node is only expanded once\footnote{This subtlety caused me such confusion that I eventually emailed Peter Yap, the author of the Block A* paper, for clarification. He explained the difference, and told me that he had included an explanation of this specific point when he gave a presentation [citation] on Block A* as the confusion is not uncommon.}. For this reason, a $length$ variable is maintained, which ensures that the algorithm terminates only when it is impossible to find a shorter path.\\
+
+\noindent
+{\bfseries Expansion}\\
+\noindent
+On expansion of $B_{i,j}$, {\em Block A*} attempts to relax every edge $e=(n_{ingress},n_{egress}) \in E_{i,j}$, where $n_{ingress} \in openSet_{i,j}$ and $n_{egress} \in V_{i,j}$. If $e$ is relaxed, all nodes that are collocational with $n_{egress}$ are added to the $openSet_{k,l}$ of their respective block $B_{k,l}$, and $B_{k,l}$ is added to $openSet$ if it is not already a member. \\
+
+\noindent
+{\bfseries Termination}\\
+\noindent
+The {\em h-value} of $B_{goal}$ is the actual shortest path from each node $n \in V_{goal}$, (see `Initialisation' section) as opposed to a Euclidean estimate that is used for the {\em h-value} in every other block. Therefore, if $B_{goal}.heapValue$ is less than the $heapValue$ of any other blocks in $openSet$ then there are no possible shorter paths to $B_{goal}$, so the algorithm terminates. This condition is ensured by the $length$ variable.\\
+
+\noindent
+{\bfseries Traceback}\\
+\noindent
+When {\em Block A*} terminates, the boundary nodes of the blocks through which $P_{G}$ passes can be found by recursively following the $parent$ pointers from $n_{goal}$ to $n_{start}$. See figure 2.8 (b). However, to recover the nodes of $P_{G}$ that do not lie on the boundaries of blocks, a traceback stage is required which involves multiple queries to the $LDDB$. See figure 2.8 (c). Although the details of this are not presented in Yap's paper, an explanation is presented in the Implementation chapter of this dissertation.\\
+
+\begin{algorithm}
+  \SetAlgoLined\DontPrintSemicolon
+  \SetKwFunction{bAS}{BlockAStar}\SetKwFunction{expand}{Expand}\SetKwFunction{traceback}{TraceBack}
+  \SetKwProg{myDef}{def}{}{}
+  \myDef{\bAS{G, $n_{start}$, $n_{goal}$}}{
+  \nl $B_{start} \gets init(n_{start})$\;
+  \nl $B_{goal} \gets init(n_{goal})$\;
+  \nl $length \gets \infty$\;
+  \nl $openSet_{blocks}.add(B_{start})$\;
+  \nl \While{$(openSet_{blocks} \neq \bot) \land ((openSet_{blocks}.peek()).heapValue < length)$} {
+    \nl $B_{curr} \gets openSet_{blocks}.pop()$\;
+    \nl $openSet_{curr} \gets B_{curr}.openSet$\;
+    \nl \If{$B_{curr} = B_{goal}$} {
+      \nl $length \gets \min\limits_{n \in openSet_{curr}} (n.g + euclidean(n,n_{goal}),length)$\;
+    }
+    \nl $\expand(B_{curr},openSet_{curr})$\;
+  }
+  \nl \uIf{$length \neq \infty$}{
+    \nl $\traceback(n_{goal})$\;
+  } \nl \Else {
+     \nl \KwRet{$\bot$}\;
+  }
+}{}
+
+ \setcounter{AlgoLine}{0}
+  \myDef{\expand{$B_{curr},openSet_{curr}$}}{
+    \nl \While{$openSet_{curr} \neq \bot $}{
+      \nl $n_{ingress} \gets openSet_{curr}.pop()$\;
+      \nl \ForEach{$n_{egress} \in B_{curr}$}{
+        \nl \uIf{$n_{ingress}.g + (n_{ingress},n_{egress}).weight < n_{egress}.g$} {
+          \nl $n_{egress}.g \gets n_{ingress}.g + (n_{ingress},n_{egress}).weight$\;
+            \nl \ForEach{$n' \in n_{egress}.collocational$}{
+              \nl $n' \gets n_{ingress}.g + (n_{ingress},n_{egress}).weight$\;
+              \nl $openSet_{n'.coord}.add(n')$\;
+              \nl \uIf{$openSet_{blocks}.contains(B_{n'.coord}) = false$} {
+                \nl $openSet_{blocks}.add(B_{n'.coord})$\;
+              }
+            }
+        }
+      }
+    }
+  }
  
-\noindent 
-When expanding $block_{4}$:
-\begin{description}
-\item[$listX$] = \\ \hfill (6,3),(7,3),(8,3),(9,3),(6,4),(6,5),(6,6),(7,6),(8,6),(9,6) from $block_{4}$\\
-\item[$listX'$] = \\ \hfill (6,3),(7,3),(8,3),(9,3) from $block_{2}$,\\ (6,3) from $block_{1}$,\\ (6,3),(6,4),(6,5),(6,6) from $block_{3}$,\\ (6,6) from $block_{6}$,\\ (6,6),(7,6),(8,6),(9,6) from $block_{goal}$
-\end{description}
+  \caption{{\sc Block A*}}
+\end{algorithm} 
 
-  \caption{Block A*: map of {$ 9 \times 9$} cells is split into 9 blocks of {$ 3 \times 3$} cells} 
-  \label{fig:lineofsight}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+    
+\node (a) at (0,10) {
+    	\begin{tikzpicture}[scale=0.85,line width=0.5pt]
+	      	\filldraw[color=black!60,fill=black!40] (0,0) rectangle (2,3); 
+		\filldraw[color=black!60,fill=black!40] (1,7) rectangle (8,8); 
+		\filldraw[color=black!60,fill=black!40] (7,7) rectangle (8,5); 
+		\filldraw[color=black!60,fill=black!40] (2,4) rectangle (5,6);
+		\filldraw[color=black!60,fill=black!40] (3,2) rectangle (5,4); 
+		\filldraw[color=black!60,fill=black!40] (4,1) rectangle (5,2);  
+     	 	\draw[color=black!60] (0,0) grid (9,9);
+      		\draw[black] (0,0) -- (0,9);
+      		\draw[black] (0,0) -- (9,0);
+      		\draw[black] (9,9) -- (0,9);
+      		\draw[black] (9,9) -- (9,0);
+		\fill[blue] (1,4) circle (3pt);
+		\node[below left] at (1,4) {$start$};
+		\fill[blue] (8,2) circle (3pt);
+		\node[below left] at (8,2) {$goal$};
+		
+		\node at (4.5,-1) {(a) Original map $M$};
+	    \end{tikzpicture}
+	    };	   
+	   
+\node (a) at (0,0) {
+    	    \begin{tikzpicture}[scale=0.85,line width=0.5pt]
+  
+      \foreach \i in {0,3,6} {
+      \foreach \j in {0,3,6} {
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {0,3} {
+          \foreach \a in {0,1,2,3} {
+            \foreach \b in {0,3} {
+             \pgfmathparse{int(\x + \i)};
+             \let\xn\pgfmathresult;
+             \pgfmathparse{int(\a + \i)};
+             \let\an\pgfmathresult;
+             \pgfmathparse{int(\y + \j)};
+             \let\yn\pgfmathresult;
+             \pgfmathparse{int(\b + \j)};
+             \let\bn\pgfmathresult;
+              \draw[orange] (\xn,\yn) -- (\an,\bn);
+              \draw[orange] (\yn,\xn) -- (\bn,\an);
+            }
+          }
+        }
+      }
+      }}
+      
+      \foreach \i in {0,3,6} {
+      \foreach \j in {0,3,6} {
+      \foreach \x in {1,2} {
+        \foreach \y in {0,3} {
+          \foreach \a in {1,2} {
+            \foreach \b in {0,3} {
+             \pgfmathparse{int(\x+\i)};
+             \let\xn\pgfmathresult;
+             \pgfmathparse{int(\a+\j)};
+             \let\an\pgfmathresult;
+             \pgfmathparse{int(\y+\j)};
+             \let\yn\pgfmathresult;
+             \pgfmathparse{int(\b+\i)};
+             \let\bn\pgfmathresult;
+              \draw[orange] (\xn,\yn) -- (\bn,\an);
+              \draw[orange] (\yn,\xn) -- (\an,\bn);
+            }
+          }
+        }
+      }
+      }}
+      
+      \filldraw[color=orange, fill=white] (0,3) rectangle (3,6);
+      \filldraw[color=orange, fill=white] (6,0) rectangle (9,3);
+      
+      \draw[orange] (1,4) -- (0,3);
+      \draw[orange] (1,4) -- (0,4);
+      \draw[orange] (1,4) -- (0,5);
+      \draw[orange] (1,4) -- (0,6);
+      \draw[orange] (1,4) -- (3,3);
+      \draw[orange] (1,4) -- (3,4);
+      \draw[orange] (1,4) -- (3,5);
+      \draw[orange] (1,4) -- (3,6);
+      \draw[orange] (1,4) -- (1,3);
+      \draw[orange] (1,4) -- (2,3);
+      \draw[orange] (1,4) -- (1,6);
+      \draw[orange] (1,4) -- (2,6);
+
+      \draw[orange] (8,2) -- (6,0);
+      \draw[orange] (8,2) -- (6,1);
+      \draw[orange] (8,2) -- (6,2);
+      \draw[orange] (8,2) -- (6,3);
+      \draw[orange] (8,2) -- (9,0);
+      \draw[orange] (8,2) -- (9,1);
+      \draw[orange] (8,2) -- (9,2);
+      \draw[orange] (8,2) -- (9,3);
+      \draw[orange] (8,2) -- (7,0);
+      \draw[orange] (8,2) -- (8,0);
+      \draw[orange] (8,2) -- (7,3);
+      \draw[orange] (8,2) -- (8,3);     
+      
+      \fill[red] (1,4) circle (2pt);
+      \node[below left] at (1,4) {$n_{start}$};
+      \fill[red] (8,2) circle (2pt);
+      \node[below left] at (8,2) {$n_{goal}$};
+      
+      \foreach \x in {0,1,2,2.95,3.05,4,5,5.95,6.05,7,8,9} {
+        \foreach \y in {0,9} {
+              \fill[red] (\x,\y) circle (2pt);
+              \fill[red] (\y,\x) circle (2pt);
+        }
+      }
+      
+      \foreach \x in {1,2,4,5,7,8} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\y + 0.05)};
+           \let\ya\pgfmathresult;
+            \pgfmathparse{(\y - 0.05)};
+           \let\yb\pgfmathresult;
+              \fill[red] (\x,\ya) circle (2pt);
+              \fill[red] (\x,\yb) circle (2pt);
+              \fill[red] (\ya,\x) circle (2pt);
+              \fill[red] (\yb,\x) circle (2pt);
+        }
+      }
+      
+       \foreach \x in {3,6} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\x + 0.05)};
+           \let\xa\pgfmathresult;
+            \pgfmathparse{(\x - 0.05)};
+           \let\xb\pgfmathresult;
+           \pgfmathparse{(\y + 0.05)};
+           \let\ya\pgfmathresult;
+              \fill[red] (\xa,\ya) circle (2pt);
+              \fill[red] (\xb,\ya) circle (2pt);
+              \fill[red] (\ya,\xa) circle (2pt);
+              \fill[red] (\ya,\xb) circle (2pt);
+        }
+      }
+      
+             \foreach \x in {3,6} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\x + 0.05)};
+           \let\xa\pgfmathresult;
+            \pgfmathparse{(\x - 0.05)};
+           \let\xb\pgfmathresult;
+           \pgfmathparse{(\y - 0.05)};
+           \let\ya\pgfmathresult;
+              \fill[red] (\xa,\ya) circle (2pt);
+              \fill[red] (\xb,\ya) circle (2pt);
+              \fill[red] (\ya,\xa) circle (2pt);
+              \fill[red] (\ya,\xb) circle (2pt);
+        }
+      }
+      
+      \fill[blue] (1,4) circle (3pt);
+      \fill[blue] (2,3.05) circle (3pt);
+      \fill[blue] (2,2.95) circle (3pt);
+      \fill[blue] (2.95,2) circle (3pt);
+      \fill[blue] (3.05,2) circle (3pt);
+      \fill[blue] (5.95,2) circle (3pt);
+      \fill[blue] (6.05,2) circle (3pt);
+      \fill[blue] (8,2) circle (3pt);
+      
+      \node at (4.5,-1) {(b) Boundary nodes of path identified};
+     
+    \end{tikzpicture}
+	    };
+	    
+\node (a) at (10,10) {
+    	    \begin{tikzpicture}[scale=0.85,line width=0.5pt]
+  
+      \foreach \i in {0,3,6} {
+      \foreach \j in {0,3,6} {
+      \foreach \x in {0,1,2,3} {
+        \foreach \y in {0,3} {
+          \foreach \a in {0,1,2,3} {
+            \foreach \b in {0,3} {
+             \pgfmathparse{int(\x + \i)};
+             \let\xn\pgfmathresult;
+             \pgfmathparse{int(\a + \i)};
+             \let\an\pgfmathresult;
+             \pgfmathparse{int(\y + \j)};
+             \let\yn\pgfmathresult;
+             \pgfmathparse{int(\b + \j)};
+             \let\bn\pgfmathresult;
+              \draw[orange] (\xn,\yn) -- (\an,\bn);
+              \draw[orange] (\yn,\xn) -- (\bn,\an);
+            }
+          }
+        }
+      }
+      }}
+      
+      \foreach \i in {0,3,6} {
+      \foreach \j in {0,3,6} {
+      \foreach \x in {1,2} {
+        \foreach \y in {0,3} {
+          \foreach \a in {1,2} {
+            \foreach \b in {0,3} {
+             \pgfmathparse{int(\x+\i)};
+             \let\xn\pgfmathresult;
+             \pgfmathparse{int(\a+\j)};
+             \let\an\pgfmathresult;
+             \pgfmathparse{int(\y+\j)};
+             \let\yn\pgfmathresult;
+             \pgfmathparse{int(\b+\i)};
+             \let\bn\pgfmathresult;
+              \draw[orange] (\xn,\yn) -- (\bn,\an);
+              \draw[orange] (\yn,\xn) -- (\an,\bn);
+            }
+          }
+        }
+      }
+      }}
+      
+      \filldraw[color=orange, fill=white] (0,3) rectangle (3,6);
+      \filldraw[color=orange, fill=white] (6,0) rectangle (9,3);
+      
+      \draw[orange] (1,4) -- (0,3);
+      \draw[orange] (1,4) -- (0,4);
+      \draw[orange] (1,4) -- (0,5);
+      \draw[orange] (1,4) -- (0,6);
+      \draw[orange] (1,4) -- (3,3);
+      \draw[orange] (1,4) -- (3,4);
+      \draw[orange] (1,4) -- (3,5);
+      \draw[orange] (1,4) -- (3,6);
+      \draw[orange] (1,4) -- (1,3);
+      \draw[orange] (1,4) -- (2,3);
+      \draw[orange] (1,4) -- (1,6);
+      \draw[orange] (1,4) -- (2,6);
+
+      \draw[orange] (8,2) -- (6,0);
+      \draw[orange] (8,2) -- (6,1);
+      \draw[orange] (8,2) -- (6,2);
+      \draw[orange] (8,2) -- (6,3);
+      \draw[orange] (8,2) -- (9,0);
+      \draw[orange] (8,2) -- (9,1);
+      \draw[orange] (8,2) -- (9,2);
+      \draw[orange] (8,2) -- (9,3);
+      \draw[orange] (8,2) -- (7,0);
+      \draw[orange] (8,2) -- (8,0);
+      \draw[orange] (8,2) -- (7,3);
+      \draw[orange] (8,2) -- (8,3);   
+      
+      \draw[blue,ultra thick] (1,4) -- (2,3) -- (3,2) -- (4,1) -- (5,1) -- (6,2) -- (8,2);
+      \fill[blue] (1,4) circle (3pt);
+      \fill[blue] (8,2) circle (3pt);
+      \fill[red] (4,1) circle (2pt);
+      \fill[red] (5,1) circle (2pt);
+      
+      \fill[red] (1,4) circle (2pt);
+      \node[below left] at (1,4) {$n_{start}$};
+      \fill[red] (8,2) circle (2pt);
+      \node[below left] at (8,2) {$n_{goal}$};
+      
+      \foreach \x in {0,1,2,2.95,3.05,4,5,5.95,6.05,7,8,9} {
+        \foreach \y in {0,9} {
+              \fill[red] (\x,\y) circle (2pt);
+              \fill[red] (\y,\x) circle (2pt);
+        }
+      }
+      
+      \foreach \x in {1,2,4,5,7,8} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\y + 0.05)};
+           \let\ya\pgfmathresult;
+            \pgfmathparse{(\y - 0.05)};
+           \let\yb\pgfmathresult;
+              \fill[red] (\x,\ya) circle (2pt);
+              \fill[red] (\x,\yb) circle (2pt);
+              \fill[red] (\ya,\x) circle (2pt);
+              \fill[red] (\yb,\x) circle (2pt);
+        }
+      }
+      
+       \foreach \x in {3,6} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\x + 0.05)};
+           \let\xa\pgfmathresult;
+            \pgfmathparse{(\x - 0.05)};
+           \let\xb\pgfmathresult;
+           \pgfmathparse{(\y + 0.05)};
+           \let\ya\pgfmathresult;
+              \fill[red] (\xa,\ya) circle (2pt);
+              \fill[red] (\xb,\ya) circle (2pt);
+              \fill[red] (\ya,\xa) circle (2pt);
+              \fill[red] (\ya,\xb) circle (2pt);
+        }
+      }
+      
+             \foreach \x in {3,6} {
+        \foreach \y in {3,6} {
+          \pgfmathparse{(\x + 0.05)};
+           \let\xa\pgfmathresult;
+            \pgfmathparse{(\x - 0.05)};
+           \let\xb\pgfmathresult;
+           \pgfmathparse{(\y - 0.05)};
+           \let\ya\pgfmathresult;
+              \fill[red] (\xa,\ya) circle (2pt);
+              \fill[red] (\xb,\ya) circle (2pt);
+              \fill[red] (\ya,\xa) circle (2pt);
+              \fill[red] (\ya,\xb) circle (2pt);
+        }
+      }
+      
+      \node at (4.5,-1) {(c) Traceback stage complete};
+      
+     
+    \end{tikzpicture}
+	    };
+	    
+\node (a) at (10,0) {
+    	\begin{tikzpicture}[scale=0.85,line width=0.5pt]
+	      	\filldraw[color=black!60,fill=black!40] (0,0) rectangle (2,3); 
+		\filldraw[color=black!60,fill=black!40] (1,7) rectangle (8,8); 
+		\filldraw[color=black!60,fill=black!40] (7,7) rectangle (8,5); 
+		\filldraw[color=black!60,fill=black!40] (2,4) rectangle (5,6);
+		\filldraw[color=black!60,fill=black!40] (3,2) rectangle (5,4); 
+		\filldraw[color=black!60,fill=black!40] (4,1) rectangle (5,2);  
+     	 	\draw[color=black!60] (0,0) grid (9,9);
+      		\draw[black] (0,0) -- (0,9);
+      		\draw[black] (0,0) -- (9,0);
+      		\draw[black] (9,9) -- (0,9);
+      		\draw[black] (9,9) -- (9,0);
+		\node[below left] at (1,4) {$start$};
+		\node[below left] at (8,2) {$goal$};
+		\fill[blue] (1,4) circle (3pt);
+      		\fill[blue] (8,2) circle (3pt);
+      		\draw[blue,ultra thick] (1,4) -- (2,3) -- (3,2) -- (4,1) -- (5,1) -- (6,2) -- (8,2);
+		
+		\node at (4.5,-1) {(d) Path $P_{M}$ through map $M$};
+	    \end{tikzpicture}
+	    };	
+
+    \end{tikzpicture}
+    \caption[Solution of {\em Block A*}]{Solution of {\em Block A*}}
+  %\label{fig:fig}
 \end{figure}
 
 
 \clearpage
 \section {Requirements analysis}
 
-As specified in the `Work to be done' section of my Proposal (see Appendix E), my project was divided into four sections. This section outlines the functional and non-functional requirements for the system, and their relative priorities using the MoSCoW system. \\
+As specified in the {\bfseries Work to be done} section of the Proposal (see {\bfseries Appendix E}), this project is logically composed of four parts. This section outlines the functional and non-functional requirements for each part, and their relative priorities using the MoSCoW system. \\
 \centerline {{\bf M} - Must; {\bf S} - Should; {\bf C} - Could; {\bf W} - Won't}
 
 \subsection{Testing simulator}
@@ -986,55 +1700,85 @@ As specified in the `Work to be done' section of my Proposal (see Appendix E), m
 
 \section {Testing}
 
-\todo{Preparation: testing \ldots}
+A thorough testing strategy was devised to reduce the chances of bugs being introduced into the code. Separate strategies were required for different modules of the system:
+
+\begin{description}
+\item[Simulator]\hfil \\
+{\em Core structural classes} --- basic functionality to be unit tested;\\
+{\em Line of sight algorithm} --- to be unit tested thoroughly, as its correctness will be assumed during testing of pathfinding algorithm implementations;\\
+{\em Pathfinding algorithms} --- correctness of all paths returned by to be optionally verified.
+\end{description}
+\begin{description}
+\item[User interface]\hfil \\
+{\em Use case scenarios} --- to be manually tested by human user.
+\end{description}
+\begin{description}
+\item[Data extraction scripts]\hfil \\
+{\em Exported CSVs} --- contents of CSV files to be unit tested.
+\end{description}
 
 \section {Design model}
 
 \noindent
-Having completed the preparation phase of the project, I refined the plan for the implementation phase from that presented in the Project Proposal (see Appendix ?). An incremental model of implementation was adopted, with new modules being developed and tested separately before being integrated into the work program. The milestones of the project were:
+Once the preparation phase of the project was completed, the plan for the implementation phase was refined from that presented in the Project Proposal (see Appendix ?). An incremental model of implementation was adopted, with new modules being developed and tested separately before being integrated into the work program. The milestones of the project were:
 \begin{description}
-\item {\em Milestone 1} - Maps of arbitrary size, coverage and clustering can be created and printed to system output.
-\item {\em Milestone 2} - Arbitrary maps can be converted to grape, and A* can be run on these maps. A visual representation of the path can be printed to system output.
-\item {\em Milestone 3} - Basic UI is built, including all functionality from {\em Milestone 2}. Basic path statistics are displayed.
-\item {\em Milestone 4} - Map saving, map loading and map creation functionality are present. This will facilitate debugging edge cases for more complex algorithms.
-\item {\em Milestone 5} - Line of sight, A* with post-smoothing, $\theta ^{*}$ and Lazy $\theta ^{*}$ are implemented.
-\item {\em Milestone 6} - Block A* is implemented.
-\item {\em Milestone 7} - Data extraction scripts are implemented.
+\item[Milestone 1]\hfil \\
+Maps of arbitrary size, coverage and clustering can be created and printed to system output.
+\item[Milestone 2]\hfil \\
+Arbitrary maps can be converted to graphs, and {\em Dijkstra} and {\em A*} can be run on these maps. A visual representation of the path can be printed to system output.
+\item[Milestone 3]\hfil \\
+Basic UI is built, including all functionality from {\bfseries Milestone 2}. Basic path statistics are displayed.
+\item[Milestone 4]\hfil \\
+Map saving, map loading and map creation functionality are present. This will facilitate debugging edge cases for more complex algorithms.
+\item[Milestone 5]\hfil \\
+{\em A* with post-smoothing}, {\em Theta*} and {\em Lazy Theta*} are implemented.
+\item[Milestone 6]\hfil \\
+{\em Block A*} is implemented.
+\item[Milestone 7]\hfil \\
+Data extraction scripts are implemented.
 \end{description}
 
 \section {Languages and tools}
 
+This section justifies the languages, libraries and tools that were chosen for this project.
+
 \begin{description}
   \item[Programming language] \hfill \\
-  {\em Java} - provides abstraction and class hierarchy to enable development of modular, extensible code.
+  {\em Java} --- provides abstraction and class hierarchy to enable development of modular, extensible code.
   \item[Libraries] \hfill \\
-  {\em Swing} - for graphical user interface design and {\em CSVWriter} for data export.
+  {\em Swing} --- for graphical user interface design;\\ 
+  {\em CSVWriter} --- for data export.\\
+  {\em JUnit} --- for unit testing.
   \item[Integrated development environment] \hfill \\
-  {\em Eclipse} - allows rapid development through integrated testing, refactoring and version control tools.
+  {\em Eclipse} --- allows rapid development through integrated testing, refactoring and version control tools.
   \item[Statistical analysis and visualisation] \hfill \\
-  {\em R} - an open-source statistical package, due to its flexibility and extensibility.
+  {\em R} --- open-source statistical package; chosen due to its flexibility and extensibility.
+  \item[Document preparation] \hfill \\
+  {\LaTeX} --- allows precise, integrated control over all aspects of document layout and style;\\
+  {\em Tikz} --- drawing package for \LaTeX\ that enables programmable diagram creation;\\
+  {\em algorithm2e} --- pseudo-code package for \LaTeX\ that enables integration with the parent document.
   \item[Backup] \hfill \\
-  {\em DropBox} and {\em Google Drive} - both of which maintain multiple shadow copies of my work in the cloud.
+  {\em DropBox} and {\em Google Drive} --- maintain multiple shadow copies of my work in the cloud.
   \item[Version Control]\hfill \\
-  {\em GitHub} - which facilitated exploring different implementation strategies by forking my core code repository.
+  {\em GitHub} --- facilitated exploring different implementation strategies by forking my core code repository.
   
 \end{description}
 
-\cleardoublepage
+%\cleardoublepage
 \chapter{Implementation}
 
-In this chapter I will give an overview of the implementation of the project, as well as investigating some of its more interesting features.\\
+This chapter provides an overview of the implementation of the project, and investigates some of its more interesting features.\\
 
 \noindent
-The chapter will be split into six parts: 
+The chapter is split into six parts: 
 \begin{description}
   \item{\bf Map generation}\\ \hfill  an explanation of the algorithm used to generate maps.
   \item{\bf Simulation}\\ \hfill an overview of the simulator, including graph generation and algorithm data.
-  \item{\bf Algorithms}\\ \hfill each of the algorithms will be covered, with specific attention given to Block A*.
+  \item{\bf Algorithms}\\ \hfill details of the implementation of each of the pathfinding algorithms, with specific attention given to {\em Block A*}.
   \item{\bf User Interface}\\ \hfill an overview of the graphical user interface. 
-  \item{\bf Testing}\\ \hfill an overview of the methods used to test the code for correctness.
-  \item{\bf Data extraction}\\ \hfill an explanation of how large volumes of data were extracted for statistical analysis.
-\end{description}
+  \item{\bf Data extraction}\\ \hfill an explanation of how large volumes of data are extracted for statistical analysis.
+  \item{\bf Testing}\\ \hfill an overview of the methods to test the code for correctness.
+  \end{description}
 
 \begin{figure}
   \centering
@@ -1072,10 +1816,10 @@ The chapter will be split into six parts:
 \newpage
 \section{Map generation}
 
-In order to reach reliable conclusions about the performance of the algorithms, I needed a way to generate large volumes of maps of a given resolution $N$, coverage percentage $C$ and clustering $D$. I devised an algorithm to pseudo-randomly create such maps. The algorithm creates maps of varying clustering by loosely approximating the idea of potential fields.\\
+In order to reach reliable conclusions about the performance of the algorithms, a method was required to generate large volumes of maps of a given size $N^{2}$, coverage percentage $C$ and clustering $D$ was require. A bespoke was devised for this project to pseudo-randomly create such maps. The algorithm creates maps of a specified level of clustering by loosely approximating the idea of potential fields.\\
 
 \noindent
-The input to the algorithm includes an integer matrix $m_{i,j}$ of size $N^{2}$ - where each element has been initialised to value 1. At any point in the algorithm, $m_{i,j}$'s value represents its `potential' - i.e. the chance that $m_{i,j}$ will be the next element set to 0 (i.e. blocked). The algorithm performs $C \times N^{2}$ iterations. In each iteration, it chooses a random number $r$ between $0$ and $\sum\limits_{i,j} m_{i,j}$. It then traverses the matrix row-by-row until the sum of the elements it has seen is at least $r$. The potential of the element that has been reached is set to $0$, and the potential of the surrounding elements is increased in a crude approximation of a potential field. The output is an integer matrix $m_{i,j}$ of size $N^{2}$ - where $C\%$ of the elements have value 0, which denotes a blocked cell, and the rest of the elements have value \textgreater $0$, which denotes a free cell. The array can then be parsed into a {\tt Map} by the {\tt Map} constructor.
+The input to the algorithm includes an integer matrix $m_{i,j}$ of size $N^{2}$ - where each element has been initialised to value 1. At any point in the algorithm, $m_{i,j}$'s value represents its `potential' - i.e. the chance that $m_{i,j}$ will be the next element set to 0 (i.e. blocked). The algorithm performs $C \times N^{2}$ iterations. In each iteration, it chooses a random number $r$ between $0$ and $\sum\limits_{i,j} m_{i,j}$. It then traverses the matrix row-by-row until the sum of the elements it has seen is at least $r$. The potential of the element that has been reached is set to $0$, and the potential of the surrounding elements is increased in a crude approximation of a potential field. The output is an integer matrix $m_{i,j}$ of size $N^{2}$ - where $C\%$ of the elements have value 0, which denotes a blocked cell \footnote{Note that this is not the same as our notation in the Preparation chapter, where a 0 denoted a free cell. The notation of 0 denoting a blocked cell is {\em only} used during the execution of the map generation algorithm.}, and the rest of the elements have value \textgreater $0$, which denotes a free cell. The array can then be parsed into a {\tt Map} by the {\tt Map} constructor.
 
 \begin{algorithm}[htp]
   \SetAlgoLined\DontPrintSemicolon
@@ -1530,7 +2274,7 @@ Using this scheme, the underlying implementation of my database was an array of 
       
 
     \end{tikzpicture}
-  \caption{Extract of the LDDB for block size of $3 \times 3$ - array of {\tt HashTable<PairOfCoords,Pair<double,List<Coord>>}s}
+  \caption[Extract of the LDDB for block size of $3 \times 3$]{Extract of the LDDB for block size of $3 \times 3$ - array of {\tt HashTable<PairOfCoords,Pair<double,List<Coord>>}s}
   %\label{fig:fig}
 \end{figure}
 
@@ -1592,7 +2336,7 @@ I will investigate the performance of the uncompressed and compressed LDDBs in t
 \footnotetext[1]{The exponential increase in size of LDDB would mean that the LDDB for block sizes of $5 \times 5$ or larger take so long to search that performance benefit diminishes.}
 \footnotetext[2]{Obtained by experimental results.}
 \footnotetext[3]{These savings could be improved further for sub maps of size {$2 \times 2$} and {$3 \times 3$} by using specific data-types depending on the submap size, but this was unnecessary, as the LDDB size was very small compared to the total available memory for sub maps of size{$2 \times 2$} and {$3 \times 3$}, and the LDDB only needs to be loaded into memory once per run of the program.}
-\footnotetext[4]{These sizes were significantly larger than those found in Yapp's paper, but his agents were only allowed to travel horizontally and vertically, so only 4 bits were needed to store the path length value.}
+\footnotetext[4]{These sizes were significantly larger than those found in Yap's paper, but his agents were only allowed to travel horizontally and vertically, so only 4 bits were needed to store the path length value.}
 
 \noindent
 {\bf Special case blocks: $block_{start}$ and $block_{goal}$} \\
@@ -1711,9 +2455,135 @@ void generateMaps
 \caption{Code snippet from {\tt DataExtraction} showing automation of {\tt Graph} creation}
 \end{figure}
 
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[scale=0.45,line width=0.5pt]
+    
+    %input
+    \filldraw[black!20] (-9,7) rectangle (-7,8);
+    \draw (-10,6) grid (-7,9);
+    \fill[black!60!green] (-8,6) circle (5pt);
+    \node[below left, black!60!green] at (-8,6) {$ingress$};
+    \fill[red] (-7,9) circle (5pt);
+    \node[above right, red] at (-7,9) {$egress$};
+    
+    %rotations
+    \draw[black!20] (-3,-1) rectangle (7,18);
+    \draw[green!40] (-2.8,7.8) rectangle (6.8,11.2);
+    
+    \filldraw[black!20] (1,13) rectangle (3,14);
+    \draw (0,12) grid (3,15);
+    \fill[black!60!green] (2,12) circle (5pt);
+    \fill[red] (3,15) circle (5pt);
+        
+    \filldraw[black!20] (1,8) rectangle (2,10);
+    \draw (0,8) grid (3,11);
+    \fill[black!60!green] (0,9) circle (5pt);
+    \fill[red] (3,8) circle (5pt);
+        
+    \filldraw[black!20] (0,5) rectangle (2,6);
+    \draw (0,4) grid (3,7);
+    \fill[black!60!green] (1,7) circle (5pt);
+    \fill[red] (0,4) circle (5pt);
+    
+    \filldraw[black!20] (1,1) rectangle (2,3);
+    \draw (0,0) grid (3,3);
+    \fill[black!60!green] (3,2) circle (5pt);
+    \fill[red] (0,3) circle (5pt);
+    
+    \draw[->] (-6,7.5) -- (-3,7.5);
+    \node[above] at (-4.5,7.5) {(a)};
+    
+    \node at (-1,17) {rotation};	\node at (5,17) {code};
+    \node at (-1.5,13.5) {0};		\node at (5,13.5) {0x18};
+    \node at (-1.5,9.5) {1};		\node at (5,9.5) {0x12};
+    \node at (-1.5,5.5) {2};		\node at (5,5.5) {0x30};
+    \node at (-1.5,1.5) {3};		\node at (5,1.5) {0x90};
+    
+    \draw[->] (7,9.5) -- (10,9.5);
+    \node[above] at (8.5,9.5) {(b)};
+   
+   %angle check
+    \filldraw[black!20] (12,8) rectangle (13,10);
+    \draw (11,8) grid (14,11);
+    \draw[orange] (11,9) -- (14,9);
+    \draw[orange] (11,9) -- (14,8);
+    \draw[orange] (11.5,9) arc (0:340:0.5);
+    \node[below left, orange] at (11,9) {$\alpha$};
+    \fill[black!60!green] (11,9) circle (5pt);
+    \fill[red] (14,8) circle (5pt);
+    
+    \draw[->] (15,9.5) -- (18,9.5);
+    \node[above] at (16.5,9.5) {(c)};
+    
+    %DB input
+    \filldraw[black!20] (20,8) rectangle (21,10);
+    \draw (19,8) grid (22,11);
+    \fill[red] (19,9) circle (5pt);
+    \fill[black!60!green] (22,8) circle (5pt);
+    
+    \draw[->] (23,9.5) -- (26,9.5);
+    \node[above] at (24.5,9.5) {(d)};
+    \draw (25.5,15) -- (28,15);
+    \draw (25.5,-12) -- (28,-12);
+    \draw (25.5,-12) -- (25.5,15);
+    \node at (26.5,1.5) {DB};
+        
+    \draw[<-] (23,-6.5) -- (26,-6.5);
+    \node[above] at (24.5,-6.5) {(e)};
+    
+    %DB output
+    \filldraw[black!20] (20,-8) rectangle (21,-6);
+    \draw (19,-8) grid (22,-5);
+    \fill[red] (19,-7) circle (5pt);
+    \fill[black!60!green] (22,-8) circle (5pt);
+    \fill[blue] (21,-6) circle (5pt);
+    \node[blue] at (21.5,-5.5) {$i_{1}$};
+    \fill[blue] (20,-6) circle (5pt);
+    \node[blue] at (20.5,-5.5) {$i_{2}$};
+    
+    \draw[<-] (15,-6.5) -- (18,-6.5);
+    \node[above] at (16.5,-6.5) {(f)};
+    
+    %flipped
+    \filldraw[black!20] (12,-8) rectangle (13,-6);
+    \draw (11,-8) grid (14,-5);
+    \fill[black!60!green] (11,-7) circle (5pt);
+    \fill[red] (14,-8) circle (5pt);
+    \fill[blue] (12,-6) circle (5pt);
+    \node[blue] at (12.5,-5.5) {$i_{1}$};
+    \fill[blue] (13,-6) circle (5pt);
+    \node[blue] at (13.5,-5.5) {$i_{2}$};
+    
+    \draw[<-] (4,-6.5) -- (10,-6.5);
+    \node[above] at (7,-6.5) {(g)};
+    
+    %rotated
+    \filldraw[black!20] (1,-7) rectangle (3,-6);
+    \draw (0,-8) grid (3,-5);
+    \fill[black!60!green] (2,-8) circle (5pt);
+    \fill[red] (3,-5) circle (5pt);
+    \fill[blue] (1,-7) circle (5pt);
+    \node[blue] at (0.5,-6.5) {$i_{1}$};
+    \fill[blue] (1,-6) circle (5pt);
+    \node[blue] at (0.5,-5.5) {$i_{2}$};
+    
+    \draw[<-] (-8.5,-6.5) -- (-1,-6.5);
+    \node[above] at (-3.75,-6.5) {(h)};
+
+
+    \end{tikzpicture}
+  \caption{my caption}
+  %\label{fig:fig}
+\end{figure}
+
+
 \chapter{Evaluation}
 
 \chapter{Conclusion}
+
+\bibliography{refs}{}
+\bibliographystyle{unsrt}
 
 \appendix
 

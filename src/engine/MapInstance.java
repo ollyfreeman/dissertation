@@ -120,8 +120,8 @@ public class MapInstance implements java.io.Serializable{
 				break;
 			case BlockAStar:
 				if(blockAStarData == null) {
-					BlockAStar_full_halved_rotSymm.loadDB("fullSChalvedRot");
-					blockAStarData =  new BlockAStar_full_halved_rotSymm(map,source,goal);
+					BlockAStar_semi.loadDB("semiSC");
+					blockAStarData =  new BlockAStar_semi(map,source,goal);
 					blockAStarData.go(graph,map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(blockAStarData);
@@ -176,8 +176,8 @@ public class MapInstance implements java.io.Serializable{
 		return path;
 	}
 	
-	protected boolean[][] getNodesExpandedArray(AlgorithmType algorithmType) {
-		boolean[][] nea;
+	protected int[][] getNodesExpandedArray(AlgorithmType algorithmType) {
+		int[][] nea;
 		try {
 			switch (algorithmType) {
 			case Dijkstra :

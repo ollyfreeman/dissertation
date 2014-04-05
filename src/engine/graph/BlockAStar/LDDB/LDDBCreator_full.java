@@ -51,7 +51,6 @@ public class LDDBCreator_full {
 		}
 		LDDB lddb = new LDDB(db);
 		saveDB(lddb);
-		//loadDB();
 	}
 
 	//mapCounter parameter only for debugging

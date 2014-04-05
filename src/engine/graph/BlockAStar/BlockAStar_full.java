@@ -17,11 +17,9 @@ public class BlockAStar_full extends BlockAStar_semi {
 
 	@Override
 	protected Node startAndGoalInSameBlock(Block startBlock, Block goalBlock, Map map) {
-		//Map m = new Map(map,goalBlock.getTopLeft(),blockSize,blockSize); not needed
 		double length = lddb.getLength(goalBlock.getCode(),new PairOfCoords(startInBlock,goalInBlock,blockSize));
 		ArrayList<Coordinate> intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(startInBlock,goalInBlock,blockSize)));
 		if(length != Double.POSITIVE_INFINITY) {
-			//nodesExpanded+=aStar.getNodesExpanded(); not needed
 			Node n = goalBlock.getNode(goalInBlock);
 			if(!startInBlock.equals(goalInBlock)) {
 				for(Coordinate c1 : intermediateNodes) {

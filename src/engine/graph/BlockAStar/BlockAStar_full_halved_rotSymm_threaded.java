@@ -14,15 +14,17 @@ import utility.Pair;
 import engine.AlgorithmData;
 import engine.graph.Graph;
 import engine.graph.Node;
-import engine.graph.BlockAStar.LDDB.compressedAsLong.LDDB;
 import engine.graph.BlockAStar.LDDB.PairOfCoords;
 import engine.map.Map;
+import engine.graph.BlockAStar.LDDB.compressedAsLong.rotSymm.LDDB;
+import engine.graph.BlockAStar.LDDB.compressedAsLong.rotSymm.BASNode;
+import engine.graph.BlockAStar.LDDB.compressedAsLong.rotSymm.Block;
 
-public class BlockAStar_full_halved extends AlgorithmData {
+public class BlockAStar_full_halved_rotSymm_threaded extends AlgorithmData {
 
 	protected static final long serialVersionUID = 1L;
 
-	protected static final int blockSize = 4;
+	protected static final int blockSize = 3;
 	protected static LDDB lddb;
 
 	protected Coordinate startInBlock,goalInBlock;
@@ -32,8 +34,16 @@ public class BlockAStar_full_halved extends AlgorithmData {
 	protected Block[][] blockArray;
 	
 	private HashSet<Coordinate> expanded = new HashSet<Coordinate>();
+	
+	//FOR THREADED IMPL
+	Block currentBlock;
+	//Block neighbourBlock;
+	LinkedList<Coordinate> y;
+	LinkedList<Coordinate> rotatedY;
+	PriorityQueue<Block> openSet;
+	ArrayList<Block> neighbourBlocks;
 
-	public BlockAStar_full_halved(Map map, Coordinate start, Coordinate goal) {
+	public BlockAStar_full_halved_rotSymm_threaded(Map map, Coordinate start, Coordinate goal) {
 		super();
 			this.source = start;
 			this.goal = goal;
@@ -46,7 +56,7 @@ public class BlockAStar_full_halved extends AlgorithmData {
 	@Override
 	public Pair<Node, int[][]> getPath(Graph graph, Map map, int[][] nea) {
 		//double startTime = System.nanoTime();
-		PriorityQueue<Block> openSet = new PriorityQueue<Block>();
+		openSet = new PriorityQueue<Block>();
 
 		//initialise
 		
@@ -63,10 +73,10 @@ public class BlockAStar_full_halved extends AlgorithmData {
 		openSet.add(startBlock);
 
 		while(!openSet.isEmpty() && openSet.peek().getHeapValue() < length) {
-			Block currentBlock = openSet.remove();
+			currentBlock = openSet.remove();
 			blockExpanded++;
 			currentBlock.setHeapValue(Double.POSITIVE_INFINITY);					//!!
-			List<Coordinate> ingressNodes = currentBlock.getIngressNodes();
+			LinkedList<Coordinate> ingressNodes = currentBlock.getIngressNodes();
 			nodesExpanded+=ingressNodes.size();
 			for(int i=0;i<ingressNodes.size();i++) {
 				//expanded.add(new Coordinate(currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX(), currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()));
@@ -79,100 +89,143 @@ public class BlockAStar_full_halved extends AlgorithmData {
 					}
 				}
 			}
-			expand(currentBlock,ingressNodes, openSet);
+			expand(ingressNodes, openSet);
 		}
 		if(length!=Double.POSITIVE_INFINITY) {
 			//stopTime = System.nanoTime();
 			//System.out.println("Main time: = " +((stopTime-startTime)/1000000));
-			//System.out.println("Node expansions: " + nodesExpanded + ", nodes expanded:" +  expanded.size() + ", block expansions: " + blockExpanded);
+			System.out.println("Node expansions: " + nodesExpanded + ", nodes expanded:" +  expanded.size() + ", block expansions: " + blockExpanded);
+			//System.out.println("Length: " + length);
 			return new Pair<Node,int[][]>(postProcessing(startBlock,goalBlock,map),nea);
 		} else {
+			//System.out.println("Length: " + length);
 			return new Pair<Node,int[][]>(null,nea);
 		}
 	}
 
-	protected void expand(Block currentBlock, List<Coordinate> y, PriorityQueue<Block> openSet) {
-		for(Block neighbourBlock : currentBlock.getNeighbours()) {
-			LinkedList<Coordinate> ListX = new LinkedList<Coordinate>();		//egress cells in currentBlock for this neighbourBlock
-			LinkedList<Coordinate> ListXPrime = new LinkedList<Coordinate>();	//corresponding ingress cell in the neighbourBlock
-			Coordinate neighbourTL = neighbourBlock.getTopLeft();				//i.e. the topLeft coordinate of the neighbour
-			Coordinate currentTL = currentBlock.getTopLeft();
+	protected void expand(LinkedList<Coordinate> ingressNodes, PriorityQueue<Block> openSet) {
+		y=ingressNodes;
+		rotatedY = new LinkedList<Coordinate>();
+		for(int i=0;i<y.size();i++) {
+			rotatedY.add(i, currentBlock.adjustCoordinates(y.get(i), true));
+		}
+		neighbourBlocks = currentBlock.getNeighbours();
+		
+		Thread thread = new Thread(){
+			public void run(){
+				for(int i=0;i<neighbourBlocks.size()/2;i++) {
+					expandBody(neighbourBlocks.get(i));
+				}  
+			}
+		};
+		thread.start();
+		for(int i=neighbourBlocks.size()/2;i<neighbourBlocks.size();i++) {
+			expandBody(neighbourBlocks.get(i));
+		}
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println("thread error");
+		}
+		
+		
 
-			if(neighbourTL.getY() < currentTL.getY() && neighbourTL.getX() < currentTL.getX()) {
-				ListX.add(new Coordinate(0,0));
-				ListXPrime.add(new Coordinate(blockSize,blockSize));
-			} else if(neighbourTL.getY() < currentTL.getY() && neighbourTL.getX() == currentTL.getX()) {
-				for(int i=1;i<blockSize;i++) {
-					ListX.add(new Coordinate(i,0));
-					ListXPrime.add(new Coordinate(i,blockSize));
-				}
-			} else if(neighbourTL.getY() < currentTL.getY() && neighbourTL.getX() > currentTL.getX()) {
-				ListX.add(new Coordinate(blockSize,0));
-				ListXPrime.add(new Coordinate(0,blockSize));
-			} else if(neighbourTL.getX() > currentTL.getX() && neighbourTL.getY() == currentTL.getY()) {
-				for(int i=1;i<blockSize;i++) {
-					ListX.add(new Coordinate(blockSize,i));
-					ListXPrime.add(new Coordinate(0,i));
-				}
-			} else if(neighbourTL.getY() > currentTL.getY() && neighbourTL.getX() > currentTL.getX()) {
-				ListX.add(new Coordinate(blockSize,blockSize));
-				ListXPrime.add(new Coordinate(0,0));
-			} else if(neighbourTL.getY() > currentTL.getY() && neighbourTL.getX() == currentTL.getX()) {
-				for(int i=1;i<blockSize;i++) {
-					ListX.add(new Coordinate(i,blockSize));
-					ListXPrime.add(new Coordinate(i,0));
-				} 
-			} else if(neighbourTL.getY() > currentTL.getY() && neighbourTL.getX() < currentTL.getX()) {
-				ListX.add(new Coordinate(0,blockSize));
-				ListXPrime.add(new Coordinate(blockSize,0));
-			} else if(neighbourTL.getX() < currentTL.getX() && neighbourTL.getY() == currentTL.getY()) {
-				for(int i=1;i<blockSize;i++) {
-					ListX.add(new Coordinate(0,i));
-					ListXPrime.add(new Coordinate(blockSize,i));
-				}
-			}else {
-				System.out.println("Neighbour error!");
-			}
+	}
+	
+	protected void expandBody(Block neighbourBlock) {
+		LinkedList<Coordinate> ListX = new LinkedList<Coordinate>();		//egress cells in currentBlock for this neighbourBlock
+		LinkedList<Coordinate> ListXPrime = new LinkedList<Coordinate>();	//corresponding ingress cell in the neighbourBlock
+		LinkedList<Coordinate> rotatedX = new LinkedList<Coordinate>();
+		Coordinate neighbourTL = neighbourBlock.getTopLeft();				//i.e. the topLeft coordinate of the neighbour
+		Coordinate currentTL = currentBlock.getTopLeft();
 
-			LinkedList<Coordinate> ListXPrimeUpdated = new LinkedList<Coordinate>();
-			for(int i=0;i<ListX.size();i++) {
-				Coordinate x = ListX.get(i);
-				for(Coordinate c : y) {
-					double length;
-					if((c.getX()<=x.getX() && c.getY()==x.getY()) || (x.getY()>c.getY())) {
-						length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(c,x,blockSize));
-					} else {
-						length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(x,c,blockSize));
-					}if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
-						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
-						//parent of x is c
-						currentBlock.setParent(x, currentBlock.getNode(c));
-					}
-				}
-				Coordinate xPrime = ListXPrime.get(i);
-				double xPrimeG = neighbourBlock.getGValue(xPrime);
-				double xG = currentBlock.getGValue(x);
-				if(xG < xPrimeG) {
-					neighbourBlock.setGValue(xPrime,xG);
-					ListXPrimeUpdated.add(xPrime);
-					//parent of xPrime is x
-					neighbourBlock.setParent(xPrime, currentBlock.getNode(x));
+		if(neighbourTL.getY() < currentTL.getY() && neighbourTL.getX() < currentTL.getX()) {
+			ListX.add(new Coordinate(0,0));
+			ListXPrime.add(new Coordinate(blockSize,blockSize));
+			rotatedX = currentBlock.getRotatedEgress(0);
+		} else if(neighbourTL.getY() < currentTL.getY() && neighbourTL.getX() == currentTL.getX()) {
+			for(int i=1;i<blockSize;i++) {
+				ListX.add(new Coordinate(i,0));
+				ListXPrime.add(new Coordinate(i,blockSize));
+			}
+			rotatedX = currentBlock.getRotatedEgress(1);
+		} else if(neighbourTL.getY() < currentTL.getY() && neighbourTL.getX() > currentTL.getX()) {
+			ListX.add(new Coordinate(blockSize,0));
+			ListXPrime.add(new Coordinate(0,blockSize));
+			rotatedX = currentBlock.getRotatedEgress(2);
+		} else if(neighbourTL.getX() > currentTL.getX() && neighbourTL.getY() == currentTL.getY()) {
+			for(int i=1;i<blockSize;i++) {
+				ListX.add(new Coordinate(blockSize,i));
+				ListXPrime.add(new Coordinate(0,i));
+			}
+			rotatedX = currentBlock.getRotatedEgress(3);
+		} else if(neighbourTL.getY() > currentTL.getY() && neighbourTL.getX() > currentTL.getX()) {
+			ListX.add(new Coordinate(blockSize,blockSize));
+			ListXPrime.add(new Coordinate(0,0));
+			rotatedX = currentBlock.getRotatedEgress(4);
+		} else if(neighbourTL.getY() > currentTL.getY() && neighbourTL.getX() == currentTL.getX()) {
+			for(int i=1;i<blockSize;i++) {
+				ListX.add(new Coordinate(i,blockSize));
+				ListXPrime.add(new Coordinate(i,0));
+			}
+			rotatedX = currentBlock.getRotatedEgress(5); 
+		} else if(neighbourTL.getY() > currentTL.getY() && neighbourTL.getX() < currentTL.getX()) {
+			ListX.add(new Coordinate(0,blockSize));
+			ListXPrime.add(new Coordinate(blockSize,0));
+			rotatedX = currentBlock.getRotatedEgress(6);
+		} else if(neighbourTL.getX() < currentTL.getX() && neighbourTL.getY() == currentTL.getY()) {
+			for(int i=1;i<blockSize;i++) {
+				ListX.add(new Coordinate(0,i));
+				ListXPrime.add(new Coordinate(blockSize,i));
+			}
+			rotatedX = currentBlock.getRotatedEgress(7);
+		}else {
+			System.out.println("Neighbour error!");
+		}
 
+		LinkedList<Coordinate> ListXPrimeUpdated = new LinkedList<Coordinate>();
+		for(int i=0;i<ListX.size();i++) {
+			Coordinate x = ListX.get(i);
+			Coordinate out = rotatedX.get(i);
+			for(int j=0;j<y.size();j++) {
+				double length;
+				Coordinate in = rotatedY.get(j);
+				if((in.getX()<=out.getX() && in.getY()==out.getY()) || (out.getY()>in.getY())) {
+					length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(in,out,blockSize));
+				} else {
+					length = lddb.getLength(currentBlock.getCode(),new PairOfCoords(out,in,blockSize));
+				}
+				if(currentBlock.getGValue(y.get(j)) + length < currentBlock.getGValue(x)) {
+					currentBlock.setGValue(x, currentBlock.getGValue(y.get(j)) + length);
+					//parent of x is c
+					currentBlock.setParent(x, currentBlock.getNode(y.get(j)));
 				}
 			}
-			double newHeapValue = Double.POSITIVE_INFINITY;
-			for(Coordinate c : ListXPrimeUpdated) {
-				if(neighbourBlock.getGValue(c)+neighbourBlock.getHValue(c) < newHeapValue) {
-					newHeapValue = neighbourBlock.getGValue(c)+neighbourBlock.getHValue(c);
-				}
+			//System.out.println();
+			Coordinate xPrime = ListXPrime.get(i);
+			double xPrimeG = neighbourBlock.getGValue(xPrime);
+			double xG = currentBlock.getGValue(x);
+			if(xG < xPrimeG) {
+				neighbourBlock.setGValue(xPrime,xG);
+				ListXPrimeUpdated.add(xPrime);
+				//parent of xPrime is x
+				neighbourBlock.setParent(xPrime, currentBlock.getNode(x));
+
 			}
-			if(newHeapValue < neighbourBlock.getHeapValue()) {
-				neighbourBlock.setHeapValue(newHeapValue);
-				if(openSet.contains(neighbourBlock)) {
-					openSet.remove(neighbourBlock);
-				}
-				openSet.add(neighbourBlock);
+		}
+		double newHeapValue = Double.POSITIVE_INFINITY;
+		for(Coordinate c : ListXPrimeUpdated) {
+			if(neighbourBlock.getGValue(c)+neighbourBlock.getHValue(c) < newHeapValue) {
+				newHeapValue = neighbourBlock.getGValue(c)+neighbourBlock.getHValue(c);
 			}
+		}
+		if(newHeapValue < neighbourBlock.getHeapValue()) {
+			neighbourBlock.setHeapValue(newHeapValue);
+			if(openSet.contains(neighbourBlock)) {
+				openSet.remove(neighbourBlock);
+			}
+			openSet.add(neighbourBlock);
 		}
 	}
 
@@ -182,7 +235,7 @@ public class BlockAStar_full_halved extends AlgorithmData {
 		Block[][] blockArray = new Block[blockArrayWidth][blockArrayHeight];
 		for(int j=0; j<blockArrayHeight;j++) {
 			for(int i=0; i<blockArrayWidth;i++) {
-				blockArray[i][j] = new Block(getMapCode(new Coordinate(i*blockSize,j*blockSize),map),blockSize,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
+				blockArray[i][j] = new Block(map,new Coordinate(i*(blockSize),j*(blockSize)),blockSize,this.goal);
 			}
 		}
 		Coordinate[] neighbourBlocks = {new Coordinate(-1,-1),new Coordinate(0,-1),new Coordinate(1,-1),new Coordinate(1,0),new Coordinate(1,1),new Coordinate(0,1),new Coordinate(-1,1),new Coordinate(-1,0)};
@@ -206,17 +259,29 @@ public class BlockAStar_full_halved extends AlgorithmData {
 		for(int i=0; i<blockSize;i++) {
 			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
-				double length;
-				if((startInBlock.getX()<=c.getX() && startInBlock.getY()==c.getY()) || (c.getY()>startInBlock.getY())) {
-					length = lddb.getLength(startBlock.getCode(),new PairOfCoords(startInBlock,c,blockSize));
+				float length;
+				ArrayList<Coordinate> intermediateNodes;
+				int j,jLimit,jStep;
+				Coordinate in = startBlock.adjustCoordinates(startInBlock,true);
+				Coordinate out = startBlock.adjustCoordinates(c,true);
+				if((in.getX()<=out.getX() && in.getY()==out.getY()) || (out.getY()>in.getY())) {
+					length = lddb.getLength(startBlock.getCode(),(new PairOfCoords(in,out,blockSize)));
+					intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords(in,out,blockSize)));
+					j = intermediateNodes.size()-1;
+					jLimit = -1;
+					jStep = -1;
 				} else {
-					length = lddb.getLength(startBlock.getCode(),new PairOfCoords(c,startInBlock,blockSize));
+					length = lddb.getLength(startBlock.getCode(),(new PairOfCoords(out,in,blockSize)));
+					intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords(out,in,blockSize)));
+					j = 0;
+					jLimit = intermediateNodes.size();
+					jStep = 1;
 				}
-				ArrayList<Coordinate> intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords(startInBlock,c,blockSize)));
 				startBlock.setGValue(c, length);
 				if(!c.equals(startInBlock)) {
 					Node n = startBlock.getNode(c);
-					for(Coordinate c1 : intermediateNodes) {
+					for(;j!=jLimit;j+=jStep) {
+						Coordinate c1 = startBlock.adjustCoordinates(intermediateNodes.get(j),false);
 						n.setParent(startBlock.getNode(c1));
 						n = startBlock.getNode(c1);
 					}
@@ -248,10 +313,12 @@ public class BlockAStar_full_halved extends AlgorithmData {
 			Coordinate[] outArray ={new Coordinate(i,0),new Coordinate(blockSize,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};//Coordinate[] outArray = {new Coordinate(i,0),new Coordinate(0,i),new Coordinate(blockSize-i,blockSize),new Coordinate(0,blockSize-i)};
 			for(Coordinate c : outArray) {
 				double length;
-				if((c.getX()<=goalInBlock.getX() && c.getY()==goalInBlock.getY()) || (goalInBlock.getY()>c.getY())) {
-					length = lddb.getLength(goalBlock.getCode(),new PairOfCoords(c,goalInBlock,blockSize));
+				Coordinate in = goalBlock.adjustCoordinates(c,true);
+				Coordinate out = goalBlock.adjustCoordinates(goalInBlock,true);
+				if((in.getX()<=out.getX() && in.getY()==out.getY()) || (out.getY()>in.getY())) {
+					length = lddb.getLength(goalBlock.getCode(),new PairOfCoords(in,out,blockSize));
 				} else {
-					length = lddb.getLength(goalBlock.getCode(),new PairOfCoords(goalInBlock,c,blockSize));
+					length = lddb.getLength(goalBlock.getCode(),new PairOfCoords(out,in,blockSize));
 				}
 				goalBlock.setHValue(c, length);
 			}
@@ -263,15 +330,17 @@ public class BlockAStar_full_halved extends AlgorithmData {
 		float length;
 		ArrayList<Coordinate> intermediateNodes;
 		int j,jLimit,jStep;
-		if((startInBlock.getX()<=goalInBlock.getX() && startInBlock.getY()==goalInBlock.getY()) || (goalInBlock.getY()>startInBlock.getY())) {
-			length = lddb.getLength(goalBlock.getCode(),(new PairOfCoords(startInBlock,goalInBlock,blockSize)));
-			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(startInBlock,goalInBlock,blockSize)));
+		Coordinate in = goalBlock.adjustCoordinates(startInBlock,true);
+		Coordinate out = goalBlock.adjustCoordinates(goalInBlock,true);
+		if((in.getX()<=out.getX() && in.getY()==out.getY()) || (out.getY()>in.getY())) {
+			length = lddb.getLength(goalBlock.getCode(),(new PairOfCoords(in,out,blockSize)));
+			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(in,out,blockSize)));
 			j = intermediateNodes.size()-1;
 			jLimit = -1;
 			jStep = -1;
 		} else {
-			length = lddb.getLength(goalBlock.getCode(),(new PairOfCoords(goalInBlock,startInBlock,blockSize)));
-			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(goalInBlock,startInBlock,blockSize)));
+			length = lddb.getLength(goalBlock.getCode(),(new PairOfCoords(out,in,blockSize)));
+			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(out,in,blockSize)));
 			j = 0;
 			jLimit = intermediateNodes.size();
 			jStep = 1;
@@ -280,7 +349,7 @@ public class BlockAStar_full_halved extends AlgorithmData {
 			Node n = goalBlock.getNode(goalInBlock);
 			if(!startInBlock.equals(goalInBlock)) {
 				for(;j!=jLimit;j+=jStep) {
-					Coordinate c1 = intermediateNodes.get(j);
+					Coordinate c1 = goalBlock.adjustCoordinates(intermediateNodes.get(j),false);
 					n.setParent(goalBlock.getNode(c1));
 					n = goalBlock.getNode(c1);
 				}
@@ -313,7 +382,6 @@ public class BlockAStar_full_halved extends AlgorithmData {
 	}
 
 	protected Node postProcessing(Block startBlock, Block goalBlock, Map map) {
-		//double startTime = System.nanoTime();
 		BASNode goal = goalBlock.getNode(goalInBlock);
 		//post processing
 		//add in intermediate nodes
@@ -333,20 +401,22 @@ public class BlockAStar_full_halved extends AlgorithmData {
 		}
 		List<Coordinate> intermediateNodes;	
 		int j, jLimit, jStep;
-		if((minGplusHCoordinate.getX()<=goalInBlock.getX() && minGplusHCoordinate.getY()==goalInBlock.getY()) || (goalInBlock.getY()>minGplusHCoordinate.getY())) {
-			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(minGplusHCoordinate,goalInBlock,blockSize)));
+		Coordinate in = goalBlock.adjustCoordinates(minGplusHCoordinate,true);
+		Coordinate out = goalBlock.adjustCoordinates(goalInBlock,true);
+		if((in.getX()<=out.getX() && in.getY()==out.getY()) || (out.getY()>in.getY())) {
+			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(in,out,blockSize)));
 			j = intermediateNodes.size()-1;
 			jLimit = -1;
 			jStep = -1;
 		} else {
-			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(goalInBlock,minGplusHCoordinate,blockSize)));
+			intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(out,in,blockSize)));
 			j = 0;
 			jLimit = intermediateNodes.size();
 			jStep = 1;
 		}
 		if(!minGplusHCoordinate.equals(goalInBlock)) {
 			for(;j!=jLimit;j+=jStep) {
-				Coordinate c1 = intermediateNodes.get(j);
+				Coordinate c1 = goalBlock.adjustCoordinates(intermediateNodes.get(j),false);
 				n.setParent(goalBlock.getNode(c1));
 				n = goalBlock.getNode(c1);
 			}
@@ -357,21 +427,21 @@ public class BlockAStar_full_halved extends AlgorithmData {
 		while(n != null && n.getParent() != null) {
 			BASNode parent = (BASNode) n.getParent();
 			if(n.getBlock() == parent.getBlock() && !n.getBlock().equals(startBlock)) {
-				Coordinate from = new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY());
-				Coordinate to = new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY());
-				if((from.getX()<=to.getX() && from.getY()==to.getY()) || (to.getY()>from.getY())) {
-					intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(from,to,blockSize)));
+				in = n.getBlock().adjustCoordinates(new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY()), true);
+				out = n.getBlock().adjustCoordinates(new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY()),true);
+				if((in.getX()<=out.getX() && in.getY()==out.getY()) || (out.getY()>in.getY())) {
+					intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords(in,out,blockSize)));
 					j = intermediateNodes.size()-1;
 					jLimit = -1;
 					jStep = -1;
 				} else {
-					intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords(to,from,blockSize)));
+					intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords(out,in,blockSize)));
 					j = 0;
 					jLimit = intermediateNodes.size();
 					jStep = 1;
 				}
 				for(;j!=jLimit;j+=jStep) {
-					Coordinate c = intermediateNodes.get(j);
+					Coordinate c = n.getBlock().adjustCoordinates(intermediateNodes.get(j),false);
 					nNew = new BASNode(new Coordinate(c.getX()+n.getBlock().getTopLeft().getX(),c.getY()+n.getBlock().getTopLeft().getY()),n.getBlock());
 					n.setParent(nNew);
 					n = nNew;
@@ -396,8 +466,6 @@ public class BlockAStar_full_halved extends AlgorithmData {
 				}
 			}
 		}
-		//double stopTime = System.nanoTime();
-		//System.out.println("Post: "+ ((stopTime-startTime)/1000000));
 		return (Node) goal;
 	}
 

@@ -18,7 +18,7 @@ public class AStarSmoothed extends AStar {
 	}
 	
 	@Override
-	protected boolean goalTest(Node current, Node goal, Map map) {
+	protected boolean goalTest(Node current, Node goal, Map map,int[][] nea) {
 		if(!current.getCoordinate().equals(goal.getCoordinate())) {
 			return false;
 		} else {
@@ -30,6 +30,7 @@ public class AStarSmoothed extends AStar {
 				target = null;
 			}
 			while(target != null) {
+				nea[n.getX()][n.getY()]++;
 				if(LineOfSight.isVisible_edge_zeroWidth(n,target,map,false)) {
 					n.setParent(target);
 					target = target.getParent();

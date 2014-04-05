@@ -39,6 +39,7 @@ public class LDDB implements java.io.Serializable {
 		return aL;
 	}
 	
+	//used by the creators, not by the algorithm itself
 	public static int getListCode(ArrayList<Coordinate> aL) {
 		int listCode = 0;
 		for(Coordinate c : aL) {

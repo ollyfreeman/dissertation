@@ -19,6 +19,8 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static float[][] distances = calculateDistances();
+	
 	protected transient Graph graph;		//when collecting data
 	private transient Node goalNode;
 	protected Coordinate source;
@@ -33,7 +35,7 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	private double algorithmTime;
 	protected double graphCreationTime;
 	private int nodesExpanded;
-	private boolean[][] nodesExpandedArray;
+	private int[][] nodesExpandedArray;
 	private LinkedList<Coordinate> path;
 	
 	public AlgorithmData() {
@@ -45,8 +47,8 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		}
 		this.source = graph.getSource().getCoordinate();
 		this.goal = graph.getGoal().getCoordinate();
-		Pair<Node,boolean[][]> p0;
-		nodesExpandedArray = new boolean[map.getWidth()+1][map.getHeight()+1];
+		Pair<Node,int[][]> p0;
+		nodesExpandedArray = new int[map.getWidth()+1][map.getHeight()+1];
 		double startTime = System.nanoTime();
 		p0  = this.getPath(graph, map, nodesExpandedArray);
 		double endTime = System.nanoTime();
@@ -56,12 +58,11 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		this.nodesExpanded = 0;
 		for(int i=0; i<this.nodesExpandedArray.length;i++) {
 			for(int j=0; j<this.nodesExpandedArray[0].length;j++) {
-				if(this.nodesExpandedArray[i][j]) {
-					this.nodesExpanded++;
-				}
+				//if(this.nodesExpandedArray[i][j]) {
+					this.nodesExpanded+=this.nodesExpandedArray[i][j];
+				//}
 			}
 		}
-		
 		Pair<Pair<Double,Double>,LinkedList<Coordinate>> p1 = calculateDistanceAnglePath();
 		this.distance = p1.get0().get0();
 		this.angle = p1.get0().get1();
@@ -71,7 +72,7 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	/*
 	 * returns the number of nodes expanded during execution
 	 */
-	protected abstract Pair<Node,boolean[][]> getPath(Graph graph, Map map, boolean[][] nodesExpandedArray);
+	protected abstract Pair<Node,int[][]> getPath(Graph graph, Map map, int[][] nodesExpandedArray);
 
 	private Pair<Pair<Double,Double>,LinkedList<Coordinate>> calculateDistanceAnglePath() {
 		Node n = goalNode;
@@ -120,7 +121,7 @@ public abstract class AlgorithmData implements java.io.Serializable {
 		return path;
 	}
 	
-	public boolean[][] getNodesExpandedArray() {
+	public int[][] getNodesExpandedArray() {
 		return this.nodesExpandedArray;
 	}
 	
@@ -132,9 +133,10 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	 * helper method - gets Euclidean distance between 2 nodes
 	 */
 	protected float getDistance(Node n1, Node n2) {
-		double xDiff = n1.getX() - n2.getX();
-		double yDiff = n1.getY() - n2.getY();
-		return (float) Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+		int xDiff = n1.getX() - n2.getX();
+		int yDiff = n1.getY() - n2.getY();
+		//return (float) Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+		return distances[Math.abs(xDiff)][Math.abs(yDiff)];
 	}
 	
 	/*
@@ -156,6 +158,16 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	}
 	public double getGraphCreationTime() {
 		return this.graphCreationTime;
+	}
+	
+	private static float[][] calculateDistances() {
+		float[][] output = new float[201][201];
+		for(int i=0;i<201;i++) {
+			for(int j=0;j<201;j++) {
+				output[i][j] = (float) Math.sqrt(i*i + j*j);
+			}
+		}
+		return output;
 	}
 
 

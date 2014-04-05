@@ -17,7 +17,7 @@ import utility.Coordinate;
 
 public class LDDBCreator_semi {
 
-	private static int blockSize = 4;
+	private static int blockSize = 2;
 
 	public static void createDB() {
 		int totalMaps = (int) Math.pow(2,blockSize*blockSize);

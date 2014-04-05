@@ -64,7 +64,7 @@ public class GUICoordinator {
 		drawingPanel.drawPath(path, color);
 	}
 	
-	public void drawNodes(boolean[][] nea, Color color) {
+	public void drawNodes(int[][] nea, Color color) {
 		drawingPanel.drawNodes(nea, color);
 	}
 	

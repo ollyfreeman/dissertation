@@ -46,7 +46,7 @@ public class BlockAStar_full_halved_rotSymm extends AlgorithmData {
 	}
 
 	@Override
-	public Pair<Node, boolean[][]> getPath(Graph graph, Map map, boolean[][] nea) {
+	public Pair<Node, int[][]> getPath(Graph graph, Map map, int[][] nea) {
 		//double startTime = System.nanoTime();
 		PriorityQueue<Block> openSet = new PriorityQueue<Block>();
 
@@ -57,7 +57,7 @@ public class BlockAStar_full_halved_rotSymm extends AlgorithmData {
 		//double stopTime = System.nanoTime();
 		//System.out.println("Init time: = " + ((stopTime-startTime)/1000000));
 		if(startBlock == goalBlock) {
-			return new Pair<Node,boolean[][]>(startAndGoalInSameBlock(startBlock,goalBlock,map),nea);
+			return new Pair<Node,int[][]>(startAndGoalInSameBlock(startBlock,goalBlock,map),nea);
 		}
 		
 		//startTime = System.nanoTime();
@@ -72,7 +72,7 @@ public class BlockAStar_full_halved_rotSymm extends AlgorithmData {
 			nodesExpanded+=ingressNodes.size();
 			for(int i=0;i<ingressNodes.size();i++) {
 				//expanded.add(new Coordinate(currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX(), currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()));
-				//nea[currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX()][currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()] = true;
+				nea[currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX()][currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()]++;
 			}
 			if(currentBlock == goalBlock) {
 				for(Coordinate c : ingressNodes) {
@@ -88,10 +88,10 @@ public class BlockAStar_full_halved_rotSymm extends AlgorithmData {
 			//System.out.println("Main time: = " +((stopTime-startTime)/1000000));
 			//System.out.println("Node expansions: " + nodesExpanded + ", nodes expanded:" +  expanded.size() + ", block expansions: " + blockExpanded);
 			//System.out.println("Length: " + length);
-			return new Pair<Node,boolean[][]>(postProcessing(startBlock,goalBlock,map),nea);
+			return new Pair<Node,int[][]>(postProcessing(startBlock,goalBlock,map),nea);
 		} else {
 			//System.out.println("Length: " + length);
-			return new Pair<Node,boolean[][]>(null,nea);
+			return new Pair<Node,int[][]>(null,nea);
 		}
 	}
 

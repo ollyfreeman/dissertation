@@ -1,7 +1,6 @@
 package engine.graph.BlockAStar.LDDB.compressedAsLong.rotSymm;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.LinkedList;
 
 import engine.graph.Node;

@@ -2,24 +2,28 @@
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {1.1}{\ignorespaces Shortest paths through maps and graphs}}{1}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces A node and its eight neighbours\relax }}{4}
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Different graph representations for a given map\relax }}{5}
-\contentsline {figure}{\numberline {2.3}{\ignorespaces A valid path for an agent modelled as a point\relax }}{5}
-\contentsline {figure}{\numberline {2.4}{\ignorespaces A* with post-smoothing\relax }}{7}
-\contentsline {figure}{\numberline {2.5}{\ignorespaces Block A*: map of {$ 9 \times 9$} cells is split into 9 blocks of {$ 3 \times 3$} cells\relax }}{11}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A map of size $4^{2}$\relax }}{3}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces A valid path for an agent modelled as a point\relax }}{4}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Octile lattice and full lattice of size $4^{2}$\relax }}{4}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Graph representations of map $M$}}{6}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces A* with post-smoothing\relax }}{9}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Set of blocks}}{13}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Anatomy of a block}}{13}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Solution of {\em Block A*}}}{16}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Flow of the user interface and simulator\relax }}{16}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Two iterations of {\tt GenerateMap} with $R$=4 and $D$=2\relax }}{16}
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Code snippet showing {\tt Node} creation for grid-based graphs\relax }}{18}
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Line of sight algorithm\relax }}{19}
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Composition of {\tt MapInstance}\relax }}{20}
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Inheritance structure of algorithms\relax }}{21}
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Extract of the LDDB for block size of $3 \times 3$ - array of {\tt HashTable<PairOfCoords,Pair<double,List<Coord>>}s\relax }}{23}
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Encoding scheme for {\tt PairOfCoords} in the compressed LDDB\relax }}{24}
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Encoding scheme for {\tt List<Coordinate>} in the compressed LDDB\relax }}{24}
-\contentsline {figure}{\numberline {3.10}{\ignorespaces User interface in map creation mode\relax }}{26}
-\contentsline {figure}{\numberline {3.11}{\ignorespaces User interface displaying paths for a generated map\relax }}{27}
-\contentsline {figure}{\numberline {3.12}{\ignorespaces Extract from a CSV file exported by {\tt DataExtract}\relax }}{27}
-\contentsline {figure}{\numberline {3.13}{\ignorespaces Code snippet from {\tt DataExtraction} showing automation of {\tt Graph} creation\relax }}{28}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Flow of the user interface and simulator\relax }}{22}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Two iterations of {\tt GenerateMap} with $R$=4 and $D$=2\relax }}{22}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Code snippet showing {\tt Node} creation for grid-based graphs\relax }}{24}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Line of sight algorithm\relax }}{25}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Composition of {\tt MapInstance}\relax }}{26}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Inheritance structure of algorithms\relax }}{27}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Extract of the LDDB for block size of $3 \times 3$}}{29}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Encoding scheme for {\tt PairOfCoords} in the compressed LDDB\relax }}{30}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Encoding scheme for {\tt List<Coordinate>} in the compressed LDDB\relax }}{30}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces User interface in map creation mode\relax }}{32}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces User interface displaying paths for a generated map\relax }}{33}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Extract from a CSV file exported by {\tt DataExtract}\relax }}{33}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Code snippet from {\tt DataExtraction} showing automation of {\tt Graph} creation\relax }}{34}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces my caption\relax }}{34}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
