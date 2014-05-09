@@ -21,14 +21,14 @@ import gui.GUICoordinator;
  * Its main job is to create, load, save and delegate to the current MapInstance.
  */
 public class Engine {
-	
+
 	private MapInstance mapInstance;
 	private GUICoordinator coordinator;
-	
+
 	public Engine(GUICoordinator coordinator) {
 		this.coordinator = coordinator;
 	}
-	
+
 	/*
 	 * loads a map with the given filename, and draws it to the GUI
 	 */
@@ -43,7 +43,7 @@ public class Engine {
 		 * MapInstance.drawMap()
 		 */
 	}
-	
+
 	/*
 	 * loads a map with the given parameters, and draws it to the GUI
 	 */
@@ -57,58 +57,58 @@ public class Engine {
 		//int resolution = mcp.getResolution();			not needed
 		int coveragePercentage = mcp.getCoverage();
 		int clusteringScore = mcp.getClustering();
-		
+
 		/*
 		 * create a map instance with the specific parameters
 		 */
 		Map map = MapGenerator.generateMap(width, height, coveragePercentage, clusteringScore);
-		
+
 		/*
 		 * create a map instance with the specific map
 		 */
 		mapInstance = new MapInstance(map);
-		
+
 		/*
 		 * plot map
 		 */
 		coordinator.drawMap(mapInstance.getMap());
-		
+
 		/*
 		 * plotting a new map so need to reset the Algorithm panel
 		 */
 		coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
 		coordinator.enableAlgorithmPanel();
 	}
-	
+
 	/*
 	 * loads a map with the given int 2D array, and draws it to the GUI
 	 */
 	public void plotMapFrom2DArray(int[][] array) {
-		
+
 		/*
 		 * create a map instance with the specific parameters
 		 */
 		Map map = new Map(array);
-		
+
 		/*
 		 * create a map instance with the specific map
 		 */
 		mapInstance = new MapInstance(map);
-		
+
 		/*
 		 * plot map
 		 */
 		coordinator.drawMap(mapInstance.getMap());
 	}
-	
-	
+
+
 	/*
 	 * obtains the statistics for an algorithm.
 	 * If no algorithm has been run it will run A* first to see if a route even exists
 	 */
 	public void createAlgorithmStatistics(AlgorithmType algorithmType, Coordinate source, Coordinate goal){
 		AlgorithmStatistics algorithmStatistics = null;
-		
+
 		/*
 		 * find out if a route on this map exists: DontKnow means not yet calculated
 		 */
@@ -118,19 +118,19 @@ public class Engine {
 		 * if one even exists
 		 */
 		if(doesRouteExist.equals(DoesRouteExist.DontKnow)) {
-			mapInstance.createAlgorithmData(AlgorithmType.Dijkstra, source, goal,false);		//OR Dijkstra? if you change this need to change MapInstance.doesRouteExist()
+			mapInstance.createAlgorithmData(AlgorithmType.Dijkstra, source, goal,true);		//OR Dijkstra? if you change this need to change MapInstance.doesRouteExist()
 		}
 		/*
 		 * recheck doesRouteExist now that we've actually tried to find one.
 		 */
 		doesRouteExist = mapInstance.doesRouteExist();
 		assert !(doesRouteExist.equals(doesRouteExist.DontKnow)) : "Just attempted to calculate route. It should not be \"DontKnow\""; 
-		
+
 		if (doesRouteExist.equals(DoesRouteExist.Yes)) {
 			/*
 			 * actually do the algorithm if it hasn't already been done
 			 */
-			algorithmStatistics = mapInstance.createAlgorithmData(algorithmType, source, goal,false);
+			algorithmStatistics = mapInstance.createAlgorithmData(algorithmType, source, goal,true);
 		} else {
 			/*
 			 * do nothing, i.e. algorithmStatistics = null tells the algorithmPanel that no path was found
@@ -141,7 +141,7 @@ public class Engine {
 		 */
 		coordinator.setAlgorithmStatistics(algorithmStatistics, algorithmType);
 	}
-	
+
 	/*
 	 * draws the path given the algorithm type and a colour
 	 */
@@ -157,7 +157,7 @@ public class Engine {
 		 */
 		coordinator.drawPath(path, color);
 	}
-	
+
 	/*
 	 * draws the expanded nodes given the algorithm type and a colour
 	 */
@@ -174,7 +174,7 @@ public class Engine {
 		 */
 		coordinator.drawNodes(nea, color);
 	}
-	
+
 	public void loadMapInstance(String filename) {
 		 try {
 			 FileInputStream fileIn = new FileInputStream(filename);
@@ -197,7 +197,7 @@ public class Engine {
 				 coordinator.resetAlgorithmPanel(mapInstance.getMap().getWidth(),mapInstance.getMap().getHeight());
 				 coordinator.enableAlgorithmPanel();
 			 }
-			 
+
 		 } catch(IOException i) {
 			 i.printStackTrace();
 			 return;
@@ -206,7 +206,7 @@ public class Engine {
 			 return;
 		 }
 	}
-	
+
 
 	public void saveMapInstance(String filename) {
 		try {
@@ -219,7 +219,7 @@ public class Engine {
 			i.printStackTrace();
 		}
 	}
-	
+
 	public void saveMapOnly(String filename) {
 		try {
 			FileOutputStream fileOut = new FileOutputStream(filename);

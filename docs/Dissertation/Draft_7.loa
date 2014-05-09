@@ -1,0 +1,15 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {algocf}{\numberline {1}{\ignorespaces {\sc Dijkstra}\relax }}{9}
+\contentsline {algocf}{\numberline {2}{\ignorespaces {\tt Update} from {\sc A*}\relax }}{10}
+\contentsline {algocf}{\numberline {3}{\ignorespaces {\tt PostSmoothing} from {\sc A* with post-smoothing}\relax }}{11}
+\contentsline {algocf}{\numberline {4}{\ignorespaces {\tt Update} from {\sc Theta*}\relax }}{11}
+\contentsline {algocf}{\numberline {5}{\ignorespaces {\sc Lazy Theta*}\relax }}{12}
+\contentsline {algocf}{\numberline {6}{\ignorespaces {\sc Block A*}\relax }}{16}
+\addvspace {10\p@ }
+\contentsline {algocf}{\numberline {7}{\ignorespaces {\sc GenerateMap}\relax }}{24}
+\contentsline {algocf}{\numberline {8}{\ignorespaces {\sc LineOfSight}\relax }}{28}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

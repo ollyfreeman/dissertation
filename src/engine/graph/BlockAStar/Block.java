@@ -16,11 +16,10 @@ public class Block implements Comparable<Block>{
 	private BASNode[][] nodeArray;
 	private ArrayList<Block> neighbours = new ArrayList<Block>(8);
 	protected int code;
-	protected int size;
+	protected static int size =3;
 	
-	public Block(Map map, int size, Coordinate topLeft, Coordinate goal) {
+	public Block(Map map, Coordinate topLeft, Coordinate goal) {
 		this.topLeft = topLeft;
-		this.size = size;
 		this.code = getCodeFromMap(map);
 		updatedGArray = new boolean[size+1][size+1];
 		nodeArray = new BASNode[size+1][size+1];
@@ -134,6 +133,11 @@ public class Block implements Comparable<Block>{
 		double xDiff = x - goal.getX();
 		double yDiff = y - goal.getY();
 		return Math.sqrt(xDiff*xDiff + yDiff*yDiff);
+	}
+	
+	//for data extraction
+	public static void setSize(int i) {
+		size = i;
 	}
 
 }

@@ -14,7 +14,6 @@ import engine.map.Map;
 import engine.graph.Graph;
 import engine.graph.Node;
 import engine.graph.GraphGenerator;
-import engine.graph.Dijkstra.DijkstraAlgorithm;
 import engine.graph.AStar.AStar;
 import engine.graph.BlockAStar.LDDB.uncompressed.PairOfCoords_uncompressed;
 import utility.Coordinate;
@@ -30,7 +29,7 @@ import utility.Pair;
 public class LDDBCreator_uncompressed {
 
 	private final static CompressionType compressionType = CompressionType.uncompressed;
-	private static int blockSize = 2;
+	private static int blockSize = 4;
 	
 	public static void createDB(ExtensionType extensionType) {
 		List<Coordinate> sourceList = new LinkedList<Coordinate>();
@@ -76,13 +75,9 @@ public class LDDBCreator_uncompressed {
 			}
 			Map m = new Map(map);
 			HashMap<PairOfCoords_uncompressed,Pair<Float,ArrayList<Coordinate>>> hm = new HashMap<PairOfCoords_uncompressed,Pair<Float,ArrayList<Coordinate>>>();
-			for(int i=0; i<blockSize;i++) {
-				for(int j=0;j<blockSize;j++) {
-					for(Coordinate sourceCoord : sourceList) {
-						for(Coordinate goalCoord : goalList) {
-							f(hm,m,sourceCoord,goalCoord,blockSize,mapCounter);
-						}
-					}
+			for(Coordinate sourceCoord : sourceList) {
+				for(Coordinate goalCoord : goalList) {
+					f(hm,m,sourceCoord,goalCoord,blockSize,mapCounter);
 				}
 			}
 			db.add(hm);
@@ -128,7 +123,7 @@ public class LDDBCreator_uncompressed {
 	}
 	
 	public static void main(String[] args) {
-		createDB(ExtensionType.standard);
+		createDB(ExtensionType.full);
 	}
 
 }

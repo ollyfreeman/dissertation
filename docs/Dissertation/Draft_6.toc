@@ -1,0 +1,73 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Introduction}{1}
+\contentsline {section}{\numberline {1.1}Motivation}{1}
+\contentsline {section}{\numberline {1.2}Related work}{2}
+\contentsline {section}{\numberline {1.3}Project goals}{2}
+\contentsline {chapter}{\numberline {2}Preparation}{3}
+\contentsline {section}{\numberline {2.1}Introduction to any-angle pathfinding}{3}
+\contentsline {subsection}{\numberline {2.1.1}Map}{3}
+\contentsline {subsection}{\numberline {2.1.2}Graph}{4}
+\contentsline {subsection}{\numberline {2.1.3}The any-angle pathfinding problem}{6}
+\contentsline {subsection}{\numberline {2.1.4}Solving the any-angle pathfinding problem}{6}
+\contentsline {section}{\numberline {2.2}Any-angle pathfinding algorithms}{7}
+\contentsline {subsection}{\numberline {2.2.1}Pathfinding over graphs}{7}
+\contentsline {subsection}{\numberline {2.2.2}Types of pathfinding algorithms}{7}
+\contentsline {subsection}{\numberline {2.2.3}Dijkstra's shortest paths}{8}
+\contentsline {subsection}{\numberline {2.2.4}A*}{9}
+\contentsline {subsection}{\numberline {2.2.5}A* with post-smoothing}{9}
+\contentsline {subsection}{\numberline {2.2.6}Theta*}{10}
+\contentsline {subsection}{\numberline {2.2.7}Lazy Theta*}{10}
+\contentsline {subsection}{\numberline {2.2.8}Block A*}{13}
+\contentsline {section}{\numberline {2.3}Requirements analysis}{18}
+\contentsline {subsection}{\numberline {2.3.1}Testing simulator}{18}
+\contentsline {subsection}{\numberline {2.3.2}Map generation}{18}
+\contentsline {subsection}{\numberline {2.3.3}Algorithm implementation}{19}
+\contentsline {subsection}{\numberline {2.3.4}Data gathering}{19}
+\contentsline {section}{\numberline {2.4}Design model}{19}
+\contentsline {section}{\numberline {2.5}Languages and tools}{20}
+\contentsline {chapter}{\numberline {3}Implementation}{21}
+\contentsline {section}{\numberline {3.1}Map selection}{21}
+\contentsline {subsection}{\numberline {3.1.1}Maps}{21}
+\contentsline {subsection}{\numberline {3.1.2}Map generation}{21}
+\contentsline {subsection}{\numberline {3.1.3}Map creation}{24}
+\contentsline {subsection}{\numberline {3.1.4}Loading a map}{25}
+\contentsline {subsection}{\numberline {3.1.5}Start and goal point selection}{25}
+\contentsline {section}{\numberline {3.2}Graph generation}{25}
+\contentsline {subsection}{\numberline {3.2.1}Graphs}{27}
+\contentsline {subsection}{\numberline {3.2.2}Grid-based graph generation}{27}
+\contentsline {subsection}{\numberline {3.2.3}Visibility graph generation}{27}
+\contentsline {subsection}{\numberline {3.2.4}Line of Sight algorithm}{28}
+\contentsline {section}{\numberline {3.3}Algorithm data}{29}
+\contentsline {section}{\numberline {3.4}Pathfinding algorithms}{29}
+\contentsline {subsection}{\numberline {3.4.1}Dijkstra's shortest paths}{31}
+\contentsline {subsection}{\numberline {3.4.2}A*}{31}
+\contentsline {subsection}{\numberline {3.4.3}A* with post-smoothing}{31}
+\contentsline {subsection}{\numberline {3.4.4}Theta* and Lazy Theta*}{31}
+\contentsline {subsection}{\numberline {3.4.5}Block A*}{32}
+\contentsline {section}{\numberline {3.5}Visualizer}{38}
+\contentsline {section}{\numberline {3.6}Testing}{39}
+\contentsline {section}{\numberline {3.7}Data extraction}{39}
+\contentsline {chapter}{\numberline {4}Evaluation}{41}
+\contentsline {section}{\numberline {4.1}Map generation algorithm}{41}
+\contentsline {section}{\numberline {4.2}Path optimality}{41}
+\contentsline {subsection}{\numberline {4.2.1}Path length}{43}
+\contentsline {subsection}{\numberline {4.2.2}Path angle-sum}{43}
+\contentsline {subsection}{\numberline {4.2.3}Block A*}{44}
+\contentsline {subsection}{\numberline {4.2.4}Explanation}{46}
+\contentsline {section}{\numberline {4.3}Expansions}{47}
+\contentsline {subsection}{\numberline {4.3.1}Block A*}{48}
+\contentsline {section}{\numberline {4.4}Computation time}{49}
+\contentsline {subsection}{\numberline {4.4.1}Benchmarking}{49}
+\contentsline {subsection}{\numberline {4.4.2}Block A*}{50}
+\contentsline {subsection}{\numberline {4.4.3}Pathfinding algorithms}{52}
+\contentsline {chapter}{\numberline {5}Conclusions}{55}
+\contentsline {section}{\numberline {5.1}Summary}{55}
+\contentsline {section}{\numberline {5.2}Further work}{55}
+\contentsline {chapter}{\numberline {A}Ancillary explanations of algorithms and concepts}{56}
+\contentsline {section}{\numberline {A.1}Discretisation}{56}
+\contentsline {section}{\numberline {A.2}A* with post-smoothing}{56}
+\contentsline {section}{\numberline {A.3}Theta*}{56}
+\contentsline {section}{\numberline {A.4}Lazy Theta*}{57}
+\contentsline {section}{\numberline {A.5}Line of Sight algorithm}{57}
+\contentsline {section}{\numberline {A.6}Query to a bitwise-and-geometrically compressed $LDDB_{N}$}{58}
+\contentsline {chapter}{\numberline {B}Project Proposal}{60}

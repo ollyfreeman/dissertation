@@ -3,7 +3,6 @@ package utility;
 import java.util.List;
 
 import engine.AlgorithmData;
-import engine.AlgorithmData_Static;
 
 /*
  * object to wrap up algorithm statistics when passing between the front end and back end
@@ -19,13 +18,6 @@ public class AlgorithmStatistics {
 		this.distance = algorithmData.getDistance();
 		this.angle = algorithmData.getAngle();
 		this.time = algorithmData.getAlgorithmTime();
-		this.path = algorithmData.getPath();
-	}
-	
-	public AlgorithmStatistics(AlgorithmData_Static algorithmData) {
-		this.distance = algorithmData.getDistance();
-		this.angle = algorithmData.getAngle();
-		this.time = algorithmData.getTime();
 		this.path = algorithmData.getPath();
 	}
 

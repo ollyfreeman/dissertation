@@ -53,6 +53,4 @@ public class LDDB_bitwise implements LDDB,java.io.Serializable {
 		listCode = listCode >>> 3;	//undo final listCode = listCode << 3;
 		return listCode;
 	}
-
-
 }

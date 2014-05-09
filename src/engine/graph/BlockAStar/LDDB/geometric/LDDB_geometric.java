@@ -18,11 +18,13 @@ public class LDDB_geometric implements LDDB,java.io.Serializable {
 	
 	public LDDB_geometric(ArrayList<HashMap<PairOfCoords_uncompressed,Pair<Float,ArrayList<Coordinate>>>> list, short[] conversionTable) {
 		this.list = list;
-		System.out.println("um?"+list.size());
 		this.conversionTable = conversionTable;
 	}
 	
 	public float getLength(int mapCode, PairOfCoords p) {
+		if(!((p.get1().getY() < p.get2().getY()) || ((p.get1().getY() == p.get2().getY()) && p.get1().getX() < p.get2().getY()))) {
+			p = new PairOfCoords_uncompressed(p.get2(),p.get1()); 
+		}
 		int lookup = conversionTable[mapCode];
 		if(list.get(lookup).get(p) == null) {
 			return Float.POSITIVE_INFINITY;
@@ -32,6 +34,9 @@ public class LDDB_geometric implements LDDB,java.io.Serializable {
 	}
 	
 	public ArrayList<Coordinate> getIntermediateNodes(int mapCode, PairOfCoords p) {
+		if(!((p.get1().getY() < p.get2().getY()) || ((p.get1().getY() == p.get2().getY()) && p.get1().getX() < p.get2().getY()))) {
+			p = new PairOfCoords_uncompressed(p.get2(),p.get1()); 
+		}
 		int lookup = conversionTable[mapCode];
 		if(list.get(lookup).get(p) != null) {
 			return list.get(lookup).get(p).get1();	

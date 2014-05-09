@@ -69,8 +69,6 @@ public class MapInstance implements java.io.Serializable{
 	 * to find out if there is a possible route
 	 */
 	protected AlgorithmStatistics createAlgorithmData(AlgorithmType algorithmType, Coordinate source, Coordinate goal, boolean isTesting) {
-		//FOR NOW I WILL RE-GENERATE A NEW GRAPH FROM THE MAP, but I need to implement a graph cloning algorithm cos this will take to long
-		//if I have loaded the graph it will have a null graph instance, so will need to consider this before cloning
 		AlgorithmStatistics algorithmStatistics;
 		if(algorithmType.equals(AlgorithmType.AStarVisibility)) {
 			Graph graph = GraphGenerator.generateGraph_visibility_edge_zeroWidth(map, new Node(source), new Node(goal));
@@ -120,8 +118,8 @@ public class MapInstance implements java.io.Serializable{
 				break;
 			case BlockAStar:
 				if(blockAStarData == null) {
-					BlockAStar_standard.loadDB("standard");
-					blockAStarData =  new BlockAStar_standard(map,source,goal);
+					BlockAStar_semi.loadDB("semi");
+					blockAStarData =  new BlockAStar_semi(map,source,goal);
 					blockAStarData.go(graph,map);
 				}
 				algorithmStatistics = new AlgorithmStatistics(blockAStarData);

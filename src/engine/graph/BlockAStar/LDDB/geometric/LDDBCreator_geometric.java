@@ -19,17 +19,10 @@ import engine.graph.BlockAStar.LDDB.uncompressed.PairOfCoords_uncompressed;
 import utility.Coordinate;
 import utility.Pair;
 
-/*
- * Most naive implementation of the LDDB, where I use an ArrayList of HashMaps of unencoded types:
- * PairOfCoords_naive : i.e. where the PairOfCoords HAS 2 Coordinates
- * Float
- * ArrayList<Coordinate>
- */
-
 public class LDDBCreator_geometric {
 
 	private final static CompressionType compressionType = CompressionType.geometric;
-	private static int blockSize = 2;
+	private static int blockSize = 4;
 	
 	public static void createDB(ExtensionType extensionType) {
 		List<Coordinate> sourceList = new LinkedList<Coordinate>();
@@ -82,7 +75,9 @@ public class LDDBCreator_geometric {
 				HashMap<PairOfCoords_uncompressed,Pair<Float,ArrayList<Coordinate>>> hm = new HashMap<PairOfCoords_uncompressed,Pair<Float,ArrayList<Coordinate>>>();
 				for(Coordinate sourceCoord : sourceList) {
 					for(Coordinate goalCoord : goalList) {
-						f(hm,m,sourceCoord,goalCoord,blockSize,mapCounter);
+						if((sourceCoord.getY() < goalCoord.getY()) || ((sourceCoord.getY() == goalCoord.getY()) && sourceCoord.getX() < goalCoord.getY())) {
+							f(hm,m,sourceCoord,goalCoord,blockSize,mapCounter);
+						}
 					}
 				}
 				db.add(hm);
@@ -109,9 +104,6 @@ public class LDDBCreator_geometric {
 			LinkedList<Coordinate> list = aStar.getPath();
 			for(int i=1; i<list.size()-1; i++) {
 				intermediateCoordinates.add(list.get(i));
-			}
-			if(mapCounter == 15) {
-				//System.out.println("from " + sourceCoord + " to " + goalCoord + " is " + distanceAccumulator);
 			}
 			hm.put(new PairOfCoords_uncompressed(sourceCoord,goalCoord),new Pair<Float,ArrayList<Coordinate>>(distanceAccumulator,intermediateCoordinates));
 			//if(mapCounter==1) System.out.println(sourceCoord + " to " + goalCoord);
@@ -171,7 +163,7 @@ public class LDDBCreator_geometric {
 	}
 	
 	public static void main(String[] args) {
-		createDB(ExtensionType.standard);
+		createDB(ExtensionType.semi);
 	}
 
 }

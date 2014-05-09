@@ -3,21 +3,21 @@ package engine.graph.BlockAStar.LDDB.geometric;
 import engine.graph.BlockAStar.Block;
 import engine.map.Map;
 import utility.Coordinate;
+import utility.Pair;
 
 public class Block_geometric extends Block{
 	
-	//private int rotation;
-	private Coordinate[][] toRotated;		//OBTAIN BY CW ROTATION
-	private Coordinate[][] fromRotated;		//OBTAIN BY CCW ROTATION
+	private int rotation;
+	private Coordinate[][][] rotationMatrix = initialiseRotationMatrix();
 	
-	public Block_geometric(Map map, int size, Coordinate topLeft, Coordinate goal) {
-		super(map, size, topLeft, goal);
-		toRotated = new Coordinate[size+1][size+1];
-		fromRotated = new Coordinate[size+1][size+1];
-		code = getCodeAndRotation(map,size,topLeft);
+	public Block_geometric(Map map, Coordinate topLeft, Coordinate goal) {
+		super(map, topLeft, goal);
+		Pair<Integer,Integer> p = getCodeAndRotation(map,size,topLeft);
+		code = p.get0();
+		rotation = p.get1();
 	}
 	
-	protected int getCodeAndRotation(Map map, int size, Coordinate topLeft) {
+	protected Pair<Integer,Integer> getCodeAndRotation(Map map, int size, Coordinate topLeft) {
 		int[][] m = new int[size][size];
 		for(int i=0;i<size;i++) {
 			for(int j=0;j<size;j++) {
@@ -33,39 +33,22 @@ public class Block_geometric extends Block{
 			}
 		}
 		int minCode = getCodeFromMap(m);
-		//int minRotation = 0;
-		Coordinate[][] fromRotatedTemp = new Coordinate[size+1][size+1]; 
-		Coordinate[][] toRotatedTemp = new Coordinate[size+1][size+1];
-		initialiseMatrix(fromRotatedTemp);
-		initialiseMatrix(toRotatedTemp);
-		System.arraycopy(fromRotatedTemp, 0, fromRotated, 0, fromRotatedTemp.length);
-		System.arraycopy(toRotatedTemp, 0, toRotated, 0, toRotatedTemp.length);
+		int minRotation = 0;
 		for(int rot=1; rot<=3; rot++) {
 			int[][] tempMap = new int[size][size];
-			Coordinate[][] fromRotatedTemp1 = new Coordinate[size+1][size+1]; 
-			Coordinate[][] toRotatedTemp1 = new Coordinate[size+1][size+1];
-			for(int i=0;i<=size;i++) {
-				for(int j=0;j<=size;j++) {
-					if(i!=size && j!=size) {
-						tempMap[i][j] = m[size-1-j][i];
-					}
-					fromRotatedTemp1[i][j] = fromRotatedTemp[size-j][i];
-					toRotatedTemp1[i][j] = toRotatedTemp[j][size-i];
-					
+			for(int i=0;i<size;i++) {
+				for(int j=0;j<size;j++) {
+					tempMap[i][j] = m[size-1-j][i];
 				}
 			}
 			if(getCodeFromMap(tempMap)<minCode) {
-				//minRotation = rot;
+				minRotation = rot;
 				minCode = getCodeFromMap(tempMap);
-				System.arraycopy(fromRotatedTemp1, 0, fromRotated, 0, fromRotatedTemp.length);
-				System.arraycopy(toRotatedTemp1, 0, toRotated, 0, toRotatedTemp.length);
 			}
 			m=tempMap;
-			fromRotatedTemp = fromRotatedTemp1;
-			toRotatedTemp = toRotatedTemp1;
 			
 		}
-		return minCode;
+		return new Pair<Integer,Integer>(minCode,minRotation);
 	}
 	
 	protected int getCodeFromMap(int[][] m) {
@@ -85,7 +68,7 @@ public class Block_geometric extends Block{
 		return code;
 	}
 	
-	private void initialiseMatrix(Coordinate[][] matrix) {
+	private static void initialiseMatrix(Coordinate[][] matrix) {
 		for(int i=0;i<matrix.length; i++) {
 			for(int j=0;j<matrix.length;j++) {
 				matrix[i][j] = new Coordinate(i,j);
@@ -94,11 +77,40 @@ public class Block_geometric extends Block{
 	}
 	
 	public Coordinate toRotated(Coordinate c) {
-		return toRotated[c.getX()][c.getY()];
+		if(rotation!=0) {
+			return rotationMatrix[3-rotation][c.getX()][c.getY()];
+		} else {
+			return c;
+		}
 	}
 	
 	public Coordinate fromRotated(Coordinate c) {
-		return fromRotated[c.getX()][c.getY()];
+		if(rotation!=0){
+			return rotationMatrix[rotation-1][c.getX()][c.getY()];
+		} else {
+			return c;
+		}
+	}
+	
+	private static Coordinate[][][] initialiseRotationMatrix() {
+		Coordinate[][][] rotMatrix = new Coordinate[3][size+1][size+1];
+		Coordinate[][] fromRotatedTemp = new Coordinate[size+1][size+1]; 
+		initialiseMatrix(fromRotatedTemp);
+		for(int rot=1; rot<=3; rot++) {
+			Coordinate[][] fromRotatedTemp1 = new Coordinate[size+1][size+1]; 
+			for(int i=0;i<=size;i++) {
+				for(int j=0;j<=size;j++) {
+					fromRotatedTemp1[i][j] = fromRotatedTemp[size-j][i];
+				}
+			}
+			fromRotatedTemp = fromRotatedTemp1;
+			for(int i=0;i<size+1;i++) {
+				for(int j=0;j<size+1;j++) {
+					rotMatrix[rot-1][i][j] = fromRotatedTemp[i][j];
+				}
+			}
+		}
+		return rotMatrix;
 	}
 	
 }

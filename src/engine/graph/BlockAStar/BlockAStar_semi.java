@@ -1,7 +1,6 @@
 package engine.graph.BlockAStar;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import utility.Coordinate;
@@ -31,23 +30,37 @@ public class BlockAStar_semi extends BlockAStar_standard {
 				double length;
 				ArrayList<Coordinate> intermediateNodes;
 				switch(compressionType) {
-					case uncompressed: 	length = lddb.getLength(startBlock.getCode(),new PairOfCoords_uncompressed(startInBlock,c));
-										intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords_uncompressed(startInBlock,c)));
-										break;
-					case bitwise: 		length = lddb.getLength(startBlock.getCode(),new PairOfCoords_bitwise(startInBlock,c));
-										intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords_bitwise(startInBlock,c)));
-										break;
-					case geometric:		Block_geometric currBlock = (Block_geometric) startBlock;
-										length = lddb.getLength(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
-										intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
-										ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
-										for(Coordinate coord : intermediateNodes) {
-											newIntermediateNodes.add(currBlock.toRotated(coord));
-										}
-										intermediateNodes = newIntermediateNodes;
-										break;
-					default:			length=0.0;
-										intermediateNodes=null;
+					case uncompressed: 	
+						{length = lddb.getLength(startBlock.getCode(),new PairOfCoords_uncompressed(startInBlock,c));
+						intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords_uncompressed(startInBlock,c)));}
+						break;
+					case bitwise: 		
+						{length = lddb.getLength(startBlock.getCode(),new PairOfCoords_bitwise(startInBlock,c));
+						intermediateNodes = lddb.getIntermediateNodes(startBlock.getCode(),(new PairOfCoords_bitwise(startInBlock,c)));}
+						break;
+					case geometric:		
+						{Block_geometric currBlock = (Block_geometric) startBlock;
+						length = lddb.getLength(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
+						intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
+						ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
+						for(Coordinate coord : intermediateNodes) {
+							newIntermediateNodes.add(currBlock.toRotated(coord));
+						}
+						intermediateNodes = newIntermediateNodes;}
+						break;
+					case geobit:		
+						{Block_geometric currBlock = (Block_geometric) startBlock;
+						length = lddb.getLength(currBlock.getCode(),(new PairOfCoords_bitwise(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
+						intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_bitwise(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
+						ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
+						for(Coordinate coord : intermediateNodes) {
+							newIntermediateNodes.add(currBlock.toRotated(coord));
+						}
+						intermediateNodes = newIntermediateNodes;}
+						break;
+					default:			
+						length=0.0;
+						intermediateNodes=null;
 				}
 				startBlock.setGValue(c, length);
 				if(!c.equals(startInBlock)) {
@@ -87,21 +100,34 @@ public class BlockAStar_semi extends BlockAStar_standard {
 				double length;
 				ArrayList<Coordinate> intermediateNodes;
 				switch(compressionType) {
-					case uncompressed: 	length = lddb.getLength(goalBlock.getCode(),new PairOfCoords_uncompressed(goalInBlock,c));
-										intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords_uncompressed(goalInBlock,c)));
-										break;
-					case bitwise: 		length = lddb.getLength(goalBlock.getCode(),new PairOfCoords_bitwise(goalInBlock,c));
-										intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords_bitwise(goalInBlock,c)));
-										break;
-					case geometric:		Block_geometric currBlock = (Block_geometric) goalBlock;
-										length = lddb.getLength(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
-										intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(startInBlock),currBlock.toRotated(c))));
-										ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
-										for(Coordinate coord : intermediateNodes) {
-											newIntermediateNodes.add(currBlock.toRotated(coord));
-										}
-										intermediateNodes = newIntermediateNodes;
-										break;
+					case uncompressed: 	
+						{length = lddb.getLength(goalBlock.getCode(),new PairOfCoords_uncompressed(goalInBlock,c));
+						intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords_uncompressed(goalInBlock,c)));}
+						break;
+					case bitwise: 	
+						{length = lddb.getLength(goalBlock.getCode(),new PairOfCoords_bitwise(goalInBlock,c));
+						intermediateNodes = lddb.getIntermediateNodes(goalBlock.getCode(),(new PairOfCoords_bitwise(goalInBlock,c)));}
+						break;
+					case geometric:		
+						{Block_geometric currBlock = (Block_geometric) goalBlock;
+						length = lddb.getLength(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(goalInBlock),currBlock.toRotated(c))));
+						intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(goalInBlock),currBlock.toRotated(c))));
+						ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
+						for(Coordinate coord : intermediateNodes) {
+							newIntermediateNodes.add(currBlock.toRotated(coord));
+						}
+						intermediateNodes = newIntermediateNodes;}
+						break;
+					case geobit:		
+						{Block_geometric currBlock = (Block_geometric) goalBlock;
+						length = lddb.getLength(currBlock.getCode(),(new PairOfCoords_bitwise(currBlock.toRotated(goalInBlock),currBlock.toRotated(c))));
+						intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_bitwise(currBlock.toRotated(goalInBlock),currBlock.toRotated(c))));
+						ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
+						for(Coordinate coord : intermediateNodes) {
+							newIntermediateNodes.add(currBlock.toRotated(coord));
+						}
+						intermediateNodes = newIntermediateNodes;}
+						break;
 					default:			length=0.0;
 										intermediateNodes=null;
 				}

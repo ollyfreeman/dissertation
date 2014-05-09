@@ -33,6 +33,4 @@ public class LDDB_uncompressed implements LDDB,java.io.Serializable {
 			return new ArrayList<Coordinate>();
 		}
 	}
-
-
 }

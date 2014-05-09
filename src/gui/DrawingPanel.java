@@ -194,7 +194,7 @@ public class DrawingPanel extends JPanel {
 							Coordinate from = path.get(j);
 							Coordinate to = path.get(j+1);
 							Graphics2D g2 = (Graphics2D) g;
-			                g2.setStroke(new BasicStroke(resolution/4));
+			                g2.setStroke(new BasicStroke(resolution/2));
 							g.drawLine((from.getX()*resolution), (from.getY()*resolution), (to.getX()*resolution), (to.getY()*resolution));
 							
 							//when drawing in middle of cell: 

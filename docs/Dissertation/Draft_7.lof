@@ -1,0 +1,47 @@
+\select@language {english}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Shortest paths through maps and graphs}}{1}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A map $M$ of size $4 \times 4$\relax }}{3}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces A valid path for an agent modelled as a point\relax }}{4}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Graph representations of map $M$}}{5}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Octile lattice and full lattice of size $4 \times 4$\relax }}{6}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Angle between a pair of path segments\relax }}{6}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces A* with post-smoothing}}{10}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Set of blocks}}{14}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Anatomy of a block}}{14}
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Solution of Block A*}}{17}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Flow of the user interface and engine\relax }}{22}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Close up of generated maps}}{23}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces The potential field of a gravity well and an approximation to a gravity well\relax }}{23}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces First two iterations of {\tt GenerateMap}}}{25}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces A map created with the Map Creation tool}}{26}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Composition of {\tt MapInstance}\relax }}{30}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Inheritance structure of algorithm implementations\relax }}{30}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Integer encoding scheme of maps\relax }}{33}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Extract of the uncompressed implementation of $LDDB_{3}$}}{34}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Encoding scheme for {\tt PairOfCoords} in the bitwise-compressed {\em LDDB}\relax }}{35}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Annotated explanation of a bitwise-and-geometrically-compressed $LDDB_{3}$ query\relax }}{36}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Class structure of different implementations of {\em Block A*}\relax }}{38}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Graphical user interface}}{39}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Unit test to check that $n_{start}$ of a grid-graph has the correct neighbours\relax }}{40}
+\contentsline {figure}{\numberline {3.15}{\ignorespaces An extract from a CSV file exported by {\tt DataExtract}\relax }}{40}
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Code snippet showing automatic generation of plots coded in {\em R}\relax }}{40}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Percentage of generated maps that have a valid path between $start$ and $goal$}}{42}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Path lengths computed by pathfinding algorithms}}{43}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Comparing path lengths of different classes of pathfinding algorithms\relax }}{44}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Path angle-sums computed by pathfinding algorithms}}{45}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Angle-sums of paths computer by any-angle pathfinding algorithms\relax }}{46}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Properties of Block A* paths}}{47}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Number of expansions required by pathfinding algorithms\relax }}{48}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Results that agree with Yap et al.'s paper}}{49}
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Expansions and neighbour visits in Block A*}}{50}
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Execution time of pathfinding algorithms\relax }}{53}
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Time per expansion of pathfinding algorithms}}{55}
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Mean priority queue length of pathfinding algorithms}}{55}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Line of Sight algorithm}}{60}
+\addvspace {10\p@ }

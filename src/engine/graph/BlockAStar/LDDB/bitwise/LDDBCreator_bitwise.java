@@ -18,17 +18,10 @@ import engine.graph.AStar.AStar;
 import engine.graph.BlockAStar.LDDB.bitwise.PairOfCoords_bitwise;
 import utility.Coordinate;
 
-/*
- * Most naive implementation of the LDDB, where I use an ArrayList of HashMaps of unencoded types:
- * PairOfCoords_naive : i.e. where the PairOfCoords HAS 2 Coordinates
- * Float
- * ArrayList<Coordinate>
- */
-
 public class LDDBCreator_bitwise {
 
 	private final static CompressionType compressionType = CompressionType.bitwise;
-	private static int blockSize = 2;
+	private static int blockSize = 4;
 	
 	public static void createDB(ExtensionType extensionType) {
 		List<Coordinate> sourceList = new LinkedList<Coordinate>();
@@ -74,13 +67,9 @@ public class LDDBCreator_bitwise {
 			}
 			Map m = new Map(map);
 			HashMap<Integer,Long> hm = new HashMap<Integer,Long>();
-			for(int i=0; i<blockSize;i++) {
-				for(int j=0;j<blockSize;j++) {
-					for(Coordinate sourceCoord : sourceList) {
-						for(Coordinate goalCoord : goalList) {
-							f(hm,m,sourceCoord,goalCoord,blockSize,mapCounter);
-						}
-					}
+			for(Coordinate sourceCoord : sourceList) {
+				for(Coordinate goalCoord : goalList) {
+					f(hm,m,sourceCoord,goalCoord,blockSize,mapCounter);
 				}
 			}
 			db.add(hm);
@@ -112,7 +101,6 @@ public class LDDBCreator_bitwise {
 			l = l << 32;
 			l = l | LDDB_bitwise.getListCode(intermediateCoordinates);
 			hm.put((new PairOfCoords_bitwise(sourceCoord,goalCoord)).hashCode(), l);
-			//if(mapCounter==1) System.out.println(sourceCoord + " to " + goalCoord);
 		}
 	}
 	

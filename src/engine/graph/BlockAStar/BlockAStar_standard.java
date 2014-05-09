@@ -26,14 +26,17 @@ public class BlockAStar_standard extends AlgorithmData {
 
 	protected static final long serialVersionUID = 1L;
 
-	protected static final int blockSize = 2;
+	protected static int blockSize = 3;
 	protected static LDDB lddb;
-	protected static String filename = "/Users/olly_freeman/Dropbox/Part2Project/";
-	protected static CompressionType compressionType = CompressionType.geometric;
+	protected static String filename = "/Users/olly_freeman/Documents/Part2/Dissertation/LDDBs/";
+	protected static CompressionType compressionType = CompressionType.bitwise;
 
 	protected Coordinate startInBlock,goalInBlock;
 	
 	protected Block[][] blockArray;
+	
+	public int PriLength = 0;
+	public int nodeExp = 0;
 
 	public BlockAStar_standard(Map map, Coordinate start, Coordinate goal) {
 		super();
@@ -68,10 +71,10 @@ public class BlockAStar_standard extends AlgorithmData {
 			//nea[currentBlock.getTopLeft().getX()][currentBlock.getTopLeft().getY()]++;	//uncomment when want the blocks expanded not nodes expanded
 			currentBlock.setHeapValue(Double.POSITIVE_INFINITY);					//!!
 			List<Coordinate> ingressNodes = currentBlock.getIngressNodes();
-			for(int i=0;i<ingressNodes.size();i++) {
+			//for(int i=0;i<ingressNodes.size();i++) {
 				//expanded.add(new Coordinate(currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX(), currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()));
-				nea[currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX()][currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()]++;
-			}
+				//nea[currentBlock.getTopLeft().getX() + ingressNodes.get(i).getX()][currentBlock.getTopLeft().getY() + ingressNodes.get(i).getY()]++;
+			//}
 			if(currentBlock == goalBlock) {
 				for(Coordinate c : ingressNodes) {
 					if(goalBlock.getGValue(c)+goalBlock.getHValue(c) < length) {
@@ -85,6 +88,7 @@ public class BlockAStar_standard extends AlgorithmData {
 			//stopTime = System.nanoTime();
 			//System.out.println("Main time: = " +((stopTime-startTime)/1000000));
 			//System.out.println("Node expansions: " + nodesExpanded + ", nodes expanded:" +  expanded.size() + ", block expansions: " + blockExpanded);
+			System.out.println(PriLength/nodeExp);
 			return new Pair<Node,int[][]>(postProcessing(startBlock,goalBlock,map),nea);
 		} else {
 			return new Pair<Node,int[][]>(null,nea);
@@ -92,6 +96,8 @@ public class BlockAStar_standard extends AlgorithmData {
 	}
 
 	protected void expand(Block currentBlock, List<Coordinate> y, PriorityQueue<Block> openSet) {
+		nodeExp++;
+		PriLength+=openSet.size();
 		for(Block neighbourBlock : currentBlock.getNeighbours()) {
 			LinkedList<Coordinate> ListX = new LinkedList<Coordinate>();		//egress cells in currentBlock for this neighbourBlock
 			LinkedList<Coordinate> ListXPrime = new LinkedList<Coordinate>();	//corresponding ingress cell in the neighbourBlock
@@ -133,22 +139,28 @@ public class BlockAStar_standard extends AlgorithmData {
 			}else {
 				System.out.println("Neighbour error!");
 			}
-			
 			LinkedList<Coordinate> ListXPrimeUpdated = new LinkedList<Coordinate>();
 			for(int i=0;i<ListX.size();i++) {
 				Coordinate x = ListX.get(i);
 				for(Coordinate c : y) {
 					double length;
 					switch(compressionType) {
-						case uncompressed: 	length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_uncompressed(c,x));
-											break;
-						case bitwise: 		length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_bitwise(c,x));
-											break;
-						case geometric:		Block_geometric currBlock = (Block_geometric) currentBlock;
-											length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_uncompressed(currBlock.toRotated(c),currBlock.toRotated(x)));
-											//System.out.println(currentBlock.getCode() + " from " + currBlock.toRotated(c) + " to " + currBlock.toRotated(x) + " length is "+ length);
-											break;
-						default:			length=0.0;
+						case uncompressed: 	
+							{length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_uncompressed(c,x));}
+							break;
+						case bitwise: 		
+							{length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_bitwise(c,x));}
+							break;
+						case geometric:		
+							{Block_geometric currBlock = (Block_geometric) currentBlock;
+							length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_uncompressed(currBlock.toRotated(c),currBlock.toRotated(x)));}
+							break;
+						case geobit:		
+							{Block_geometric currBlock = (Block_geometric) currentBlock;
+							length = lddb.getLength(currentBlock.getCode(),new PairOfCoords_bitwise(currBlock.toRotated(c),currBlock.toRotated(x)));}
+							break;
+						default:			
+							length=0.0;
 					}
 					if(currentBlock.getGValue(c) + length < currentBlock.getGValue(x)) {
 						currentBlock.setGValue(x, currentBlock.getGValue(c) + length);
@@ -189,10 +201,10 @@ public class BlockAStar_standard extends AlgorithmData {
 		Block[][] blockArray = new Block[blockArrayWidth][blockArrayHeight];
 		for(int j=0; j<blockArrayHeight;j++) {
 			for(int i=0; i<blockArrayWidth;i++) {
-				if(compressionType == CompressionType.geometric) {
-					blockArray[i][j] = new Block_geometric(map,blockSize,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
+				if((compressionType == CompressionType.geometric) || ((compressionType == CompressionType.geobit))) {
+					blockArray[i][j] = new Block_geometric(map,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
 				} else {
-					blockArray[i][j] = new Block(map,blockSize,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
+					blockArray[i][j] = new Block(map,new Coordinate(i*(blockSize),j*(blockSize)),this.goal);
 				}
 			}
 		}
@@ -305,23 +317,6 @@ public class BlockAStar_standard extends AlgorithmData {
 		}
 	}
 
-	/*protected int getMapCode(Coordinate topLeft, Map map) {
-		int code = 0;
-		for(int j=0;j<blockSize;j++) {
-			for(int i=0;i<blockSize;i++) {
-				code = code<<1;
-				try{
-					if(!map.getCell(i+topLeft.getX(),j+topLeft.getY()).isBlocked()) {
-						code++;
-					}
-				} catch (ArrayIndexOutOfBoundsException e) {
-					//skip if part of this block is out of bounds, because we call those cells blocked!
-				}
-			}
-		}
-		return code;
-	}*/
-
 	protected Node postProcessing(Block startBlock, Block goalBlock, Map map) {
 		//double startTime = System.nanoTime();
 		BASNode goal = goalBlock.getNode(goalInBlock);
@@ -359,19 +354,32 @@ public class BlockAStar_standard extends AlgorithmData {
 				Coordinate from = new Coordinate(n.getX()-n.getBlock().getTopLeft().getX(),n.getY()-n.getBlock().getTopLeft().getY());
 				Coordinate to = new Coordinate(parent.getX()-parent.getBlock().getTopLeft().getX(),parent.getY()-parent.getBlock().getTopLeft().getY());
 				switch(compressionType) {
-					case uncompressed: 	intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords_uncompressed(from,to)));
-										break;
-					case bitwise: 		intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords_bitwise(from,to)));
-										break;
-					case geometric:		Block_geometric currBlock = (Block_geometric) n.getBlock();
-										intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(from),currBlock.toRotated(to))));
-										ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
-										for(Coordinate c : intermediateNodes) {
-											newIntermediateNodes.add(currBlock.toRotated(c));
-										}
-										intermediateNodes = newIntermediateNodes;
-										break;
-					default:			intermediateNodes = null;
+					case uncompressed: 	
+						{intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords_uncompressed(from,to)));}
+						break;
+					case bitwise: 		
+						{intermediateNodes = lddb.getIntermediateNodes(n.getBlock().getCode(),(new PairOfCoords_bitwise(from,to)));}
+						break;
+					case geometric:		
+						{Block_geometric currBlock = (Block_geometric) n.getBlock();
+						intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_uncompressed(currBlock.toRotated(from),currBlock.toRotated(to))));
+						ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
+						for(Coordinate c : intermediateNodes) {
+							newIntermediateNodes.add(currBlock.toRotated(c));
+						}
+						intermediateNodes = newIntermediateNodes;}
+						break;
+					case geobit:		
+						{Block_geometric currBlock = (Block_geometric) n.getBlock();
+						intermediateNodes = lddb.getIntermediateNodes(currBlock.getCode(),(new PairOfCoords_bitwise(currBlock.toRotated(from),currBlock.toRotated(to))));
+						ArrayList<Coordinate> newIntermediateNodes = new ArrayList<Coordinate>();
+						for(Coordinate c : intermediateNodes) {
+							newIntermediateNodes.add(currBlock.toRotated(c));
+						}
+						intermediateNodes = newIntermediateNodes;}
+						break;
+					default:			
+						intermediateNodes = null;
 				}
 				for(int i=(intermediateNodes.size()-1);i>=0;i--) {
 					Coordinate c = intermediateNodes.get(i);
@@ -417,18 +425,28 @@ public class BlockAStar_standard extends AlgorithmData {
 	public static void loadDB(String s) {
 		try {
 			if(lddb == null) {
+				double startTime = System.nanoTime();
 				FileInputStream fileIn = new FileInputStream(filename+s+"_"+blockSize+"_"+compressionType+".ser");
 				ObjectInputStream in = new ObjectInputStream(fileIn);
 				LDDB db = (LDDB) in.readObject();
 				in.close();
 				fileIn.close();
 				lddb = db;
+				double stopTime = System.nanoTime();
+				
 			}
 		} catch(IOException i) {
 			i.printStackTrace();
 		} catch (ClassNotFoundException c) {
 			c.printStackTrace();
 		}
+	}
+	
+	//for data extraction
+	public static void setSizeAndCompression(int i, CompressionType c) {
+		blockSize = i;
+		compressionType=c;
+		lddb=null;
 	}
 
 }

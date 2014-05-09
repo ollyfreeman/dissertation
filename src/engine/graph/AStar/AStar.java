@@ -17,7 +17,6 @@ public class AStar extends Dijkstra {
 		super(map,source,goal);
 	}
 	
-	
 	@Override
 	protected boolean updateCost(Node current, Node neighbour, Node goal, Map map) {
 		double prosposedNewGScore = current.getG() + getDistance(current, neighbour);

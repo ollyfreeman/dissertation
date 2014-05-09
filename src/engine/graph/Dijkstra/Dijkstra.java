@@ -16,6 +16,9 @@ public class Dijkstra extends AlgorithmData {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public int PriLength = 0;
+	public int nodeExp = 0;
+	
 	public Dijkstra() {
 		super();
 	}
@@ -26,7 +29,6 @@ public class Dijkstra extends AlgorithmData {
 		this.graph =  GraphGenerator.generateGraph_edge_zeroWidth(map, new Node(source), new Node(goal));
 		double endTime = System.nanoTime();
 		this.graphCreationTime = (endTime - startTime)/1000000;
-		
 	}
 
 	@Override
@@ -39,12 +41,15 @@ public class Dijkstra extends AlgorithmData {
 		Node goal = graph.getGoal();
 		
 		while(!openSet.isEmpty()) {
+			nodeExp++;
+			PriLength+=openSet.size();
 			Node current = openSet.remove();	nea[current.getX()][current.getY()]++;
 			//System.out.println(current.coordinateAsString());
 			
 			setNode(current,closedSet,map);									//for Lazy Theta Star
 			if(goalTest(current,goal,map,nea)) {
 				//System.out.println("Nodes expanded : " + nodesExpanded);
+				System.out.println(PriLength/nodeExp);
 				return new Pair<Node,int[][]>(current,nea);
 			}
 			closedSet.add(current);

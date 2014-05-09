@@ -133,7 +133,6 @@ public abstract class AlgorithmData implements java.io.Serializable {
 	protected float getDistance(Node n1, Node n2) {
 		int xDiff = n1.getX() - n2.getX();
 		int yDiff = n1.getY() - n2.getY();
-		//return (float) Math.sqrt(xDiff*xDiff + yDiff*yDiff);
 		return distances[Math.abs(xDiff)][Math.abs(yDiff)];
 	}
 	

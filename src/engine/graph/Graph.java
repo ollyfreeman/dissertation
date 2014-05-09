@@ -8,10 +8,6 @@ public class Graph implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	//Should we keep statistics about how long it took to create each graph, for later evaluation?
-	
-	//Later I may need to subclass this as GridGraph and VisibilityGraph
-	
 	/*
 	 * this could be any searchable data structure, as searching for nodes "getNode" is only 
 	 * done during the creation of the LDDB which is not time critical
@@ -68,11 +64,6 @@ public class Graph implements java.io.Serializable {
 		 * parents and neighbours
 		 */
 		return null;
-	}
-	
-	//DELETE ME
-	public HashMap<Coordinate,Node> getHashMap() {
-		return graph;
 	}
 
 }
