@@ -3,8 +3,8 @@ nfig41 <-function() {
     require(ggplot2)
     require(scales)
     
-    df <- read.csv("/Users/olly_freeman/Documents/Part2/Dissertation/CSV/ValidPaths_EmptySandG_100_400_Cluster0to10to100.csv")
-    df1000 <- read.csv("/Users/olly_freeman/Documents/Part2/Dissertation/CSV/ValidPaths_EmptySandG_100_400_Cluster1000.csv")
+    df <- read.csv("/Users/olly_freeman/Dropbox/Part2Project/maps/CSVs/ValidPaths_EmptySandG_100_400_Cluster0to10to100.csv")
+    df1000 <- read.csv("/Users/olly_freeman/Dropbox/Part2Project/maps/CSVs/ValidPaths_EmptySandG_100_400_Cluster1000.csv")
     
     Clustering0  <- (subset(df,Clustering==0))
     Clustering1  <- (subset(df,Clustering==100))
