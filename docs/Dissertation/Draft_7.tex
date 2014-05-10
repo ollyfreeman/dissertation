@@ -117,6 +117,8 @@ University of Cambridge\\
 \setcounter{page}{1}
 \pagenumbering{arabic}
 \pagestyle{headings}
+ 
+\cleardoublepage %%%
 
 \chapter{Introduction}
 
@@ -288,7 +290,6 @@ The goals of this project are to:
 \end {itemize}
 
 \cleardoublepage
-
 
 \chapter{Preparation} 
 
@@ -1754,7 +1755,7 @@ This section justifies the languages, libraries and tools that were chosen for t
   
 \end{description}
 
-%\cleardoublepage
+\cleardoublepage
 \chapter{Implementation}
 
 This chapter provides an overview of the implementation of the project and explores certain performance-critical features in further detail.\\
@@ -2890,10 +2891,13 @@ public class GraphGeneratorStartTest {
 The engine has a simple API which allows scripts to access the engine directly, without any interaction with the UI. The open source package {\tt CSVWriter} is used to write the pathfinding data obtained from the API to CSV files (see Figure 3.15). This data is then processed by $R$ scripts (see Figure 3.16) embedded in the \LaTeX\ source file, which parse the imported CSVs into $dataframes$ and apply various statistical analyses to produce the data summarised in the Evaluation chapter.
 
 \begin{figure}
-{\tt "Map","Algorithm","AlgorithmTime","Distance","Angle","NodesExpanded"\\
-"Map 1","Dijkstra","29.927168","299.2447285652","675.0001980166","34471"\\
-"Map 1","AStar","23.916032","299.2447285652","1215.0001907721","10352"\\
-"Map 1","AStarSmoothed","24.805952","289.9301939011","182.8053896642","10579"}
+\lstset{language={}}
+\begin{lstlisting}
+"Map","Algorithm","AlgorithmTime","Distance","Angle","NodesExpanded"
+"Map 1","Dijkstra","29.92716","299.244728565","675.000198016","34471"
+"Map 1","AStar","23.91603","299.244728565","1215.000190772","10352"
+"Map 1","AStarSmoothed","24.80595","289.930193901","182.805389664","10579"
+\end{lstlisting}
 \caption{An extract from a CSV file exported by {\tt DataExtract}}
 \end{figure}
 
@@ -2917,14 +2921,15 @@ plotFigure <- function() {
     p <-  ggplot(DF)
     p <- p + geom_boxplot(aes(x=variable,y=value))
     p <- p + labs(x="", y="Path length/Optimal path length")
-    print(p)
     tikz(`figure.tex', width=6.5, height=4.5)
+    print(p)
     dev.off()
 }
 \end{lstlisting}
 \caption{Code snippet showing automatic generation of plots coded in {\em R}}
 \end{figure}
 
+\cleardoublepage
 \chapter{Evaluation}
 
 This chapter compares the performance of the any-angle pathfinding algorithms introduced in this dissertation. The first section identifies a suitable set of maps to use for the comparisons, the second section focuses on the optimality of the paths produced, and the remainder focuses on the computation time required by each pathfinding algorithm.\\
@@ -2942,7 +2947,7 @@ For a fixed clustering score $D$, Figure 4.1 shows that the graphs generated fro
 \noindent
 The confidence intervals are calculated using the standard error of $\hat{p}$, the estimated proportion in the population\cite{PennState}, as:
 \begin{equation}
-\hat{p} = 1.96 \times \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}
+\hat{p} \pm 1.96 \times \sqrt{\frac{\hat{p}(1-\hat{p})}{n}}
 \end{equation}
 where $n$ is the sample size of 400, and the multiplier of 1.96 indicates a confidence level of 95\%.\\
 
@@ -2953,14 +2958,14 @@ where $n$ is the sample size of 400, and the multiplier of 1.96 indicates a conf
 \end{figure}
 
 \noindent
-This analysis reveals that the percolation threshold for generated maps is in the range of $C=30-40\%$. Therefore from this point in the evaluation, all graphs are plotted from data obtained from a standard set of 200 maps of the {\em standard configuration} with coverage $C=20\%$ and clustering score of $D=50$ to ensure with high probability that the maps used for testing have a valid path from $start$ to $finish$.
+This analysis reveals that the percolation threshold for generated maps is in the range of $C=30-40\%$. Therefore from this point in the evaluation, all graphs are plotted from data obtained from a standard set of 100 maps of the {\em standard configuration} with coverage $C=20\%$ and clustering score of $D=50$ to ensure with high probability that the maps used for testing have a valid path from $start$ to $finish$.
 
 \section{Path optimality}
 
 Subsection 2.1.3 defines a path through a map $M$ as optimal `if there do not exist any paths through $M$ from $start$ to $goal$ with a shorter path length and a smaller path angle-sum'. This section investigates the optimality of the paths found by both classic and any-angle pathfinding algorithms.\\
 
 \subsection{Path length}
-Figure 4.2 shows the distribution over 200 maps of the {\em standard configuration} of path lengths for the different algorithms  as a fraction of the optimal length (where the optimal length is found by running {\em A*} over a visibility graph).The figure confirms that the any-angle pathfinding algorithms do indeed find shorter paths than the classic algorithms, but the margins are small (the median path length for the any-angle pathfinding algorithms is approximately $4\%$ shorter than those of the classic algorithms).\\
+Figure 4.2 shows the distribution over 100 maps of the {\em standard configuration} of path lengths for the different algorithms  as a fraction of the optimal length (where the optimal length is found by running {\em A*} over a visibility graph).The figure confirms that the any-angle pathfinding algorithms do indeed find shorter paths than the classic algorithms, but the margins are small (the median path length for the any-angle pathfinding algorithms is approximately $4\%$ shorter than those of the classic algorithms).\\
 
 \noindent
 Figure 4.3(a), which is an enlarged section of Figure 4.2, emphases that there is significant overlap between the distributions of the path lengths found by the any-angle algorithms, and there is no single algorithm that is clearly superior to the others in relation to path length.\\
@@ -3111,6 +3116,8 @@ However, even despite the author's warning that ``the number of expansions done 
 \noindent
 Furthermore, a node expansion in {\em Block A*} requires more attempted edge relaxations than the other algorithms because {\em Block A*} uses a completely different graph structure --- therefore, using the number of attempted edge relaxations (normally known as {\em neighbour visits}) instead of node expansions provides a normalised metric. All of the pathfinding algorithms perform a maximum of $8$ {\em neighbour visits} per node expansion, whereas for {\em Block A*} the number of {\em neighbour visits} increases with block size, from a constant $8$ for a block size of $2 \times 2$, to $12$ for $3\times 3$ and $16$ for $4 \times 4$. Figure 4.9(b) shows that the performance of {\em Block A*} appears even less favourable with this metric, and Figure 4.9(c) shows that the total number of neighbour visits actually increases when {\em Block A*} is run with a larger block size. Therefore, using neighbour visits (a normalised version of expansions) as a performance predictor implies that the entire premise behind {\em Block A*} may not be sound.\\
 
+\newpage
+
 \begin{figure}
 \centering
   \begin{subfigure}{0.32\textwidth}
@@ -3237,7 +3244,7 @@ Figure 4.10 shows the execution times of the different pathfinding algorithms. I
 Whilst the results confirm some of the broad predictions obtained from using the number of expansions (an architecture-agnostic metric) as a predictor of performance, the correlation is far from exact. This is exemplified by Figure 4.11, which highlights that not all expansions are equal, and confirms the claim made in section 4.3.1, which follow naturally from the graph-theoretic description of the algorithms developed for this dissertation, that defining an expansion in {\em Block A*} as the expansion of a block (as per Yap et al.'s paper) gives unreasonably high predictions of performance, and that {\em if} expansions are used as a performance predictor then a more consistent definition of an expansion for {\em Block A*} is to use the number of {\em nodes} expanded.\\
 
 \noindent
-The consistent framework developed in the Preparation chapter allows explanation of this figure:
+The consistent framework developed in the Preparation chapter allows explanation of this Figure 4.11:
 \begin{enumerate}
 \item {\em Dijkstra} expansions are faster than those of {\em A*} because they do not require the calculation of the {\em h-value};
 \item {\em Lazy Theta*} expansions are faster than those of {\em Theta*} because they only perform one line of sight test per expansion, whereas {\em Theta*} performs up to eight;
@@ -3252,6 +3259,7 @@ The consistent framework developed in the Preparation chapter allows explanation
 \caption[Mean priority queue length of pathfinding algorithms]{Mean priority queue length of pathfinding algorithms}
 \end{figure}
 
+\cleardoublepage
 \chapter{Conclusions}
 
 \section{Summary}

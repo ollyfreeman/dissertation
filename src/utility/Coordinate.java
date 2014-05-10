@@ -30,7 +30,7 @@ public class Coordinate implements java.io.Serializable {
 	}	
 	
 	public int hashCode() {
-		return x*5 + y;		//is this ok - I am assuming Coordinate's hash value is only called when storing the LDDB
+		return x*5 + y;		//Coordinate's hash value is only called when storing the LDDB
 	}
 	
 	public boolean equals(Object o){
